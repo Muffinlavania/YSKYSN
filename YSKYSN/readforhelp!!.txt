@@ -1,0 +1,63 @@
+If you want to make your own exe, first youre going to need pyinstaller...
+If you already have it (or dont want to make sure you have it), go down to the "Steps"!
+else....
+
+----- Getting pyinstaller -----
+First, if you don't have pip, pythons module installer, download it here: - https://www.python.org/downloads/
+
+-----
+On windows, pip is well, "pip", on mac and other os (i think), its called "pip3", this applies to the next step!
+-----
+run `pip/pip3 install pyinstaller` in your console [command prompt for windows, idk for other os....]
+
+
+
+
+
+
+
+-----  Steps: (after getting pyinstaller)  -----
+
+1) make sure to have all of these audios in an unzipped folder called YSKYSN
+
+2) make sure this YSKYSN folder is in the same directory as the YSKYSNsolo.py file
+
+3) after opening command prompt (or the equivalent in other os) navigate to the directory of these files
+
+	to go to other directories, use the 'cd' command 
+
+	example: 
+		command prompt starts on C:\Windows\System32> 
+		cd / will take it back to just C:\>
+		then do something like 'cd "C:\Users\Muffinlavania\Downloads"', since my files were in the downloads folder
+
+
+4) after making sure your command prompt is in the right directory run one of these commands (they are also at the start of the py file!!!):
+	Windows:  	       pyinstaller -F --add-data "YSKYSN/*.wav;YSKYSN/" --add-data "YSKYSN/*.mp3;YSKYSN/" YSKYSNsolo.py
+	mac/otheros (i think): pyinstaller -F --add-data "YSKYSN/*.wav:YSKYSN/" --add-data "YSKYSN/*.mp3:YSKYSN/" YSKYSNsolo.py
+
+	^ the only difference in these two is ";" vs ":" being used as separators, so idk!!!
+
+
+
+
+
+
+
+
+
+
+after all this, a bunch of stuff should pop up, and then at the end, your exe should be in a folder called "dist" in that directory
+
+feel free to put the exe anywhere, and have fun!
+
+
+
+
+
+
+
+
+
+
+ALSO - before you make the exe, make sure you at least look at the py file a bit!! never just make an exe out of someone elses code without checking it a bit.... (and i guess you can see my notes lol)
