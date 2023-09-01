@@ -1,8 +1,8 @@
 Gist of what to do:
-
-1) get pyinstaller 
-2) using the commands on step 4 pyinstaller all the files together
-3) go to the dist folder and have fun!
+1) unzip this
+2) get pyinstaller 
+3) using the commands on step 2 below pyinstaller all the files together
+4) go to the dist folder and have fun!
 
 
 
@@ -28,11 +28,7 @@ run `pip/pip3 install pyinstaller` in your console [command prompt for windows, 
 
 -----  Steps: (after getting pyinstaller)  -----
 
-1) make sure to have all of these audios in an unzipped folder called YSKYSN
-
-2) make sure this YSKYSN folder is in the same directory as the YSKYSNsolo.py file
-
-3) after opening command prompt (or the equivalent in other os) navigate to the directory of these files
+1) after opening command prompt (or the equivalent in other os) navigate to the directory of these files
 
 	to go to other directories, use the 'cd' command 
 
@@ -42,7 +38,7 @@ run `pip/pip3 install pyinstaller` in your console [command prompt for windows, 
 		then do something like 'cd "C:\Users\Muffinlavania\Downloads"', since my files were in the downloads folder
 
 
-4) after making sure your command prompt is in the right directory run one of these commands (they are also at the start of the py file!!!):
+2) after making sure your command prompt is in the right directory run one of these commands (they are also at the start of the py file!!!):
 	Windows:  	       pyinstaller -F --add-data "YSKYSN/*.wav;YSKYSN/" --add-data "YSKYSN/*.mp3;YSKYSN/" YSKYSNsolo.py
 	mac/otheros (i think): pyinstaller -F --add-data "YSKYSN/*.wav:YSKYSN/" --add-data "YSKYSN/*.mp3:YSKYSN/" YSKYSNsolo.py
 
