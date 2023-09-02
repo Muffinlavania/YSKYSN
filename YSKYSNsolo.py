@@ -109,10 +109,11 @@ def file_name(name):
       base_path = os.path.abspath(".")
   return os.path.join(base_path, name)
 
-all_sounds = {}
+all_sounds,sound_volume,music_volume = {},1,1
 def sound(path:str,kk=True,name='SOUND',setvolume=1):
-  global all_sounds
+  global all_sounds,sound_volume
   all_sounds[name]=mixer.Sound(file_name(path) if kk else path)
+  sound_volume = setvolume
   mixer.Sound.set_volume(all_sounds[name],setvolume*defaultvolume)
   mixer.Sound.play(all_sounds[name])
 def stopsound(name):
@@ -122,13 +123,14 @@ def stopsound(name):
     del all_sounds[name]
 defaultvolume = 1
 def music(name:str,music_path:str,canloop:bool=True,setvolume=1):
-  global all_music
+  global all_music,music_volume
   if not all_music.get(name,False):
     if all_music!={}:
       Music.unload()
     all_music = {name:True}
     Music.load(file_name(music_path))
-    Music.set_volume(setvolume*(defaultvolume))
+    music_volume = setvolume
+    Music.set_volume(setvolume*defaultvolume)
     Music.play(-1 if canloop else 0)
   elif not Music.get_busy():
     Music.unpause()
@@ -301,7 +303,7 @@ gamering=list('''
 ))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))
 ''')
 #-----moving stuff-----
-d11,d12,d21,d22,d31,d32,d41,d42,d51,d52,d61,d62,d71,d72 = "hey hi\ndid you know you could actually use your truth data for this game\nfr!!!!!! just like put it in the same folder as this exe and bam haha achievement extraction go brrrrr\nits like actually kinda good game design\nimpossible","pretty sure the guy who made this didnt take into account the other way around then called it a feature....\nmaybe this game kinda sucks","wait how did you find me\nmy disguise is crazy good bro\nloooooook at me you cant\nin fact i cant see myself...\nwhy is the depth thing realistic like i want to see myself???","like these stupid things carry onto the next screen in the same exact location\nits like a filter man....","You know, I was incredibly scared of that guy to the east until I found out his real name.\nIt's 'You Should Keep Yourself Safe Now.'\nAt least that's what that guy over there told me...","He's still super scary, but now I can pretend I'm better than him because his name doesnt mean the other thing I thought about, that isnt his real name I swear, it's only that name that the other guy told me because I know I could trust the other guy and not my gut since my gut always lies to me, and there's nothing like a friend that I met two seconds ago, but we didnt even meet fr I'm just pretending we did so there's context behind this conversation because I'm socially incapable of not being awkward.\n\nYou know?","hiiiiiiiiiii did you see the new update\nlike sure half of the boss is just copied from that other game but the new modes are coool hehe\nfunny names too and i think theres gonna be one more, que epico","i heard there was this one guy, a true legend...\nhe beat every single mode on this boss fight....\n\nthe creator took that personally, creating Cancer difficulty for that exact reason....\nif you havent seen it yet, i suggest saving your brain cells","you know the achievements tab right?\nat the bottom is something that says like 'beat all the ez modes' or something right\nand i beat them JUST FOR THAT, took me a few seconds since im like that yk\nBUT THE GOD DAMN MODE ISNT EVEN OUT YET?????\nlike how can you say to unlock something that doesnt even exist.","did i beat the other modes? no, of course not.\nthey are impossible.","nah bro you talk to that guy to the left of me?\nbros bonkers\ni dont think mans seen the sun period\ni mean i havent either but thats besides the point\nat least i know what the sun is","you dont know what the sun is?\nstop capping this isnt the truth\ngo outside look at the sky","Never mind, I'm alive!!!!!\nThat is if you remember me from last update...\nEither way, I figured the game out!\n\nThe top part is to control the overall speed of the level, and change said level if you want to go back....\n\nOh yeah, to actually play, first start the game by activating the pink buttons, which should start something like a countdown...\nOrbs will spawn from the left, and I think you need to catch them by standing next to the tile they will land on, I couldn't quite win though....","It's quite cool you can activate two tiles at once, it makes the game at least playable....\n\nBut if you forgot how to work it, above me are the controls, blue for speed, green for level 'select', pink to start the game\nCatch the orbs coming from the left after the countdown, and beyond that, I got no clue."
+d11,d12,d21,d22,d31,d32,d41,d42,d51,d52,d61,d62,d71,d72 = "hey hi\ndid you know you could actually use your truth data for this game\nfr!!!!!! just like put it in the same folder as this exe and bam haha achievement extraction go brrrrr\nits like actually kinda good game design\nimpossible","pretty sure the guy who made this didnt take into account the other way around then called it a feature....\nmaybe this game kinda sucks","wait how did you find me\nmy disguise is crazy good bro\nloooooook at me you cant\nin fact i cant see myself...\nwhy is the depth thing realistic like i want to see myself???","like these stupid things carry onto the next screen in the same exact location\nits like a filter man....","You know, I was incredibly scared of that guy to the east until I found out his real name.\nIt's 'You Should Keep Yourself Safe Now.'\nAt least that's what that guy over there told me...","He's still super scary, but now I can pretend I'm better than him because his name doesnt mean the other thing I thought about, that isnt his real name I swear, it's only that name that the other guy told me because I know I could trust the other guy and not my gut since my gut always lies to me, and there's nothing like a friend that I met two seconds ago, but we didnt even meet fr I'm just pretending we did so there's context behind this conversation because I'm socially incapable of not being awkward.\n\nYou know?","hiiiiiiiiiii did you see the new update\nlike sure half of the boss is just copied from that other game but the new modes are coool hehe\nfunny names too and i think theres gonna be one more, que epico","i heard there was this one guy, a true legend...\nhe beat every single mode on this boss fight....\n\nthe creator took that personally, creating Cancer difficulty for that exact reason....\nif you havent seen it yet, i suggest saving your brain cells","you know the achievements tab right?\nat the bottom is something that says like 'beat all the ez modes' or something right\nand i beat them JUST FOR THAT, took me a few seconds since im like that yk\nBUT THE GOD DAMN MODE ISNT EVEN OUT YET?????\nlike how can you say to unlock something that doesnt even exist.","did i beat the other modes? no, of course not.\nthey are impossible.","nah bro you talk to that guy to the left of me?\nbros bonkers\ni dont think mans seen the sun period\ni mean i havent either but thats besides the point\nat least i know what the sun is","you dont know what the sun is?\nstop capping this isnt the truth\ngo outside look at the sky","Never mind, I'm alive!!!!!\nThat is if you remember me from last update...\nEither way, I figured the game out!\n\nThe top part is to control the overall speed of the level, and change said level if you want to go back....\n\nOh yeah, to actually play, first start the game by activating the pink buttons, which should start something like a countdown...\nOrbs will spawn from the left, and I think you need to catch them by standing next to the tile they will land on, I couldn't quite win though....","It's quite cool you can activate two tiles at once, it makes the game at least playable....\n\nBut if you forgot how to work it, next to me controls, blue for speed, green for level 'select', pink to start the game\nCatch the orbs coming from the left after the countdown, and beyond that, I got no clue."
 charss = {'AaEimqu':'┌','Bbfjnrv':'┐','Ccgkosw':'└','Ddhlptx':'┘'}
 charss2,npcers,npnums = ''.join(charss),{'abcd':[d11,d12],'Efgh':[d21,d22],'ijkl':[d31,d32],'mnop':[d41,d42],'qrst':[d51,d52],'uvwx':[d61,d62],"ABCD":[d71,d72]},{}
 def np(o):
@@ -370,7 +372,7 @@ def move(dir):
       printt(f"\nThe paper reads:\n\tTip #{tips.index(n:=random.choice(tips))+1}: {n}",.02)
       anykey()
     c()
-  elif ischar(dir,'e'):
+  elif ischar(dir,'e') and mazeq==main:
     yskysn()
   elif ischar(dir,'Q'):
     speed += 1 if dir=='right' else -1
@@ -507,8 +509,8 @@ def spawners(skip=False,alter_song=song2_ALTER): #find minigame
       
   if aliver:
     if speed>=7:
-      s("aint no way" if level==1 else 'HOW' if level==2 else "idk add your achievement here??????????") 
-    elif speed>achievements.get(f'm{level}',0):
+      achieve("aint no way" if level==1 else 'HOW' if level==2 else "idk add your achievement here??????????") 
+    if speed>achievements.get(f'm{level}',0):
       achieve(f'm{level}',speed)
     level,maxlevel=2 if maxlevel==1 else level,2 #win stuff
   for i in ['1','2','3']:
@@ -1056,7 +1058,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no              
         elif wee=='c':
           c()
         elif wee in ['-','=','+']:
-          setvolume(wee,True)
+          setvolume(wee)
         elif wee=='p':
           pause=not pause
           Music.pause() if pause else Music.unpause()
@@ -1361,12 +1363,15 @@ def printmaze(maze):
           printr(colors.get(i,("\033[48;5;172m" if counti%52>30 else "\033[48;5;178m")+(i if i not in 'ABCD-' else " " if i=='-' else [charss[k] for k in charss if i in k][0])),i not in charss2)
   for i in ['Q1','Q2','W1','W2']: colors[i] = "\033[48;5;27m" if 'Q' in i else '\033[48;5;41m'
 SCREENUP=False
-def setvolume(h,autoset=False):
+def setvolume(h):
   global defaultvolume
   defaultvolume += .05*(-1 if h=='-' else 1)
   defaultvolume = 2 if defaultvolume>2 else .01 if defaultvolume<.05 else .05 if round(defaultvolume,2)==.06 else round(defaultvolume,2)
-  if autoset:
-    Music.set_volume(defaultvolume)
+  Music.set_volume(music_volume*defaultvolume)
+  if len(all_sounds)>0:
+    for i in all_sounds:
+      mixer.Sound.set_volume(all_sounds[i],sound_volume*defaultvolume)
+clear = False
 while True:
   box1,box2,box3,box4=mazeq.index('┌'),mazeq.index('┐'),mazeq.index('└'),mazeq.index('┘')
   printmaze(mazeq)
@@ -1377,16 +1382,15 @@ while True:
       printmaze(mazeq)
       SCREENUP=False
   h=keyz
+  if clear:
+    clear = False
+    c()
   if h in ['w','a','s','d',UP,DOWN,LEFT,RIGHT]:
     move("up" if h in ['w',UP] else "down" if h in ['s',DOWN] else 'right' if h in ['d',RIGHT] else 'left')
   if h in ['i','j','k','l'] and both:
     move2({"i":'up','j':'left','k':'down','l':"right"}[h])
   if h == 'c':
     c()
-  if h in ['=','-','+']:
-    setvolume(h)
-    print(f"Volume multiplier: {defaultvolume}\nApplies to everything!")
-    anykey()
   if h == 'v':
     achievers()
   if h == 'z':
@@ -1398,7 +1402,10 @@ while True:
     checkthing()
     THREAD(target=spawners, args=(True)).start()
   print("\033[H",end="")
-
+  if h in ['=','-','+']:
+    setvolume(h)
+    print(f"Volume multiplier: {defaultvolume}, Applies to everything!")
+    clear=True
 mixer.quit()
 
 '''
