@@ -1,4 +1,4 @@
-import os,time,sys,random,json,pygame,threading,pydub
+import os,time,sys,random,json,threading,pydub
 from pygame import mixer
 from threading import Thread
 from pydub import AudioSegment
@@ -6,14 +6,15 @@ def SOUND(path):
   return AudioSegment.from_file(file_name(path),format='wav')
 
 def changespeed(sound, speed=1.0):
+    #11025 framerate on here
     altedsound = sound._spawn(sound.raw_data, overrides={"frame_rate": int(sound.frame_rate * speed)})
     return altedsound.set_frame_rate(sound.frame_rate)
 
 #PYINSTALLER:
 #windows:
-#pyinstaller -F --add-data "YSKYSN/*.wav;YSKYSN/" --add-data "YSKYSN/*.mp3;YSKYSN/" YSKYSNsolo.py
+#pyinstaller -F --add-data "YSKYSN/*.wav;YSKYSN/" --add-data "YSKYSN/*.mp3;YSKYSN/" YSKYSNsolo.py 
 #mac (i think):
-#pyinstaller -F --add-data "YSKYSN/*.wav:YSKYSN/" --add-data "YSKYSN/*.mp3:YSKYSN/" YSKYSNsolo.py
+#pyinstaller -F --add-data "YSKYSN/*.wav:YSKYSN/" --add-data "YSKYSN/*.mp3:YSKYSN/" YSKYSNsolo.py --paths /Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages
 #YSKYSN the solo
 #small idea for a minigame, you move up and down to catch things coming from the left to eh right, kinda like fnf, theres detectors to your left that activate when youre to the right or in the same row basically, little area to start which starts a thread, make it easily chartable like it reads a list idk
 '''
@@ -50,7 +51,8 @@ def starter(expand={}):
       big_ach[i][k] = expand[i][k] or big_ach[i].get(k,False)
   names=list(big_ach.keys())
   def col(o):
-    for ind,g in enumerate(o): yield f"{ind+1}) {g}{os.linesep}" 
+    for ind,g in enumerate(o): 
+      yield f"{ind+1}) {g}"+'\n' 
     
   nameZ="".join([i for i in col(names)])
   j = input(f"\033[38;5;222mSave data detected!\033[0m\nIf you think this is a mistake, delete yskysndata.json in this folder.\n(This folder is {os.getcwd()})\n\n\033[38;5;222mOtherwise, who are you?\033[0m (n for new user)\n"+nameZ+"\n\n>\033[38;5;222m ")
@@ -98,10 +100,13 @@ c()
 
 
 #-----Music-----
-mixer.init(frequency=512)
+mixer.init()
+#works?????
+
 Music = mixer.music
 
 all_music = {}
+
 def file_name(name):
   try:
       base_path = sys._MEIPASS # PyInstaller creates a temp folder and stores path in _MEIPASS
@@ -138,7 +143,6 @@ def musicstop():
   global all_music
   Music.pause()
   all_music = {}
-
 
 
 #-----getkey/big important things-----
@@ -345,7 +349,7 @@ def distance(spot,distance=2,limit=6969):
 mazeq,nextone = main,[]  #find mazeq
 radio_on,radio_off,canspam = distance(419,3),distance(419,4),mazeq==notmain
 
-tips = ["There will be a secret for going to yskysn with the alter, just you wait!!!","Your character is two tall... would be a shame if you only had to move once most of the time.","Splitting your SOUL doesn't mean you can move them at the same time... You still are one person after all!","Don't know where the audio is coming from? Check the room next to this one, this totally makes sense!","Remember, the easiest controls are WASD for your main self, and IJKL for the other half...","It is possible to beat speed 9. I havent, but you can.","Annoyed by the countdown? Press 5 to start the game instantly! (also works anywhere!)","Can't hit the notes? Try being better!\n(and understanding the notes register when they HIT it/disappear, not when they get there)","Can't hit the last note in level 2? Be less color blind!","Bad at videogame? Decrease the speed! And touch less grass!","Trying speed 9 constantly? Touch grass, drink water, look up what a shower is, and stop.","I don't know what to put here. How are you :) (i hope you said good)",'You can use +/- on your keyboard to change the volume of everything! (Also works for boss music/sounds!)','Make sure to meet spiderman before beating the boss... thank me later.']
+tips = ["Use ]/[ to adjust song offset, ] to add, [ to substract!","There will be a secret for going to yskysn with the alter, just you wait!!!","Your character is two tall... would be a shame if you only had to move once most of the time.","Splitting your SOUL doesn't mean you can move them at the same time... You still are one person after all!","Don't know where the audio is coming from? Check the room next to this one, this totally makes sense!","Remember, the easiest controls are WASD for your main self, and IJKL for the other half...","It is possible to beat speed 9. I havent, but you can.","Annoyed by the countdown? Press 5 to start the game instantly! (also works anywhere!)","Can't hit the notes? Try being better!\n(and understanding the notes register when they HIT it/disappear, not when they get there)","Can't hit the last note in level 2? Be less color blind!","Bad at videogame? Decrease the speed! And touch less grass!","Trying speed 9 constantly? Touch grass, drink water, look up what a shower is, and stop.","I don't know what to put here. How are you :) (i hope you said good)",'You can use +/- on your keyboard to change the volume of everything! (Also works for boss music/sounds!)','Make sure to meet spiderman before beating the boss... thank me later.']
 
 def checkthing():
   global hassseen2
@@ -390,7 +394,7 @@ def move(dir):
     movedir(dir)
     if canspam:
       if (k:=mazeq.index('┌')) in radio_on:
-        music('spam',"YSKYSN/realboy.mp3",True,.1)
+        music('spam',"YSKYSN/realboy.mp3",True,.8)
       elif k in radio_off:
         Music.pause()
 
@@ -451,9 +455,9 @@ def spawners(skip=False,alter_song=song2_ALTER): #find minigame
             aliver=not candie
       
   def startmusic():
-    time.sleep(song[0]-((song[0]/10)*speed))
+    time.sleep(song[0]-((song[0]/10)*speed)+offset)
     if aliver:
-      sound(changespeed(SOUND("YSKYSN/dial1.wav" if level==1 else "YSKYSN/dial2.wav"), SPEEDS[str(speed)]).raw_data,False,'DIAL')
+      sound(changespeed(SOUND("YSKYSN/dial1.wav" if level==1 else "YSKYSN/dial2.wav"), SPEEDS[str(speed)]*s_offset).raw_data,False,'DIAL')
       if level==2:
         mixer.Sound.set_volume(all_sounds['DIAL'],.5*defaultvolume)
         time.sleep(1)
@@ -659,7 +663,7 @@ def yskysn():
       yehp,noheal,nonr=1,True,True
     elif jy=='6':
       printt(["A single sip of the stuff sends you higher than you've ever dreamt of.....","The world is spinning, attacks seem to come from nowhere..."],[2,1])
-      print("(THIS MODE IS VERY HARD!!!!!!! GOOD LUCK LUCAS, save scumming might do something...)")
+      print("(THIS MODE IS VERY HARD!!!!!!! GOOD LUCK, save scumming might do something...)")
       xtreme,cloud9 = True,True
     elif jy=='7':
       printt(["As he sips his lean, you start to tremble.","\033[38;5;88mHe\033[0m stands over you, entirely omniscient...."],[2,2])
@@ -1371,7 +1375,7 @@ def setvolume(h):
   if len(all_sounds)>0:
     for i in all_sounds:
       mixer.Sound.set_volume(all_sounds[i],sound_volume*defaultvolume)
-clear = False
+clear,s_offset,offset = False,1,0
 while True:
   box1,box2,box3,box4=mazeq.index('┌'),mazeq.index('┐'),mazeq.index('└'),mazeq.index('┘')
   printmaze(mazeq)
@@ -1393,6 +1397,8 @@ while True:
     c()
   if h == 'v':
     achievers()
+  if h == 'g':
+    music("ok","YSKYSN/KYSAFE.wav")
   if h == 'z':
     print("End game? (y for yes)")
     if getkey1()=='y':
@@ -1401,11 +1407,21 @@ while True:
   if h == '5' and '207m' in colors['Z'] and mazeq==gamering:
     checkthing()
     THREAD(target=spawners, args=(True)).start()
+  if h in ['[',']']:
+    s_offset = round(s_offset-.02 if h=='[' and s_offset>.5 else s_offset+.02,2)
+    print(f"Song speed: x{s_offset}, only applies to minigame!")
+    clear=True
+  if h in [';',"'"]:
+    offset = round(offset-.05 if h==';' else offset+.05,2)
+    print(f"Song offset: {offset}sec, only applies to minigame!")
+    clear=True
   print("\033[H",end="")
   if h in ['=','-','+']:
     setvolume(h)
     print(f"Volume multiplier: {defaultvolume}, Applies to everything!")
     clear=True
+
+sys.stdout.write("\033[?25h")
 mixer.quit()
 
 '''
