@@ -3,7 +3,9 @@ from pygame import mixer
 from threading import Thread
 from pydub import AudioSegment
 def SOUND(path):
-  return AudioSegment.from_file(file_name(path),format='wav')
+  if "wav":
+    return cls._from_safe_wav(file)[:duration*1000]
+  return AudioSegment.from_file(file_name(path))
 
 def changespeed(sound, speed=1.0):
     #11025 framerate on here
@@ -23,8 +25,16 @@ def changespeed(sound, speed=1.0):
   - two phases, need to kill him for 2nd phase, which is a savepoint you can continue from (since phase 2 not gonna be easy at all)
   - 2nd phase is actually completley different
   - 100% random attack schedule thing, one more extra attack that can happen
+  - Add multi word attack 1
+  - Section where the board expands like a ton
   - he no longer has random dialogues, his health is times a random amount (which is also what your attack is multipled by)
-  - dmg multiplier gets +/- somewhere between .5-1 or something?
+  
+  
+  - phase 1: attack 1: multi words, attack 2: norm + slow lasers/lasers on every red basically, attack3: fast lasers, attack 4: double horizontal lasers, attack 5: lightning but can come from top and bottom, attack 6: MULTIPLE IN ONE, randomness 
+  - phase 1 end: "A bolt of lightning comes to strick YSKYSN, but the spidy bot.... takes it. It's gone,
+
+ALTER:
+  - dmg multiplier gets +/- somewhere between .5-2 or something?
 add lean no hit, lean random mode
 '''
 
@@ -730,8 +740,7 @@ def yskysn():
         dang.append(i)
     JUSTUPIT=True
     time.sleep(timee)
-    dang=[]
-    JUSTUPIT=True
+    dang=[];JUSTUPIT=True
     return -1 if space in rightside else 1
   def more(theone,amoint,symb,dirt=1,timri=.5): #space to place, amount more, symbol to place, direction going (1/-1), time inbetween moves
     nonlocal playin,theows,JUSTUPIT,thereds
@@ -771,17 +780,21 @@ def yskysn():
         thewhites.remove(i)
   def returnit(h=False):#True=in left, False = in right
     return ((198 if h else 249) if (e:=playin.index('▢')) in [199,207,215,223,231,239,247] else (390 if h else 441) if e in [391,399,407,415,423,431,439] else (582 if h else 633) if e in [583,591,599,607,615,623,631] else (774 if h else 825))
+  
+  def upit():
+    nonlocal JUSTUPIT
+    JUSTUPIT = True
+  
   phase1li=['HATE','DIE.','BURN','HATE','DIE.','BURN','KYSN','STOP','HATE','DIE.','BURN','KYSN','STOP','hihi','BURN','KYSN','KYSN','BURN','HAHA','LMAO','HEHE','GRRR',"BUMB"]
+  # -------------------------------------------------------- Attacks --------------------------------------------------------------
   def attack(lol=9): #find attack
-    nonlocal playin,attackin,theintlim,coloreddict,iframes,yehp,orang,theows,JUSTUPIT,owie,turnramp,cutscene,iframamo,thereds
+    nonlocal playin,attackin,theintlim,coloreddict,iframes,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds
     time.sleep(1)
     if yehp<1:
       return
-    lol2=99
-    if cloud9:
-      lol2 = random.randrange(0,7) #can get 6th attack so yes
-      if lol2==6:
-        lol2=random.choice([5,6]) #so not too too hard lol
+    
+    lol2=99 if not cloud9 else random.randrange(0,7)
+    
     if bhp in [420,69,666]:
       yehp=999999
       c()
@@ -793,53 +806,42 @@ def yskysn():
       printt("\033[38;5;196mYou have activated his trap card...."+r)
       time.sleep(2)
       cutscene=False
-      if attackin:
-        c()
-        printman(YS[0:960])
-        JUSTUPIT=True
-        time.sleep(2)
-      if attackin:
-        sound("YSKYSN/KYSAFE.wav")
+      c()
+      printman(YS[0:960])
+      upit();time.sleep(2)
+      sound("YSKYSN/KYSAFE.wav")
       iframamo=.25
       yehp+=round(690*dmgmul) #even though this is almost perfect, theres a way to cheese it...
       owie=20
       for i in range(0,69):
-        if yehp>0:
+        if yehp>40:
           orang=spaced.copy()
           orang.remove(random.choice(orang))
-          JUSTUPIT=True
-          time.sleep(.1)
+          upit();time.sleep(.1)
           for i in orang:
             theows.append(i)
-          JUSTUPIT=True
-          time.sleep(.1)
-          theows=[]
-          orang=[]
-          JUSTUPIT=True
-      yehp=1
-      iframamo=1.5
-      attackin=False
+          upit();time.sleep(.1)
+          orang,theows=[],[];upit()
+      yehp,iframamo,attackin=1,1.5,False
       return
     elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0:#phase 1, words come frop left/right
       turn2(0,lol)
       owie=5+turnramp[0]
+      
       for i in range(random.randrange(7,(10 if lol!=0 else 15)+turnramp[0])):
-        if yehp>0:
-          kf=random.choice(random.choice([leftimps,rightimps]))
-          JUSTUPIT=True
-          rw=((1 if lol!=0 else .25)-(.25 if xtreme else 0)-turnramp[0]/10)
-          tru=danger(kf,4,rw if rw>0 else 0) #returns the direction its gonna go (-1 or 1)
-          theintlim+=1 #this and thesymlist were for if i was gonna make many words at once which i never did lol (maybe some day!!!)
-          metan=thesymlist[theintlim]
-          coloreddict[metan]=random.choice(phase1li)
-          h4='hehehaha'
-          while h4 not in ['end','hit']:
-            hei=(.4 if lol!=0 else .2)-(.1 if xtreme else 0)-turnramp[0]/40/(3 if xtreme else 1)
-            h4=more(kf,4,metan,tru,hei if hei>.1 else .1)
-            kf+=(8*tru)
-          if h4=='hit' and not iframes:
-            damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0))*dmgmul)
-          theintlim-=1
+        kf,rw=random.choice(random.choice([leftimps,rightimps])),((1 if lol!=0 else .25)-(.25 if xtreme else 0)-turnramp[0]/10)
+        tru = danger(kf,4,rw if rw>0 else 0) #returns the direction its gonna go (-1 or 1)
+        metan=thesymlist[(theintlim:=theintlim+1)] #this and thesymlist were for if i was gonna make many words at once which i never did lol (maybe some day!!!)
+        coloreddict[metan]=random.choice(phase1li)
+        h4='hehehaha'
+        while h4 not in ['end','hit']:
+          hei=(.4 if lol!=0 else .2)-(.1 if xtreme else 0)-turnramp[0]/40/(3 if xtreme else 1)
+          h4=more(kf,4,metan,tru,hei if hei>.1 else .1)
+          kf+=(8*tru)
+        if h4=='hit' and not iframes:
+          damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0))*dmgmul)
+        theintlim-=1
+    
     elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1:#phase2, random spaces
       turn2(1,lol)
       owie=(8 if lol!=1 else 10)+(5 if xtreme else 0)+turnramp[1]
@@ -925,6 +927,8 @@ def yskysn():
         turnramp[i]=-1
       attack(random.randrange(0,6))
     attackin=False
+  
+  
   def printman(yt,l=True): #find print
     YY=''
     if cancer and stats4nerds['shields']>0:
@@ -1239,13 +1243,10 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
       elif cloud9:
         printt(['You beat me at my own game.','Even while I perked up, you perked up just the same...','I could learn a thing or two from you. Thanks.'],[1,2,1])
         achieve("CLOUD 9")
-        print("(Crazy stuff.... only you would do this li)")
       elif cancer:
-        printt(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now!"],[1,2,.03])
+        printt(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now! (fr)"],[1,2,.03])
         achieve("Cancer")
-        print("(HOW DID YOU DO THIS???? nvm youre asian understandable have a good day)")
         s4=stats4nerds
-        print(r+'\n----------------\nYour final stats (i need to see these bro):\n\n\033[38;5;82m\nHealth: '+str(yehp)+'\nBoss Health: '+str(bhp)+'\nTotal Turns: '+str(s4['turns'])+'\nTotal Speaks: '+str(s4['speak'])+'\nTotal Magics: '+str(s4['magic'])+'\nTotal Heal Ups: '+str(s4['heal up'])+'\nTotal KYS: '+str(s4['kys'])+'\nTotal Dream Masks: '+str(s4['dream mask'])+f'\n{"Total Hockey Masks" if not cancer else "Total Shields"}: '+str(s4['hockey mask'])+("\nShields avaliable: "+str(s4['shields'])+'\nTotal Red Bulls: '+str(s4['reds'])+"\nRed bulls available: "+str(s4['red bulls']) if cancer else "")+'\nTotal Rusty Masks: '+str(s4['rusty mask'])+'\nTotal Doctor\'s Kits: '+str(s4['doctors'])+'\nTotal YSKYSN Heals: '+str(s4['yskysn heals'])+'\nTotal Damage Taken: '+str(s4['damage taken'])+'\nTotal Useless Turns: '+str(s4['useless turns'])+r+'\n----------------')
       elif noheal or bmulti==2 or xtreme:
         printt(['Wow.',"I was so mad I didn't even see how cool you were man.","Love yourself."+r],[1,2,.03])
         achieve(("True Chad" if noheal else 'LEAN' if xtreme else 'Double takedown'))
@@ -1258,6 +1259,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         printman(YL)
         print('\n'*9)
         slepy(3)
+      print(r+'\n----------------\nYour final stats:\n\n\033[38;5;82m\nHealth: '+str(yehp)+'\nBoss Health: '+str(bhp)+'\nTotal Turns: '+str(s4['turns'])+'\nTotal Speaks: '+str(s4['speak'])+'\nTotal Magics: '+str(s4['magic'])+'\nTotal Heal Ups: '+str(s4['heal up'])+'\nTotal KYS: '+str(s4['kys'])+'\nTotal Dream Masks: '+str(s4['dream mask'])+f'\n{"Total Hockey Masks" if not cancer else "Total Shields"}: '+str(s4['hockey mask'])+("\nShields avaliable: "+str(s4['shields'])+'\nTotal Red Bulls: '+str(s4['reds'])+"\nRed bulls available: "+str(s4['red bulls']) if cancer else "")+'\nTotal Rusty Masks: '+str(s4['rusty mask'])+'\nTotal Doctor\'s Kits: '+str(s4['doctors'])+'\nTotal YSKYSN Heals: '+str(s4['yskysn heals'])+'\nTotal Damage Taken: '+str(s4['damage taken'])+'\nTotal Useless Turns: '+str(s4['useless turns'])+r+'\n----------------')
       achieve('LYS')
       anykey()
     else:
