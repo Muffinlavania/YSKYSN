@@ -1,17 +1,13 @@
-import os,time,sys,random,json,threading,pydub
+import os,time,sys,random,json
 from pygame import mixer
 from threading import Thread
-from pydub import AudioSegment
-def SOUND(path):
-  if "wav":
-    return cls._from_safe_wav(file)[:duration*1000]
-  return AudioSegment.from_file(file_name(path))
+import AUDIO
 
-def changespeed(sound, speed=1.0):
-    #11025 framerate on here
-    altedsound = sound._spawn(sound.raw_data, overrides={"frame_rate": int(sound.frame_rate * speed)})
-    return altedsound.set_frame_rate(sound.frame_rate)
 
+def changespeed(file, speed=1.0):
+    #11025 framerate on here, im an idiot!!!!
+    return AUDIO.spawnsound(open(file_name(file), mode='rb'),6)[0] #6 being the speed, need to adjust this!
+  
 #PYINSTALLER:
 #windows:
 #pyinstaller -F --add-data "YSKYSN/*.wav;YSKYSN/" --add-data "YSKYSN/*.mp3;YSKYSN/" YSKYSNsolo.py 
@@ -356,7 +352,7 @@ def distance(spot,distance=2,limit=6969):
   y.extend(spot+(distance*k)+(52*q) for k in [-1,1] for q in range(distance*-1,distance+1) if 0<spot+(distance*k)+(52*q)<limit)
   return y
 
-mazeq,nextone = main,[]  #find mazeq
+mazeq,nextone = gamering,[]  #find mazeq
 radio_on,radio_off,canspam = distance(419,3),distance(419,4),mazeq==notmain
 
 tips = ["Use ]/[ to adjust song offset, ] to add, [ to substract!","There will be a secret for going to yskysn with the alter, just you wait!!!","Your character is two tall... would be a shame if you only had to move once most of the time.","Splitting your SOUL doesn't mean you can move them at the same time... You still are one person after all!","Don't know where the audio is coming from? Check the room next to this one, this totally makes sense!","Remember, the easiest controls are WASD for your main self, and IJKL for the other half...","It is possible to beat speed 9. I havent, but you can.","Annoyed by the countdown? Press 5 to start the game instantly! (also works anywhere!)","Can't hit the notes? Try being better!\n(and understanding the notes register when they HIT it/disappear, not when they get there)","Can't hit the last note in level 2? Be less color blind!","Bad at videogame? Decrease the speed! And touch less grass!","Trying speed 9 constantly? Touch grass, drink water, look up what a shower is, and stop.","I don't know what to put here. How are you :) (i hope you said good)",'You can use +/- on your keyboard to change the volume of everything! (Also works for boss music/sounds!)','Make sure to meet spiderman before beating the boss... thank me later.']
@@ -431,7 +427,7 @@ song2[0] = 6.2
 song2_ALTER = [["AMONGUS",23],["4", 4], ["3", 4], ["4", 4], ["5", 3], ["5", 3], ["5", 22], ["A", 3], ["B", 3], ["A", 4], ["9", 3], ["9", 3], ["9", 23], ["D", 3], ["C", 3], ["B", 4], ["D", 4], ["E", 3], ["D", 20], ["B", 4], ["A", 4], ["9", 4], ["8", 3],["7",3]]
 
 SPEEDS = {"1":0.113,"2":0.126,"3":0.144,"4":0.167,"5":0.2,"6":0.245,"7":0.32,"8":0.45,"9":0.8}
-
+#SPEEDS2 = {i:k**.5 for i,k in SPEEDS.items()} not even right lol
 nextone2 = []
 candie = True #so i can like test lol
 hassseen2 = False
@@ -467,7 +463,7 @@ def spawners(skip=False,alter_song=song2_ALTER): #find minigame
   def startmusic():
     time.sleep(song[0]-((song[0]/10)*speed)+offset)
     if aliver:
-      sound(changespeed(SOUND("YSKYSN/dial1.wav" if level==1 else "YSKYSN/dial2.wav"), SPEEDS[str(speed)]*s_offset).raw_data,False,'DIAL')
+      sound(changespeed("YSKYSN/dial1.wav" if level==1 else "YSKYSN/dial2.wav", SPEEDS[str(speed)]*s_offset),False,'DIAL')
       if level==2:
         mixer.Sound.set_volume(all_sounds['DIAL'],.5*defaultvolume)
         time.sleep(1)
@@ -493,7 +489,7 @@ def spawners(skip=False,alter_song=song2_ALTER): #find minigame
   
   THREAD(target=startmusic).start()
   
-  
+  time.sleep(100)
   while aliver and not end:
     nextone=[55+(52*int(i,16)) for i in song[sd['ind1']+1][0]] if sd['ind1']+1<len(song) else []
     if both:
@@ -729,7 +725,7 @@ def yskysn():
           turnramp[i]=-1
         elif i!=ab and turnramp[i]>-1:
           turnramp[i]-=1
-    turnramp[ab]+=(1 if not xtreme or cloud9 else random.randint(1,3))
+    turnramp[ab]+=(1 if not xtreme or cloud9 else random.randrange(1,3) if not cloud9 else random.randint(1,3))
   def danger(space,nubi=1,timee=2):
     nonlocal JUSTUPIT,dang
     if type(nubi)==int:
@@ -850,13 +846,13 @@ def yskysn():
           orang=[]
           for i in range(random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21))):
             orang.append(random.choice(spaced))
-          JUSTUPIT=True
+          upit()
           time.sleep((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0))
           for i in orang:
             theows.append(i)
-          JUSTUPIT=True
+          upit()
           time.sleep((1 if lol!=1 else .25)-(.2 if xtreme else 0))
-          theows,orang,JUSTUPIT=[],[],True
+          theows,orang=[],[];upit()
           wer=(1 if lol!=1 else .5)-(.5 if xtreme else 0)-turnramp[1]/20
           time.sleep(wer if wer>0 else 0)
     elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2:#phase3, lasers up/down
@@ -1009,7 +1005,7 @@ def yskysn():
       iframes,JUSTUPIT=False,True
   def heal(at,y=True): #a lil spaget but who cares
     nonlocal bhp,yehp
-    softlimit = 100 if not cloud9 else 200
+    softlimit = 100
     if y==True:
       if not noheal:
         if yehp>softlimit:
@@ -1235,6 +1231,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
     time.sleep(2)
     printt("\n\033[38;5;204m...")
     slepy(2)
+    s4=stats4nerds
     if hasspidy:
       printt(r+'\n[One final bolt of lightning comes from the sky,\n but luckily the \033[38;5;1mspidy bot'+r+' is there to block it...]\033[38;5;204m\n')
       if nonr:
@@ -1246,7 +1243,6 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
       elif cancer:
         printt(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now! (fr)"],[1,2,.03])
         achieve("Cancer")
-        s4=stats4nerds
       elif noheal or bmulti==2 or xtreme:
         printt(['Wow.',"I was so mad I didn't even see how cool you were man.","Love yourself."+r],[1,2,.03])
         achieve(("True Chad" if noheal else 'LEAN' if xtreme else 'Double takedown'))
