@@ -207,7 +207,7 @@ def s(jh):
   return '\033[48;5;46m \033[0m' if achievements.get(jh,False) else '\033[48;5;160m \033[0m'
 
 def upped_achieves():
-  te = all([acheck(i) for i in ['True chad','LYS','LEAN','Double takedown','YSLYSN']])
+  te = all([acheck(i) for i in ['True Chad','LYS','LEAN','Double takedown','YSLYSN']])
   return f'''
   ┌────────────────────────────────────────────────┐
   |                  \033[38;5;88mAchievements\033[0m                  |
@@ -419,14 +419,14 @@ level,maxlevel,speed,message,both,ALTER1 = 1,1,5,"Pink to start...",False,135 #f
 
 
 #find songs
-song1 = [6.8, ["8", 34], ["C", 1], ["B", 1], ["A", 1], ["9", 1], ["A", 1], ["9", 1], ["A", 1], ["B", 32], ["5", 1], ["6", 1], ["5", 1], ["6", 1], ["5", 1], ["6", 1], ["7", 32], ["C", 1], ["B", 1], ["A", 1], ["B", 1], ["A", 1], ["9", 1], ["8", 19], ["6", 1], ["7", 1], ["8", 7], ["7", 1], ["6", 1], ["5", 7], ["4", 1], ["5", 1],["6",1]] #tuples = ([note positions to spawn (STRING)],iterations to wait)
+song1 = [7, ["8", 34], ["C", 1], ["B", 1], ["A", 1], ["9", 1], ["A", 1], ["9", 1], ["A", 1], ["B", 32], ["5", 1], ["6", 1], ["5", 1], ["6", 1], ["5", 1], ["6", 1], ["7", 32], ["C", 1], ["B", 1], ["A", 1], ["B", 1], ["A", 1], ["9", 1], ["8", 19], ["6", 1], ["7", 1], ["8", 7], ["7", 1], ["6", 1], ["5", 7], ["4", 1], ["5", 1],["6",1]] #tuples = ([note positions to spawn (STRING)],iterations to wait)
 song2 = song1.copy() #yea lol
 song2[0] = 6.2
 
 song2_ALTER = [["AMONGUS",23],["4", 4], ["3", 4], ["4", 4], ["5", 3], ["5", 3], ["5", 22], ["A", 3], ["B", 3], ["A", 4], ["9", 3], ["9", 3], ["9", 23], ["D", 3], ["C", 3], ["B", 4], ["D", 4], ["E", 3], ["D", 20], ["B", 4], ["A", 4], ["9", 4], ["8", 3],["7",3]]
 
 SPEEDSBEFORE = {"1":0.113,"2":0.126,"3":0.144,"4":0.167,"5":0.2,"6":0.245,"7":0.32,"8":0.45,"9":0.8}
-SPEEDS = {i:k*(.208/.2) for i,k in SPEEDSBEFORE.items()}
+SPEEDS = {i:k*(.209/.2) for i,k in SPEEDSBEFORE.items()}
 
 nextone2 = []
 candie = True #so i can like test lol
@@ -709,7 +709,11 @@ def yskysn():
   #idea, yskyn changes mouth colors the less health he has: 3 for start, 131 for med, 196 for low (also change hp color?) 9 for YSLYSN
   #when he becomes yslyn eyes ('W') change from 7 to 239
   hddict={4:'\033[38;5;46m',3:'\033[38;5;46m',2:'\033[38;5;6m',1:'\033[38;5;166m',0:'\033[38;5;196m'}
+  
+  #optimize these sayings, this looks hella spaget
   saying={10:['\033[38;5;160m','Why are you here, just to worship me?'],9:['\033[38;5;160m','Kill yourself, now!!!!!!'],8:['','YSKYSN hates the crowd, YSKYSN kills the crowd.'],7:['','There is no more crowd.'],6:['','Lightning crackles all around you.'],5:['','YSKYSN is getting mad...'],4:['\033[38;5;160m','You serve ZERO purpose.'],3:['','Something about him seems less menacing.'],2:['','YSKYSN looks very tired...'],1:['','A sense of order emerges.'],0:['','Peace soon to come.']}
+  HELL_saying = ["It's time.","Make it last.",""]
+
   def up(gu=False):
     print("\033[H",end="\n"*15)
     if gu:
@@ -1147,12 +1151,13 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no              
             stats4nerds['useless turns']+=1
         elif theeven==3: #heal him
           stats4nerds['yskysn heals']+=1
-          printt("Suddenly the thunder outside gets even more intense...",2)
-          printt("His eyes crackle even brighter.")
-          print('(\033[38;5;88mYSKYSN\033[0m healed '+str(heal(random.randrange(40,65),kys))+'..)')
-          if heal(10,kys)==0:
-            stats4nerds['useless turns']+=1
-            print("(What a loser...)")
+          if not cloud9:
+            printt("Suddenly the thunder outside gets even more intense...",2)
+            printt("His eyes crackle even brighter.")
+            print('(\033[38;5;88mYSKYSN\033[0m healed '+str(heal(random.randrange(40,65),kys))+'..)')
+            if heal(10,kys)==0:
+              stats4nerds['useless turns']+=1
+              print("(What a loser...)")
       elif selection==2: #heal up
         stats4nerds['heal up']+=1
         printt(random.choice(['Staring straight into his eyes gives you a sudden confidence...','You remember that KYS can mean keep yourself safe...','The lightning seems to fill YOU with strength...','You try to imagine his face as the man face...']),1)
