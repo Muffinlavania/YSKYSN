@@ -434,7 +434,7 @@ song2_ALTER = [["AMONGUS",23],["4", 4], ["3", 4], ["4", 4], ["5", 3], ["5", 3], 
 SPEEDSBEFORE = {"1":0.113,"2":0.126,"3":0.144,"4":0.167,"5":0.2,"6":0.245,"7":0.32,"8":0.45,"9":0.8}
 SPEEDS = {i:k*(.209/.2) for i,k in SPEEDSBEFORE.items()}
 
-nextone2,candie,hasseen2 = [],True,False #for testing stuff
+nextone2,candie,hassseen2 = [],True,False #for testing stuff
 
 def spawners(skip=False,alter_song=song2_ALTER): #find minigame
   global gamering,maxlevel,level,colors,SCREENUP,ALTER1,message,nextone,nextone2,both
@@ -583,8 +583,10 @@ YL='''\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no------
 YS='''\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o'''
 
 r='\033[0m'
+#vars you can change in settings, preferences
+centerit,centermodes,skipintro = "center",["center","right","left"],False # make settings!/hell mode things    
 def yskysn():
-  global afk
+  global afk,centerit,skipintro
   playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwR\n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwwR\n wwwg____________________________________________________gggwwR\n wgg__~_______~_______~_______~_______~_______~_______~___gwwwR\n wwg_____________________________________________________ggggwR\n wwwg____________________________________________________gwwgwR\n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwwwR\n wgwg_____________________________________________________gwgwR\n wgg______________________________________________________ggwwR\n wg___~_______~_______~_______~_______~_______~_______~___wgwwR\n wwg_____________________________________________________ggwwwR\n wgwg____________________________________________________gwgwwR\n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgwR\n wwwg____________________________________________________gwwgwR\n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwwwR\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwR''')
   playinref = playin.copy()
   playinref[415] = "~" 
@@ -631,11 +633,8 @@ def yskysn():
     c()
     #new select!!!!!!!
     
-    #vars you can change in settings
-    centerit,centermodes,skipintro = "center",["center","right","left"],False # make settings!/hell mode things
     
-    
-    modes_allow,sets_allow,save_allow = ['0','1','2','3'],['0','1','y'],[] #set up list of things you can see/do in main menu
+    modes_allow,sets_allow,save_allow = ['0','1','2','3'],['0','1','y'],['x','y'] #set up list of things you can see/do in main menu
     for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,(SAVE:=acheck("s"))!=False]):
       if casee and not i.isdigit(): modes_allow.append(i)
       else: save_allow.append(i)
@@ -648,19 +647,19 @@ def yskysn():
     
     def prints(e,width='default',butting=False,addon_mode=False,JUSTPRINT=False,center_left:int=0): #addon_mode cause color codes make centering bad
       """Use JUSTPRINT to simply center/right/left the text, center_left to move text left by that many spaces"""
-      global both
-      nonlocal curlist,skipintro
+      global both,skipintro
+      nonlocal curlist
       if type(width)==str or width<10: width=os.get_terminal_size().columns
       for i in e.split("\n"):
         if not JUSTPRINT and (not butting or (i.strip()=='' or i[0] in curlist or (special_starts.get(i[0],False)) or i[0].isupper())):
           Q = i[1:-1]+endit(i[-1]) if butting and i!='' and i[-1] != " " else i
           print((seledchar:=("\033[48;5;5m" if butting and i!='' and curlist[cur] == i[0] else '')) + \
             ((f"{Q:>{width//2+len(Q)//2}}" if '|' in i or addon_mode else f"{Q:^{width-center_left}}") if centerit=='center' else f"{Q:>{width-(1 if not addon_mode else len(mode())+1)}}" if centerit=='right' else Q) +\
-            ('' if not butting or i=='' or i[-1] in [' ','#']+special_ends else (s({'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both}.get(i[-1],False),False))+seledchar+(" "*(width//2-len(i)//2 if centerit=='center' else 0 if centerit=="right" else width-len(i)-1)))+(mode()+"    " if addon_mode else r))
+            ('' if not butting or i=='' or i[-1] in [' ','#']+special_ends else (s({'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both}.get(i[-1],False),False))+seledchar+(" "*(width//2-len(i)//2 if centerit=='center' else 0 if centerit=="right" else width-len(i)-1)))+(mode()+("    " if centerit!='right' else '')if addon_mode else r))
         elif JUSTPRINT:
           print(f"{i:^{width}}" if centerit=='center' else f"{i:>{width}}" if centerit=='right' else i)
 
-    #extra space (" ") after word means its 100% normal, a hashtag ("#") is for ones that can be selected but 
+    #extra space (" ") after word means its 100% normal, a hashtag ("#") is for ones that can be selected but not achiev
     buts = '\n-Save Data#\n\n0Double Boss HP | a\n  \n1No hit (1 hp)  | b\n2     No heals  | c\n  \n3Extreme mode   | d\n\n4CLOUD 9        | e\n5Hell.          | f\n\nySettings#\nxExit#\nzContinue#\n;ALTER          | :\n'
     buts_settings = """\nSettings \n\n0Center mode: ^\n1Show introduction text: | &\n\nyExit Settings#\n"""
     buts_save = """
@@ -673,9 +672,10 @@ Your hp: 1
 Boss hp: 2
 }Has Spidy: 4
 
-2
-    """
-    cur,curlist = 0,modes_allow
+xLoad Save
+yBack
+""" #Mode = SAVE[0] Spidy = SAVE[4] etc
+    SAVEITPLEASE, cur,curlist = False, 0, modes_allow #saveitplease = load the save after it breaks or something idk what im doing
     print("\033[38;5;88m")
     prints("YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse Up/Down to move, Z/Enter/Left/Right to select!\n\n",'','','',True)
     prints("Selected mode: ",'def',False,True,False,4)
@@ -688,29 +688,32 @@ Boss hp: 2
       elif t in [ENTER,LEFT,RIGHT,'a','d']:
         sound('YSKYSN/sel.wav',True,"sel",.5)
         if curlist==modes_allow:
-          (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (save_menu:=True) if g=='-' else ''
+          (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (curlist:=buts_save) if g=='-' else ''
           if g=='x':
             return c()
           if g=='z':
             break
         elif curlist==sets_allow:
           (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if t in [LEFT,'a'] else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) + c() if g=='0' else (skipintro:=not skipintro) if g=='1' else ''
+        elif curlist==save_allow:
+          (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (SAVEITPLEASE := True)
+          if g=='x':
+            break
       if cloud9 or hell:
         nonr,bmulti,bhp,xtreme,noheal = False,1,1000,False,False
       print("\033[H",end="\n"*6)
       if curlist==modes_allow:
         prints("Selected mode: ",'def',False,True,False,4)
       prints(buts if curlist==modes_allow else buts_settings,'f',True)
+    
+    if SAVEITPLEASE:
+      if hell:
+    
+        printt(["....","You know what you've done.","Instead of giving in, or merely fighting back, you decided to end this, once and for all.","\033[38;5;88mGood luck mortal. You rats always need it.\033[0m"],[3,1,2,.03])
+        print("[Any key to continue to hell. Good luck.]")
+    else:
+      pass
     def old_select():
-      print(f"\033[38;5;153mSave data detected! (l to load, will get overwritten if new game started!)\033[0m\n\tMode: {cOL(SAVE[0])}{r}\n\tYour hp: {SAVE[1]}\n\tBoss hp: {SAVE[2]}\n\tSpidy?: {SAVE[4]}\n\tOther stats: Would take up too much space rn. L.")
-      
-      if (g:=all([acheck("YSLYSN"),acheck("True Chad"),acheck("LEAN"),acheck("Double takedown")])):
-        print("\n\033[38;5;67m0) True hell awaits. You value your life, right? (NOT FINISHED, I DONT KNOW WHAT THIS DOES)\n")
-      print(f"\n\033[38;5;1m{'1 - Open a window':<40}(x2 boss hp!)\n\033[38;5;93m{'2 - Give him lean':<40}(enables extreme mode!)\n\033[38;5;159m{'3 - Engulf yourself in lightning':<40}(disables heals!)\n\033[38;5;130m{'4 - Give into the hate.':<40}(no hit.)\n\033[0m{'5 - Stare back at him':<40}(normal boss)\n\033[38;5;93m{'6 - Try some cough syrup...' if acheck('LEAN') else ''}\033[0m\n\033[38;5;93m{'7 - Disrespect the lean gods. May THE god be with you.' if acheck('LEAN') else ''}\033[0m\n[All harder modes give a special ending..., x to just exit]")
-      dalist = [('0' if g or name=='Muffinlavania' else '1'),('l' if SAVE!=False else '1'),('6' if acheck("LEAN") else '1'),('7' if acheck("LEAN") else '1'),'1','2','3','4','5','x']
-      while (jy:=getkey1()) not in dalist:
-        pass
-      c()
       if jy=='x':
         return
       if jy=='0':
