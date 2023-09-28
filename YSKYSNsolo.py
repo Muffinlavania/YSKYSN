@@ -1,9 +1,10 @@
 import os,time,sys,random,json,AUDIO
 from pygame import mixer
 from threading import Thread
-from ctypes import windll
+if os.name == 'nt': #doesnt work on mac?
+  from ctypes import windll
 
-mid = (windll.user32.GetSystemMetrics(78)//2, windll.user32.GetSystemMetrics(79)//2)
+  mid = (windll.user32.GetSystemMetrics(78)//2, windll.user32.GetSystemMetrics(79)//2)
 
 def changespeed(file, speed=1.0):
     #11025 framerate on here, im an idiot!!!!
@@ -622,7 +623,7 @@ def yskysn():
     LEAN,NOHIT,NOHEAL,HP2X,CANCER,CLOUD9,HELL,HELL2 = \
       xtreme if '16' not in data else True,nonr if not '94' in data else True,noheal if '12' not in data else True,bmulti==2 if '3' not in data else True,'50' in data,cloud9 if '49' not in data else True,hell if '64' not in data else True, hell2 if '65' not in data else True
     return f'\033[38;5;{"0" if HELL or HELL2 else "88" if (e:=all([LEAN,NOHIT,HP2X])) else "99" if LEAN and NOHIT else "171" if LEAN or CLOUD9 else "202" if HP2X else "194" if NOHIT else "7"}m'+\
-      ("Hell." if HELL else "Doomsday." if e else "Cancer." if LEAN and NOHIT or CANCER else f"NO HIT{'+' if any([LEAN,HP2X]) else ''}" if NOHIT else\
+      ("Hell." if HELL else "Doomsday." if e else "Cloud 9." if cloud9 else "Cancer." if LEAN and NOHIT or CANCER else f"NO HIT{'+' if any([LEAN,HP2X]) else ''}" if NOHIT else\
         f"LEAN{'+' if any([noheal,HP2X]) else ''}" if LEAN else f"NO HEALS{'+' if HP2X else ''}" if NOHEAL else "2x HP" if HP2X else "Normal")+\
         "\033[0m"
   
@@ -651,23 +652,16 @@ def yskysn():
       if type(width)==str: width=os.get_terminal_size().columns
       for i in e.split("\n"):
         if not JUSTPRINT and (not butting or (i.strip()=='' or i[0] in curlist or (i[0]==';' and both) or i[0].isupper())):
-          Q = i[1:-1] if butting and i!='' and i[-1] != " " else i if i=='' or i[-1] not in special_ends else i+endit(i[-1])
+          Q = i[1:-1]+endit(i[-1]) if butting and i!='' and i[-1] != " " else i
           print((seledchar:=("\033[48;5;5m" if butting and i!='' and curlist[cur] == i[0] else '')) + \
-            ((f"{Q:>{width//2+len(Q)//2}}" if '|' in i or addon_mode else f"{Q:^{width-center_left}}") if centerit=='center' else f"{Q.strip():>{width}}" if centerit=='right' else Q.strip()) +\
-            ('' if not butting or i=='' or i[-1] in [' ','&','#'] else (s({'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both}.get(i[-1],False),False))+seledchar+(" "*(width//2-len(i)//2)))+(mode() if addon_mode else r))
+            ((f"{Q:>{width//2+len(Q)//2}}" if '|' in i or addon_mode else f"{Q:^{width-center_left}}") if centerit=='center' else f"{Q:>{width}}" if centerit=='right' else f"{Q:<{width}}") +\
+            ('' if not butting or i=='' or i[-1] in [' ','#']+special_ends else (s({'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both}.get(i[-1],False),False))+seledchar+(" "*(width//2-len(i)//2)))+(mode()+"    " if addon_mode else r))
         elif JUSTPRINT:
-          print(f"{i:^{width}}" if centerit=='center' else f"{i:>{width}}" if centerit=='right' else i+"OOGA")
-    
+          print(f"{i:^{width}}" if centerit=='center' else f"{i:>{width}}" if centerit=='right' else i)
+
     #extra space (" ") after word means its 100% normal, a hashtag ("#") is for ones that can be selected but 
     buts = '\n-Save Data#\n\n0Double Boss HP | a\n  \n1No hit (1 hp)  | b\n2     No heals  | c\n  \n3Extreme mode   | d\n\n4CLOUD 9        | e\n5Hell.          | f\n\nySettings#\nxExit#\nzContinue#\n;ALTER          | :\n'
-    buts_settings = f"""
-Settings 
-
-0Center mode: ^
-1Show introduction text: &
-
-yExit Settings 
-"""
+    buts_settings = f"""\nSettings \n\n0Center mode: ^\n1Show introduction text: &\n\nyExit Settings#\n"""
     cur,curlist = 0,modes_allow
     print("\033[38;5;88m")
     prints("    YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse WS/Up/Down to move, Z/Enter/Left/Right to select!\n\n",1,1,1,True)
@@ -681,20 +675,20 @@ yExit Settings
       elif t in [ENTER,LEFT,RIGHT]:
         sound('YSKYSN/sel.wav',True,"sel",.5)
         if curlist==modes_allow:
-          (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=modes_allow[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (save_menu:=True) if g=='-' else ''
+          (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (save_menu:=True) if g=='-' else ''
           if g=='x':
             return c()
           if g=='z':
             break
         elif curlist==sets_allow:
-          (curlist:=modes_allow) + [c(),(cur:=0)] if g=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if t==LEFT else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) if g=='0' else (skipintro:=not skipintro) if g=='1' else ''
+          (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if t==LEFT else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) + c() if g=='0' else (skipintro:=not skipintro) if g=='1' else ''
+      if cloud9 or hell:
+        nonr,bmulti,bhp,xtreme,noheal = False,1,1000,False,False
       print("\033[H",end="\n"*6)
       if curlist==modes_allow:
         prints("Selected mode: ",'def',False,True,False,4)
       prints(buts if curlist==modes_allow else buts_settings,'f',True)
     def old_select():
-      cOL = lambda u: "\033[38;5;1m2x boss hp" if u=="3" else "\033[38;5;93mLean" if u=='16' else "\033[38;5;159mNo heals" if u=='12' else "Normal" if u=='22' else "\033[38;5;130mNo hit." if u not in ['64','61','49','50'] else "\033[38;5;93mCloud 9" if u=='49' else "\033[38;5;93mCancer." if u=='50' else "\033[38;5;52mHell." if u=='64' else "\033[38;5;52mAbsolute Hell."
-      #save data
       if (SAVE:=acheck("s"))!=False:
         print(f"\033[38;5;153mSave data detected! (l to load, will get overwritten if new game started!)\033[0m\n\tMode: {cOL(SAVE[0])}{r}\n\tYour hp: {SAVE[1]}\n\tBoss hp: {SAVE[2]}\n\tSpidy?: {SAVE[4]}\n\tOther stats: Would take up too much space rn. L.")
       
