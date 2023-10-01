@@ -633,17 +633,16 @@ def yskysn():
     c()
     #new select!!!!!!!
     
-    
+    SAVE = ['','','','','']
     modes_allow,sets_allow,save_allow = ['0','1','2','3'],['0','1','y'],['x','y'] #set up list of things you can see/do in main menu
     for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,(SAVE:=acheck("s"))!=False]):
-      if casee and not i.isdigit(): modes_allow.append(i)
-      else: save_allow.append(i)
+      if casee: modes_allow.append(i)
     
     
     #special printing things
     special_ends,special_starts = ['^','0','1','2','4'],{";":both,"}":"Hell" not in mode(SAVE[0])} #mostly used for settings
     def endit(ending): #update this with special_ends!!!
-      return {"^":f"< {centerit} >"}.get(ending,'')
+      return str({"^":f"< {centerit} >","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
     
     def prints(e,width='default',butting=False,addon_mode=False,JUSTPRINT=False,center_left:int=0): #addon_mode cause color codes make centering bad
       """Use JUSTPRINT to simply center/right/left the text, center_left to move text left by that many spaces"""
@@ -651,7 +650,7 @@ def yskysn():
       nonlocal curlist
       if type(width)==str or width<10: width=os.get_terminal_size().columns
       for i in e.split("\n"):
-        if not JUSTPRINT and (not butting or (i.strip()=='' or i[0] in curlist or (special_starts.get(i[0],False)) or i[0].isupper())):
+        if not JUSTPRINT and (not butting or (i.strip()=='' or i[0] in curlist+['#'] or (special_starts.get(i[0],False)) or i[0].isupper())):
           Q = i[1:-1]+endit(i[-1]) if butting and i!='' and i[-1] != " " else i
           print((seledchar:=("\033[48;5;5m" if butting and i!='' and curlist[cur] == i[0] else '')) + \
             ((f"{Q:>{width//2+len(Q)//2}}" if '|' in i or addon_mode else f"{Q:^{width-center_left}}") if centerit=='center' else f"{Q:>{width-(1 if not addon_mode else len(mode())+1)}}" if centerit=='right' else Q) +\
@@ -663,17 +662,17 @@ def yskysn():
     buts = '\n-Save Data#\n\n0Double Boss HP | a\n  \n1No hit (1 hp)  | b\n2     No heals  | c\n  \n3Extreme mode   | d\n\n4CLOUD 9        | e\n5Hell.          | f\n\nySettings#\nxExit#\nzContinue#\n;ALTER          | :\n'
     buts_settings = """\nSettings \n\n0Center mode: ^\n1Show introduction text: | &\n\nyExit Settings#\n"""
     buts_save = """
-Save Data
-Will be overidden if you start another game!
+Save Data 
+Will be overidden if you start another game! 
 Loaded game will instantly start! 
 
-Mode: 0
-Your hp: 1
-Boss hp: 2
+#Mode: 0
+#Your hp: 1
+#Boss hp: 2
 }Has Spidy: 4
 
-xLoad Save
-yBack
+xLoad Save#
+yBack#
 """ #Mode = SAVE[0] Spidy = SAVE[4] etc
     SAVEITPLEASE, cur,curlist = False, 0, modes_allow #saveitplease = load the save after it breaks or something idk what im doing
     print("\033[38;5;88m")
@@ -688,7 +687,7 @@ yBack
       elif t in [ENTER,LEFT,RIGHT,'a','d']:
         sound('YSKYSN/sel.wav',True,"sel",.5)
         if curlist==modes_allow:
-          (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (curlist:=buts_save) if g=='-' else ''
+          (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (curlist:=save_allow) + [c(),(cur:=0)] if g=='-' else ''
           if g=='x':
             return c()
           if g=='z':
@@ -704,7 +703,7 @@ yBack
       print("\033[H",end="\n"*6)
       if curlist==modes_allow:
         prints("Selected mode: ",'def',False,True,False,4)
-      prints(buts if curlist==modes_allow else buts_settings,'f',True)
+      prints(buts if curlist==modes_allow else buts_settings if curlist==sets_allow else buts_save,'f',True)
     
     if SAVEITPLEASE:
       if hell:
