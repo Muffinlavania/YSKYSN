@@ -1,6 +1,9 @@
 import os,time,sys,random,json,AUDIO
 from pygame import mixer
 from threading import Thread
+
+#Change doomsday to darkness minus red lightning/eyes ?, "The Last One Standing." make doomsday dialogues
+
 if os.name == 'nt': #doesnt work on mac?
   from ctypes import windll
 
@@ -17,7 +20,15 @@ def changespeed(file, speed=1.0):
 #pyinstaller -F --add-data "YSKYSN/*.wav:YSKYSN/" --add-data "YSKYSN/*.mp3:YSKYSN/" YSKYSNsolo.py --paths /Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages
 
 '''
-- finish adding lean no hit for lucas lol
+HELL MODE ITEM VIEWER???? 
+- Switch "MAGIC" with "PRAY " and "HEAL UP" with " ITEM "
+- pray same as magic but ALL hell choices, ITEM taks you to a sort of maze that lets you see what you have
+Heavnly lghtmakes thebackgroundwhite, can see items like red pill, apple etc
+spidy replaced with Heaven's Bow, need first heavnly light (Light shines down from above.... The light fills you with warmth. (1/3 parts!))
+heavenly Bow, (Suddenly, a bow from the light above. Light as the clouds and shining bright as a star, hope emerges. (2/3 parts!))
+Golden Arrow, (A message from a god... an arrow! A gold engraving says "Golden Finale." The complete bow gives you the perfect endgame... (3/3, dont give up now!)
+
+
 - HELL MODE
   - two phases, need to kill him for 2nd phase, which is a savepoint you can continue from (since phase 2 not gonna be easy at all)
   - 2nd phase is actually completley different
@@ -32,12 +43,12 @@ def changespeed(file, speed=1.0):
 
 ALTER:
   - dmg multiplier gets +/- somewhere between .5-2 or something?
-add lean no hit, lean random mode
+
 
 WHAT IVE DONE (so no forgor)
 changed achievement SAVING (only) to be a list of all modes' numbers, need to update reading of it etc
-made some of the buttons working, need to add save, make the modes/intro text pop up and change if need be
-center the god damn YSKYSN first text!!!!!!!!!, figure out wtf is happening with settings tab
+made all modes mixable (minus the special one)
+added bonus of Doomsday!
 '''
 
 r='\033[0m'
@@ -642,7 +653,16 @@ def yskysn():
     #special printing things
     special_ends,special_starts = ['^','0','1','2','4'],{";":both,"}":"Hell" not in mode(SAVE[0])} #mostly used for settings
     def endit(ending): #update this with special_ends!!!
-      return str({"^":f"< {centerit} >","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
+      return str({"^":f"< {centerit} >","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))      
+
+    #if there is a colorcode, add on that # ofchars to the left offset 
+    def CENTEROFF(st):
+      if '\033' not in st: return 0
+      else: 
+        count,fina = 0,0
+        while (count:=st.find('\033',count))!=-1:
+          fina += len(st[count:(count:=st.find('m',count))])-1
+        return fina
     
     def prints(e,width='default',butting=False,addon_mode=False,JUSTPRINT=False,center_left:int=0): #addon_mode cause color codes make centering bad
       """Use JUSTPRINT to simply center/right/left the text, center_left to move text left by that many spaces"""
@@ -652,8 +672,9 @@ def yskysn():
       for i in e.split("\n"):
         if not JUSTPRINT and (not butting or (i.strip()=='' or i[0] in curlist+['#'] or (special_starts.get(i[0],False)) or i[0].isupper())):
           Q = i[1:-1]+endit(i[-1]) if butting and i!='' and i[-1] != " " else i
+          center_left += CENTEROFF(mode() if addon_mode else '')
           print((seledchar:=("\033[48;5;5m" if butting and i!='' and curlist[cur] == i[0] else '')) + \
-            ((f"{Q:>{width//2+len(Q)//2}}" if '|' in i or addon_mode else f"{Q:^{width-center_left}}") if centerit=='center' else f"{Q:>{width-(1 if not addon_mode else len(mode())+1)}}" if centerit=='right' else Q) +\
+            ((f"{Q:>{width//2+len(Q)//2-(3 if addon_mode else 0)}}" if '|' in i or addon_mode else f"{Q:^{width-center_left}}") if centerit=='center' else f"{Q:>{width-(1 if not addon_mode else len(mode()))+center_left}}" if centerit=='right' else Q) +\
             ('' if not butting or i=='' or i[-1] in [' ','#']+special_ends else (s({'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both}.get(i[-1],False),False))+seledchar+(" "*(width//2-len(i)//2 if centerit=='center' else 0 if centerit=="right" else width-len(i)-1)))+(mode()+("    " if centerit!='right' else '')if addon_mode else r))
         elif JUSTPRINT:
           print(f"{i:^{width}}" if centerit=='center' else f"{i:>{width}}" if centerit=='right' else i)
@@ -677,7 +698,7 @@ yBack#
     SAVEITPLEASE, cur,curlist = False, 0, modes_allow #saveitplease = load the save after it breaks or something idk what im doing
     print("\033[38;5;88m")
     prints("YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse Up/Down to move, Z/Enter/Left/Right to select!\n\n",'','','',True)
-    prints("Selected mode: ",'def',False,True,False,4)
+    prints("Selected mode: ")
     prints(buts,'default',True)
     while (t:=getkey1()):
       if t in ['w','s',UP,DOWN]:
@@ -705,13 +726,18 @@ yBack#
         prints("Selected mode: ",'def',False,True,False,4)
       prints(buts if curlist==modes_allow else buts_settings if curlist==sets_allow else buts_save,'f',True)
     
-    if SAVEITPLEASE:
+    if not SAVEITPLEASE:
       if hell:
-    
         printt(["....","You know what you've done.","Instead of giving in, or merely fighting back, you decided to end this, once and for all.","\033[38;5;88mGood luck mortal. You rats always need it.\033[0m"],[3,1,2,.03])
         print("[Any key to continue to hell. Good luck.]")
+      elif 1==1:
+        pass
     else:
-      pass
+      noheal, xtreme, bmulti, nonr, hell, hell2, cloud9, cancer, yehp, bhp, stats4nerds, hasspidy = \
+      '12' in SAVE[0],'16' in SAVE[0], '3' in SAVE[0], '94' in SAVE[0], '64' in SAVE[0], '65' in SAVE[0], '49' in SAVE[0],'50' in SAVE[0],\
+      SAVE[1],SAVE[2],SAVE[3],SAVE[4]
+      print("Game loaded!")
+      anykey()
     def old_select():
       if jy=='x':
         return
