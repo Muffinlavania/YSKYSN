@@ -1,27 +1,3 @@
-'''
-import time
-def get_current_mac_wind():
-  from AppKit import NSWorkspace
-  from Quartz import kCGWindowListOptionOnScreenOnly, kCGNullWindowID, CGWindowListCopyWindowInfo
-
-  workspace = NSWorkspace.sharedWorkspace()
-  activeApps = workspace.runningApplications()
-  for app in activeApps:
-      if app.isActive():
-          options = kCGWindowListOptionOnScreenOnly
-          windowList = CGWindowListCopyWindowInfo(options,
-                                                  kCGNullWindowID)
-          for window in windowList:
-              if window['kCGWindowOwnerName'] == app.localizedName():
-                  return app
-          break
-  return None
-
-window = get_current_mac_wind()
-window.hideOtherApplications()
-time.sleep(2)
-window.unhideOtherApplications()
-'''
 import os,time,sys,random,json,AUDIO
 from pygame import mixer
 from threading import Thread
