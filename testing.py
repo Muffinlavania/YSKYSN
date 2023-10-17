@@ -1,9 +1,42 @@
+import time,os
+def get_current_mac_wind():
+  from AppKit import NSWorkspace
+  from Quartz import kCGWindowListOptionOnScreenOnly, kCGNullWindowID, CGWindowListCopyWindowInfo
 
-def distance(spot,distance=2,limit=6969):
-  # returns distance to a spot (used for radio lol)
-  y = [i for k in [-1,1] for i in range(spot-distance-52*distance*k,spot+1+distance-52*distance*k) if 0<i<limit]
-  y.extend(spot+(distance*k)+(52*q) for k in [-1,1] for q in range(distance*-1,distance+1) if 0<spot+(distance*k)+(52*q)<limit)
+  workspace = NSWorkspace.sharedWorkspace()
+  activeApps = workspace.runningApplications()
+  for app in activeApps:
+      if app.isActive():
+          options = kCGWindowListOptionOnScreenOnly
+          windowList = CGWindowListCopyWindowInfo(options,
+                                                  kCGNullWindowID)
+          for window in windowList:
+              if window['kCGWindowOwnerName'] == app.localizedName():
+                  return app
+          break
+  return None
+
+#window = get_current_mac_wind()
+#window.hideOtherApplications()
+#time.sleep(2)
+#window.unhideOtherApplications()
+
+def distance(spot,distance=2,limit=6969,W=52):
+  # if 2nd thing in spot is greater just do the greater thing lol, 1st spot is ALWAYS the reference point or somethin 
+  #top/bottom parts
+  spot=list(spot)
+  if len(spot) == 1: spot.append(0)
+  y = [i for k in [-1,1] for i in range(spot[0]-distance-W*distance*k,spot[0]+(1 if spot[1]<spot[0] else 2)+distance-W*distance*k) if 0<i<limit]
+  y.extend(spot[0]+(distance*k)+(W*q) for k in ([-1,1] if spot[0]>spot[1] else [-1,1,2]) for q in range(distance*-1,distance+1+int(spot[1]>spot[0])) if 0<spot[0]+(distance*k)+(W*q)<limit)
   return y
+
+#------#
+#      #
+#  e   #
+#   d  #
+#      #
+#------#
+
 
 def printItem():
   for i in ITEMS:
@@ -31,8 +64,9 @@ ITEMS = """-----------------------------------------------------------------
 -ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-
 -----------------------------------------------------------------
 """
-HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = False,False,False
-iinv = ['Apple','Cherry','Cheesecake',"Jalepeno","Gum",'Vanilla Cone','Chocolate Cone']
+distant = distance(240,3,9999,65)
+HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = True,True,True
+iinv = []
 ITEMSd = {
   '-':" ",
   " " : '"\033[48;5;52m " if "Red Pill" in iinv else "\033[48;5;17m " if "Blue Pill" in iinv else " "',
