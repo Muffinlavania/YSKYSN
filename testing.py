@@ -21,13 +21,13 @@ def get_current_mac_wind():
 #time.sleep(2)
 #window.unhideOtherApplications()
 
-def distance(spot,distance=2,limit=6969,W=52):
-  # if 2nd thing in spot is greater just do the greater thing lol, 1st spot is ALWAYS the reference point or somethin 
+def distance(spot,dist=2,limit=6969,W=52):
   #top/bottom parts
-  spot=list(spot)
-  if len(spot) == 1: spot.append(0)
-  y = [i for k in [-1,1] for i in range(spot[0]-distance-W*distance*k,spot[0]+(1 if spot[1]<spot[0] else 2)+distance-W*distance*k) if 0<i<limit]
-  y.extend(spot[0]+(distance*k)+(W*q) for k in ([-1,1] if spot[0]>spot[1] else [-1,1,2]) for q in range(distance*-1,distance+1+int(spot[1]>spot[0])) if 0<spot[0]+(distance*k)+(W*q)<limit)
+  spot=[spot,0] if type(spot)==int else spot
+  multi = spot[1]>spot[0]
+  y = [i for k in [-1,1] for i in range(spot[0]-dist+(W*dist*k)+(W if k==1 and multi else 0),spot[0]+(2 if multi else 1)+dist+(W*dist*k)+(W if k==1 and multi else 0)) if 0<i<limit]
+  y.extend(spot[0]+(dist*k)+(W*q)+(int(multi and k==1)) for k in ([-1,1]) for q in range(dist*-1,dist+1) if 0<spot[0]+(dist*k)+(W*q)<limit)
+  y.append(spot[0])
   return y
 
 #------#
@@ -39,8 +39,11 @@ def distance(spot,distance=2,limit=6969,W=52):
 
 
 def printItem():
-  for i in ITEMS:
-    print(e if '"' not in (e:=ITEMSd.get(i,i)) else eval(e),end="\033[0m")
+  temper = {i:(e if '"' not in (e:=ITEMSd[i]) else eval(e)) for i in ITEMSd}
+  for ind,i in enumerate(ITEMS): 
+      print(temper.get(i,i) if ind not in distant else "\033[48;5;203m ",end="\033[0m")
+
+
 ITEMS = """-----------------------------------------------------------------
 -ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-
 -o                      lllllllllllllllll                      o-
@@ -64,7 +67,7 @@ ITEMS = """-----------------------------------------------------------------
 -ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-
 -----------------------------------------------------------------
 """
-distant = distance(240,3,9999,65)
+distant = distance(240,3,9999,66)
 HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = True,True,True
 iinv = []
 ITEMSd = {
@@ -117,4 +120,6 @@ while True:
     eval(h)
   with open("TEST.txt",'r') as j:
     ITEMS = j.read()
+  #with open("testing-test.txt",'r') as k:
+  #  distant = eval(k.read())
   os.system('cls' if os.name=='nt' else 'clear')
