@@ -592,7 +592,7 @@ def thingthing(key):
 #-------------------------YSKYSN----------------------
 YL='''\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no----------------------GGGGGGGGGGGGG--------------------------o\no--------------------GGGGGGGGGGGGGGGG-------------------------o\no--------------------GbbbbbbbbbbbbbGGG------------------------o\no--------------------bbbbbbbbbbbbbbbGG------------------------o\no--------------------bbbWWWbbbbWWWbbbB------------------------o\no--------------------bbbbbbbbbbbbbbbbB------------------------o\no---------------------bbbbbbbbbbbbbbB-------------------------o\no---------------------BbbbmmmmmbbbBB--------------------------o\no----------------------BbbbbbbbbbBB---------------------------o\no-----------------------BBBBBBBBBBb---------------------------o\no-------------------nnnnbbbbbbbbbbbnnn------------------------o\no---------------nnnnnnnnnnnnnnnnnnnnnnn-----------------------o\no--------------nnnnnnnnnnnnnnnnnnnnnnnnn----------------------o\no--------------nnnnnnnnnnnnnnnnnnnnnnnnnnn--------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnn-------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn------------------o'''
 YS='''\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o'''
-
+ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSRRggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggRRgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------\n'
 r='\033[0m'
 #vars you can change in settings, preferences
 centerit,centermodes,skipintro = "center",["center","right","left"],False # make settings!/hell mode things
@@ -610,7 +610,6 @@ def yskysn():
   JUSTUPIT,kys,itsafirst,hasspidy=False,False,not acheck("LYS"),False #itsafirst first attacking turn, 2.6 spidy cycle
   zeeeee,whereheat,dmgmul=0,0,1
   noheal,xtreme,bmulti,hell,hell2,cloud9,cancer,nonr=False,False,1,False,False,False,False,False #different modes
-  
   coloreddict={
     'o':'\033[48;5;0m ', #black for the border
     '-':'\033[48;5;233m ', #black (background)
@@ -626,11 +625,59 @@ def yskysn():
     'Q':'\033[38;5;46m','!':'\033[38;5;177m','@':'\033[38;5;174m','#':'\033[38;5;174m','$':'\033[38;5;174m',
     'R':'\033[0m','▢':'\033[38;5;51m▢', #player
     '~':'\033[38;5;62m◌'#empty space to move in
-    }
+  }
+  #HELLMODE STUFF
+  ITEM_spots = { #distance thing, stats (plus defense, heal etc), description
+    'Jalepeno': [[[1106, 0], 3, 66, 0],"+75 HP","Scorching hot... A fiery start leads to a smoother end."],
+    'Cheesecake': [[[1180, 0], 3, 66, 1],"+100 HP, 2x damage taken next turn","A treat for the tolerant. Not for the lactose intolerant."],
+    'Chocolate Cone': [[[1096, 0], 3, 66, 1],"+25 HP, +1 defense!","A dark delight, made for the tough."],
+    'Vanilla Cone': [[[1080, 0], 3, 66, 1],"+25 HP, +5 attack!","A coned confection, made for the strong."],
+    'Placebo': [[[1088, 0], 2, 66, 1],"Once taken, never forgotten.","A truly effective medicine. Made to decieve, used to rationalize."],
+    'Gum': [[[1135, 0], 2, 66, 2],"+25 HP, +defense next turn","A tough chew...  Not the most nutritious, but hard to hurt."],
+    'Cherry': [[[996, 997], 2, 66, 2],"+50 HP, +defense next turn","A lucky break, a jackpot of sorts. A quick fix to lost attention."],
+    'Apple': [[[1192, 0], 2, 66, 1],"+10 HP","An apple a day keeps the defibrillator away... The first resort."],
+    "Heaven's Bow": [[[559, 0], 6, 66, 5],"Delivery. (Part 2/3)","A glow trapped in gold. Limitless potential, yet limited to the gods."],
+    "Heaven's Arrow": [[[559, 0], 6, 66, 5],"Swift justice. (Part 3/3)","A message straight to the point."],
+    "Heaven's Light": [[[494, 0], 6, 66, 18],"Radiance. (Part 1/3)","A blessing from above, in times of need."],
+    'Red Pill': [[[494, 0], 6, 66, 25],"+15 crit damage, can be heightened...","The sky lights up, replaced with blood red. Once taken, never forgotten."],
+    'Blue Pill': [[[494, 0], 6, 66, 25],"+5 blue shield, can be heightened...","The sky lights up, replaced with a solid blue. Once taken, never forgotten."]}
+  ITEMSd = {
+    '-':" ",'g' : '\033[48;5;242m ',
+    " " : '"\033[48;5;52m " if "Red Pill" in iinv else "\033[48;5;17m " if "Blue Pill" in iinv else " "',
+    'o' : '"\033[48;5;0m " if not HEAVEN_LIGHT else "\033[48;5;234m "',
+    'l' : '"\033[48;5;7m " if HEAVEN_LIGHT else eval(ITEMSd[" "])',
+    's' : '"\033[48;5;100m " if HEAVEN_BOW else eval(ITEMSd["l"])', #bow string
+    'b' : '"\033[48;5;226m " if HEAVEN_BOW else eval(ITEMSd["l"]) ', #bow well bow
+    'a' : '"\033[48;5;231m " if HEAVEN_ARROW else eval(ITEMSd["l"]) ', #arrow shaft
+    't' : '"\033[48;5;195m " if HEAVEN_ARROW else eval(ITEMSd["l"]) ', #arrow tip
+    'A': '"\033[48;5;196m " if "Apple" in iinv else ITEMSd["g"]', #apple red
+    'B': '"\033[48;5;131m " if "Apple" in iinv else ITEMSd["g"]', #apple brown (stem)
+    'L': '"\033[48;5;112m " if "Apple" in iinv else ITEMSd["g"]', #apple leaf
+    'P': '"\033[48;5;124m " if "Red Pill" in iinv else "\033[48;5;27m " if "Blue Pill" in iinv else ITEMSd["g"]',#placebo pill
+    '=': '"\033[48;5;253m " if "Red Pill" in iinv or "Blue Pill" in iinv else ITEMSd["g"]',#placebo middle
+    'R': '"\033[48;5;160m " if "Cherry" in iinv else ITEMSd["g"]', #cherry red
+    'S': '"\033[48;5;64m " if "Cherry" in iinv else ITEMSd["g"]', #cheery stem/connector
+    'C': '"\033[48;5;230m " if "Cheesecake" in iinv else ITEMSd["g"]', #cheesecake top
+    'c': '"\033[48;5;222m " if "Cheesecake" in iinv else ITEMSd["g"]', #cheesecake bottom
+    'Z': '"\033[48;5;162m " if "Cheesecake" in iinv else ITEMSd["g"]', #cheesecake strawberry
+    'J': '"\033[48;5;1m " if "Jalepeno" in iinv else ITEMSd["g"]', #jalepeno red
+    'H': '"\033[48;5;28m " if "Jalepeno" in iinv else ITEMSd["g"]', #jalepeno green
+    'G': '"\033[48;5;207m " if "Gum" in iinv else ITEMSd["g"]', #gum pink
+    'V': '"\033[48;5;255m " if "Vanilla Cone" in iinv else ITEMSd["g"]', #vanilla ice cream
+    'O': '"\033[48;5;94m " if "Chocolate Cone" in iinv else ITEMSd["g"]', #chocolate ice cream
+    '1': '"\033[48;5;215m " if "Vanilla Cone" in iinv else ITEMSd["g"]', #vanilla cone
+    '2': '"\033[48;5;215m " if "Chocolate Cone" in iinv else ITEMSd["g"]' #choc cone
+  }
+  distant = distance([410,500],3,66,-1) #need t implement a way to like change between items and print out stuff!!!
+  def printItem():
+    temper = {i:(e if '"' not in (e:=ITEMSd[i]) else eval(e)) for i in ITEMSd}
+    for ind,i in enumerate(ITEMS):
+        print(temper.get(i,i) if ind not in distant or i=='\n' else "\033[48;5;203m ",end="\033[0m")
   
+  def itemView():
+    pass #uh
+
   stats4nerds={'turns':0,'speak':0,'magic':0,'heal up':0,'kys':0,'yskysn heals':0,'dream mask':0,'rusty mask':0,'hockey mask':0,'doctors':0,'damage taken':0,'useless turns':0}
-  
-  #get mode, bigger ones first etc
   def mode(data:list=[]):
     if '22' in data: return "Normal" #quick normal loading moment
     LEAN,NOHIT,NOHEAL,HP2X,CANCER,CLOUD9,HELL,HELL2 = \
@@ -639,13 +686,12 @@ def yskysn():
       ("Hell." if HELL else "Doomsday." if e else "Cloud 9." if cloud9 else "Cancer." if (LEAN and NOHIT) or CANCER else f"NO HIT{'+' if any([LEAN,HP2X]) else ''}" if NOHIT else\
         f"LEAN{'+' if any([NOHEAL,HP2X]) else ''}" if LEAN else f"NO HEALS{'+' if HP2X else ''}" if NOHEAL else "2x HP" if HP2X else "Normal")+\
         "\033[0m"
-  
+
   if not itsafirst:
     c()
     #new select!!!!!!!
     
-    SAVE = ['','','','','']
-    modes_allow,sets_allow,save_allow = ['0','1','2','3'],['0','1','y'],['x','y'] #set up list of things you can see/do in main menu
+    SAVE,modes_allow,sets_allow,save_allow = ['','','','',''],['0','1','2','3'],['0','1','y'],['x','y'] #set up list of things you can see/do in main menu
     for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,(SAVE:=acheck("s"))!=False]):
       if casee: modes_allow.append(i)
     
