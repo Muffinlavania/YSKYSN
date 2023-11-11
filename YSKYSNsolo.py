@@ -2,6 +2,13 @@ import os,time,sys,random,json,AUDIO
 from pygame import mixer
 from threading import Thread
 
+def distance(spot,dist=2,W=52,ex_W=0):
+  #top/bottom parts
+  spot=[spot,0] if type(spot)==int else spot
+  multi = spot[1]>spot[0]
+  y = [i for k in [-1,1] for i in range(spot[0]-dist+(W*dist*k)+(W if k==1 and multi else 0) - ex_W,spot[0]+(2 if multi else 1)+dist+(W*dist*k)+(W if k==1 and multi else 0) + ex_W)]
+  y.extend(spot[0]+(dist*k)+(W*q)+(int(multi and k==1))+ex_W*k for k in ([-1,1]) for q in range(dist*-1,dist+1))
+  return y
 #Change doomsday to darkness minus red lightning/eyes ?, "The Last One Standing." make doomsday dialogues
 
 if os.name == 'nt': #doesnt work on mac?
