@@ -2,13 +2,6 @@ import os,time,sys,random,json,AUDIO
 from pygame import mixer
 from threading import Thread
 
-def distance(spot,dist=2,W=52,ex_W=0):
-  #top/bottom parts
-  spot=[spot,0] if type(spot)==int else spot
-  multi = spot[1]>spot[0]
-  y = [i for k in [-1,1] for i in range(spot[0]-dist+(W*dist*k)+(W if k==1 and multi else 0) - ex_W,spot[0]+(2 if multi else 1)+dist+(W*dist*k)+(W if k==1 and multi else 0) + ex_W)]
-  y.extend(spot[0]+(dist*k)+(W*q)+(int(multi and k==1))+ex_W*k for k in ([-1,1]) for q in range(dist*-1,dist+1))
-  return y
 #Change doomsday to darkness minus red lightning/eyes ?, "The Last One Standing." make doomsday dialogues
 
 if os.name == 'nt': #doesnt work on mac?
@@ -634,7 +627,8 @@ def yskysn():
     '~':'\033[38;5;62m◌'#empty space to move in
   }
   #HELLMODE STUFF
-  ITEM_spots = { #distance thing, stats (plus defense, heal etc), description
+  pill = '' #change pill to be 'r' for Red Pill, 'b' for Blue Pill
+  ITEM_spots = { #distance thing, stats (plus defense, heal etc), description, check (only for the ones at the top, red pill, light etc)
     'Jalepeno': [[[1106, 0], 3, 66, 0],"+75 HP","Scorching hot... A fiery start leads to a smoother end."],
     'Cheesecake': [[[1180, 0], 3, 66, 1],"+100 HP, 2x damage taken next turn","A treat for the tolerant. Not for the lactose intolerant."],
     'Chocolate Cone': [[[1096, 0], 3, 66, 1],"+25 HP, +1 defense!","A dark delight, made for the tough."],
@@ -643,14 +637,16 @@ def yskysn():
     'Gum': [[[1135, 0], 2, 66, 2],"+25 HP, +defense next turn","A tough chew...  Not the most nutritious, but hard to hurt."],
     'Cherry': [[[996, 997], 2, 66, 2],"+50 HP, +defense next turn","A lucky break, a jackpot of sorts. A quick fix to lost attention."],
     'Apple': [[[1192, 0], 2, 66, 1],"+10 HP","An apple a day keeps the defibrillator away... The first resort."],
-    "Heaven's Bow": [[[559, 0], 6, 66, 5],"Delivery. (Part 2/3)","A glow trapped in gold. Limitless potential, yet limited to the gods."],
-    "Heaven's Arrow": [[[559, 0], 6, 66, 5],"Swift justice. (Part 3/3)","A message straight to the point."],
-    "Heaven's Light": [[[494, 0], 6, 66, 18],"Radiance. (Part 1/3)","A blessing from above, in times of need."],
-    'Red Pill': [[[494, 0], 6, 66, 25],"+15 crit damage, can be heightened...","The sky lights up, replaced with blood red. Once taken, never forgotten."],
-    'Blue Pill': [[[494, 0], 6, 66, 25],"+5 blue shield, can be heightened...","The sky lights up, replaced with a solid blue. Once taken, never forgotten."]}
+    "Heaven's Bow": [[[559, 0], 6, 66, 5],"Delivery. (Part 2/3)","A glow trapped in gold. Limitless potential, yet limited to the gods.","HEAVEN_BOW"],
+    "Heaven's Arrow": [[[559, 0], 6, 66, 5],"Swift justice. (Part 3/3)","A message straight to the point.","HEAVEN_ARROW"],
+    "Heaven's Light": [[[494, 0], 6, 66, 18],"Radiance. (Part 1/3)","A blessing from above, in times of need.","HEAVEN_LIGHT"],
+    'Red Pill': [[[494, 0], 6, 66, 25],"+15 crit damage, can be heightened...","The sky lights up, replaced with blood red. Once taken, never forgotten.","pill=='r'"],
+    'Blue Pill': [[[494, 0], 6, 66, 25],"+5 blue shield, can be heightened...","The sky lights up, replaced with a solid blue. Once taken, never forgotten.","pill=='b'"],
+    "None1":[[[1088, 0], 6, 66, 25],"None","None"],"None2":[[[494, 0], 6, 66, 25],"None","None","True"]}
+  iinv, ITEM_l_real,ITEM_r_real = [],["Apple","Cherry","Gum","Vanilla Cone","Placebo","Chocolate Cone","Jalepeno","Cheesecake"],["Red Pill","Blue Pill","Heaven's Light","Heaven's Bow","Heaven's Arrow"] #order to view items 
   ITEMSd = {
     '-':" ",'g' : '\033[48;5;242m ',
-    " " : '"\033[48;5;52m " if "Red Pill" in iinv else "\033[48;5;17m " if "Blue Pill" in iinv else " "',
+    " " : '"\033[48;5;52m " if pill=="r" else "\033[48;5;17m " pill=="b" else " "',
     'o' : '"\033[48;5;0m " if not HEAVEN_LIGHT else "\033[48;5;234m "',
     'l' : '"\033[48;5;7m " if HEAVEN_LIGHT else eval(ITEMSd[" "])',
     's' : '"\033[48;5;100m " if HEAVEN_BOW else eval(ITEMSd["l"])', #bow string
@@ -660,8 +656,8 @@ def yskysn():
     'A': '"\033[48;5;196m " if "Apple" in iinv else ITEMSd["g"]', #apple red
     'B': '"\033[48;5;131m " if "Apple" in iinv else ITEMSd["g"]', #apple brown (stem)
     'L': '"\033[48;5;112m " if "Apple" in iinv else ITEMSd["g"]', #apple leaf
-    'P': '"\033[48;5;124m " if "Red Pill" in iinv else "\033[48;5;27m " if "Blue Pill" in iinv else ITEMSd["g"]',#placebo pill
-    '=': '"\033[48;5;253m " if "Red Pill" in iinv or "Blue Pill" in iinv else ITEMSd["g"]',#placebo middle
+    'P': '"\033[48;5;124m " if pill=="r" else "\033[48;5;27m " if pill=="b" else ITEMSd["g"]',#placebo pill
+    '=': '"\033[48;5;253m " if pill in "br" else ITEMSd["g"]',#placebo middle
     'R': '"\033[48;5;160m " if "Cherry" in iinv else ITEMSd["g"]', #cherry red
     'S': '"\033[48;5;64m " if "Cherry" in iinv else ITEMSd["g"]', #cheery stem/connector
     'C': '"\033[48;5;230m " if "Cheesecake" in iinv else ITEMSd["g"]', #cheesecake top
@@ -675,14 +671,37 @@ def yskysn():
     '1': '"\033[48;5;215m " if "Vanilla Cone" in iinv else ITEMSd["g"]', #vanilla cone
     '2': '"\033[48;5;215m " if "Chocolate Cone" in iinv else ITEMSd["g"]' #choc cone
   }
-  distant = distance([410,500],3,66,-1) #need t implement a way to like change between items and print out stuff!!!
-  def printItem():
+  def distance(spot,dist=2,W=52,ex_W=0):
+    #top/bottom parts
+    spot=[spot,0] if type(spot)==int else spot
+    multi = spot[1]>spot[0]
+    y = [i for k in [-1,1] for i in range(spot[0]-dist+(W*dist*k)+(W if k==1 and multi else 0) - ex_W,spot[0]+(2 if multi else 1)+dist+(W*dist*k)+(W if k==1 and multi else 0) + ex_W)]
+    y.extend(spot[0]+(dist*k)+(W*q)+(int(multi and k==1))+ex_W*k for k in ([-1,1]) for q in range(dist*-1,dist+1))
+    return y
+
+  distant = distance([410,500],3,66,-1) 
+  HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = False,False,False
+  def printItem(distant=distant):
     temper = {i:(e if '"' not in (e:=ITEMSd[i]) else eval(e)) for i in ITEMSd}
     for ind,i in enumerate(ITEMS):
         print(temper.get(i,i) if ind not in distant or i=='\n' else "\033[48;5;203m ",end="\033[0m")
   
   def itemView():
-    pass #uh
+    global distant
+    ITEM_l,ITEM_r = f if (f:=[i for i in ITEM_l_real if i in iinv])!=[] else ["None1"],f if (f:=[i for i in ITEM_r_real if eval(ITEM_spots.get(i,['','','',False])[3])]) else ["None2"]
+    CUR,current = ITEM_l,0
+    while True:
+      distant = ITEM_spots[CUR[current]]
+      printItem(distant[0])
+      print(f"{CUR[current]}({iinv.count(CUR[current])}) - {distant[1]}\n\t{distant[2]}\n(Arrow keys to move, enter to select)")
+      if (g:=getkey1()) in ['a','d',LEFT,RIGHT]:
+        current+=1 if current<len(CUR) and g in ['d',RIGHT] else -1 if current>0 and g in ['a',LEFT] else 0
+      elif g in ['w','s',UP,DOWN]:
+        CUR = ITEM_l if g in ['w',UP] else ITEM_r
+      elif g==ENTER and "None" not in CUR[current]:
+        pass
+      
+      
 
   stats4nerds={'turns':0,'speak':0,'magic':0,'heal up':0,'kys':0,'yskysn heals':0,'dream mask':0,'rusty mask':0,'hockey mask':0,'doctors':0,'damage taken':0,'useless turns':0}
   def mode(data:list=[]):
