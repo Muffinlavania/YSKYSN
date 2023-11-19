@@ -627,7 +627,6 @@ def yskysn():
     '~':'\033[38;5;62m◌'#empty space to move in
   }
   #HELLMODE STUFF
-  pill = '' #change pill to be 'r' for Red Pill, 'b' for Blue Pill
   ITEM_spots = { #distance thing, stats (plus defense, heal etc), description, check (only for the ones at the top, red pill, light etc)
     'Jalepeno': [[[1106, 0], 3, 66, 0],"+75 HP","Scorching hot... A fiery start leads to a smoother end."],
     'Cheesecake': [[[1180, 0], 3, 66, 1],"+100 HP, 2x damage taken next turn","A treat for the tolerant. Not for the lactose intolerant."],
@@ -679,7 +678,8 @@ def yskysn():
     y.extend(spot[0]+(dist*k)+(W*q)+(int(multi and k==1))+ex_W*k for k in ([-1,1]) for q in range(dist*-1,dist+1))
     return y
 
-  distant = distance([410,500],3,66,-1) 
+  distant = distance([410,500],3,66,-1)
+  pill = '' #change pill to be 'r' for Red Pill, 'b' for Blue Pill
   HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = False,False,False
   def printItem(distant=distant):
     temper = {i:(e if '"' not in (e:=ITEMSd[i]) else eval(e)) for i in ITEMSd}
@@ -687,7 +687,7 @@ def yskysn():
         print(temper.get(i,i) if ind not in distant or i=='\n' else "\033[48;5;203m ",end="\033[0m")
   
   def itemView():
-    global distant
+    nonlocal distant,pill,HEAVEN_LIGHT,HEAVEN_ARROW,HEAVEN_BOW
     ITEM_l,ITEM_r = f if (f:=[i for i in ITEM_l_real if i in iinv])!=[] else ["None1"],f if (f:=[i for i in ITEM_r_real if eval(ITEM_spots.get(i,['','','',False])[3])]) else ["None2"]
     CUR,current = ITEM_l,0
     while True:
@@ -800,8 +800,10 @@ def yskysn():
       elif cancer:
         printt(["As he sips his lean, you start to tremble.","\033[38;5;88mHe\033[0m stands over you, entirely omniscient...."],[2,2])
         print("(No heals/Lean mode activated! Your hp: 1. You asked, I delivered. This IS possible, \033[38;5;16mthere are new tools to help.\033[0m)")
+        xtreme,nonr,noheal = True,True,True
       elif cloud9:
         printt(["A single sip of the stuff sends you higher than you've ever dreamt of.....","The world is spinning, spinning!"],[2,.03])
+        xtreme = True
       elif xtreme and nonr and bmulti==2:
         printt(["There's really no hope left.","\033[38;5;88mThere's only time to suffer."],[2,.03])
         print("\033[0m(Doomsday activated! Good luck!!!!)")
@@ -855,7 +857,7 @@ def yskysn():
   
   buttons='''
    !╓─────────╖  R @╓─────────╖      R #╓─────────╖    R$╓─────────╖
-   !║  SPEAK  ║ R  @║  '''+"MAGIC" if not hell else "PRAY "+'''  ║      R #║ '''+"HEAL UP" if not hell else "ITEM  "+''' ║   R $║   KYS   ║
+   !║  SPEAK  ║ R  @║  '''+("MAGIC" if not hell else "PRAY ")+'''  ║      R #║ '''+("HEAL UP" if not hell else "ITEM  ")+''' ║   R $║   KYS   ║
    !╙─────────╜ R  @╙─────────╜     R  #╙─────────╜  R  $╙─────────╜
   '''
   #thresholds: 600, 300
@@ -1200,7 +1202,7 @@ def yskysn():
         printman(YS)
         printman('''\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no               Q       YSKYSN HP: '''+' '*(4-len(str(bhp)))+str(bhp)+'''                        o\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo''')
         j=10 - bhp//(100*bmulti) #saying things
-        print("\n"+("\033[48;5;180m" if not (hell or cancer) else '')+f'{saying[j] if not (hell or cancer) else "Cancer." if cancer else random.choice(HELL_s[j].split("|")) if not hell2 else "This is it. The end.":^63}'+r+(' (no)' if j==9 and not (hell or cancer) else ''))
+        print("\n"+("\033[38;5;180m" if not (hell or cancer) else '')+f'{saying[j] if not (hell or cancer) else "Cancer." if cancer else random.choice(HELL_s[j].split("|")) if not hell2 else "This is it. The end.":^63}'+r+(' (no)' if j==9 and not (hell or cancer) else ''))
         print(f"\n{'[A/D to move, Z to select, N = stats, P = Toggle music]':^63}\n{'[C to reset screen, l = leave, game saves!]':^63}")
         if hasspidy:
           print(f'\033[38;5;1m{"[Spidy]":^63}'+r)
@@ -1209,7 +1211,7 @@ def yskysn():
         printman(buttons,False)
         zeeeee = stats4nerds['rusty mask']*20
         achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[not any([bmulti==2,xtreme,noheal,cloud9,cancer,hell]),bmulti==2,xtreme,noheal,nonr,cloud9,cancer,hell,hell2]) if y],yehp,bhp,stats4nerds,hasspidy])
-        wee=getkey1() #yskysn input
+        wee=getkey1() #yskysn input (INPUT NPUT oiDWNIOWNDJKFdkkfnkalKWMDLKWmd)
         if wee in [RIGHT,LEFT,'a','d']:
           coloreddict[noballs[selection]]='\033[38;5;174m'
         if wee in [LEFT,'a']:
@@ -1229,6 +1231,8 @@ def yskysn():
           print(r+'\n----------------\nStats for nerds:\n\n\033[38;5;82m\nHealth: '+str(yehp)+'\nBoss Health: '+str(bhp)+'\nTotal Turns: '+str(s4['turns'])+'\nTotal Speaks: '+str(s4['speak'])+'\nTotal Magics: '+str(s4['magic'])+'\nTotal Heal Ups: '+str(s4['heal up'])+'\nTotal KYS: '+str(s4['kys'])+'\nTotal Dream Masks: '+str(s4['dream mask'])+f'\n{"Total Hockey Masks" if not cancer else "Total Shields"}: '+str(s4['hockey mask'])+("\nShields avaliable: "+str(s4['shields'])+'\nTotal Red Bulls: '+str(s4['reds'])+"\nRed bulls available: "+str(s4['red bulls']) if cancer else "")+'\nTotal Rusty Masks: '+str(s4['rusty mask'])+'\nTotal Doctor\'s Kits: '+str(s4['doctors'])+'\nTotal YSKYSN Heals: '+str(s4['yskysn heals'])+'\nTotal Damage Taken: '+str(s4['damage taken'])+'\nTotal Useless Turns: '+str(s4['useless turns'])+r+'\n----------------')
           anykey()
           c()
+        elif wee=='i': #item view testing
+          itemView()
         if wee in [ENTER,'z','l']:
           pickin=False
           theender = wee=='l'
