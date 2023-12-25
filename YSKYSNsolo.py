@@ -608,7 +608,7 @@ def yskysn():
   upimps,leftside,leftimps,rightside,rightimps,spaced=[135,143,151,159,167,175,183],[134,198,262,326,390,454,518,582,646,710,774,838],[198,390,582,774],[185,249,313,377,441,505,569,633,697,761,825,889],[249,441,633,825],[199,207,215,223,231,239,247,391,399,407,415,423,431,439,583,591,599,607,615,623,631,775,783,791,799,807,815,823]
   turnramp={0:-1,1:-1,2:-1,3:-1,4:-1,5:-1} #:flushed:
   JUSTUPIT,kys,itsafirst,hasspidy=False,False,not acheck("LYS"),False #itsafirst first attacking turn, 2.6 spidy cycle
-  zeeeee,whereheat,dmgmul=0,0,1
+  zeeeee,whereheat,dmgmul,whatrupto=0,0,1,"235m" #doomsday change this to 0 so like i need it
   noheal,xtreme,bmulti,hell,hell2,cloud9,cancer,nonr=False,False,1,False,False,False,False,False #different modes
   coloreddict={
     'o':'\033[48;5;0m ', #black for the border
@@ -718,7 +718,7 @@ def yskysn():
     #new select!!!!!!!
     
     SAVE,modes_allow,sets_allow,save_allow = ['','','','',''],['0','1','2','3'],['0','1','y'],['x','y'] #set up list of things you can see/do in main menu
-    for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,(SAVE:=acheck("s"))!=False]):
+    for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,(SAVE:=acheck("s"))[0][0]!=False]):
       if casee: modes_allow.append(i)
     
     
@@ -830,26 +830,28 @@ def yskysn():
       SAVE[1],SAVE[2],SAVE[3],SAVE[4]
       print("Game loaded!")
       anykey()
-    if cancer:
-      for i in ['shields','reds','red bulls']: stats4nerds[i]=0
-    #setting up colored stuff
-    coloreddict['r']='\033[48;5;52m ' if hell else '\033[48;5;253m ' if noheal else '\033[48;5;91m ' if xtreme else coloreddict['r']
-    if nonr: coloreddict['n']='\033[48;5;52m '
-    if cloud9: coloreddict['o'] = '\033[48;5;91m '
-    if cancer: coloreddict['w'] = '\033[48;5;5m '
-    if hell:
-      coloreddict['n'],coloreddict['g'],coloreddict['w'] = "\033[48;5;0m ",'\033[48;5;52m ','\033[48;5;90m '
-      #hell mode 2: coloreddict['W'] = '\033[48;5;1m '
-    if xtreme and bmulti==2 and nonr: #doomsday
-      for thing,col in zip(['-','_','g','r','n','B','w'],['0','0','0','0','0','52','34']): coloreddict[thing] = f"\033[48;5;{col}m "
-  elif (SAVE:=acheck("s"))!=False:
+  elif (SAVE:=acheck("s"))[0]!=False:
     print(f"\033[38;5;153mSave data detected! (l to load, any other key to overide and start fight!)\033[0m\n\tMode: Normal{r}\n\tYour hp: {SAVE[1]}\n\tBoss hp: {SAVE[2]}\n\tSpidy?: {SAVE[4]}\n\tOther stats: Would take up too much space rn. L.")
     time.sleep(.5)
     if getkey1()=='l':
       print("\033[38;5;88mYSKYSN\033[0m smiles.\n(Loaded game!)")
       noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy=SAVE[0] not in ['16','3','22','64','61','49'],SAVE[0] in ["16",'49','50'],2 if SAVE[0]=="3" else 1,SAVE[0] not in ['49','50','16','3','12','22','64','61'],SAVE[0] in ['64','61'],SAVE[0]=='61',SAVE[0]=='49',SAVE[0]=='50',SAVE[1],SAVE[2],SAVE[3],SAVE[4]
       anykey()
-  
+  yehp = 1 if nonr else 100
+  if cancer:
+    for i in ['shields','reds','red bulls']: stats4nerds[i]=0
+  #setting up colored stuff
+  coloreddict['r']='\033[48;5;52m ' if hell else '\033[48;5;253m ' if noheal else '\033[48;5;91m ' if xtreme else coloreddict['r']
+  if nonr: coloreddict['n']='\033[48;5;52m '
+  if cloud9: coloreddict['o'] = '\033[48;5;91m '
+  if cancer: coloreddict['w'] = '\033[48;5;5m '
+  if hell:
+    coloreddict['n'],coloreddict['g'],coloreddict['w'] = "\033[48;5;0m ",'\033[48;5;52m ','\033[48;5;90m '
+    #hell mode 2: coloreddict['W'] = '\033[48;5;1m '
+  if xtreme and bmulti==2 and nonr: #doomsday
+    for thing,col in zip(['-','_','g','r','G','n','B','b','w','W','m'],['0','0','0','0','0','0','254','0','34','52','0']):
+      coloreddict[thing] = f"\033[48;5;{col}m "
+    whatrupto = "0m"
   
   
   #------------------------- End Save/load data stuff ------------------------------
@@ -1090,17 +1092,17 @@ def yskysn():
     for coi,i in enumerate(yt):
       if i in coloreddict.keys() and l or (not l and (i in ['!','@','#','$','R','w','_','g','~','▢','r','x'] or i in thesymlist)):
         if coi not in dang and ((coi not in theows and coi not in orang) or i not in ['~','▢']) or l:
-          print(('\033[48;5;235m'+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '')+coloreddict[i],end=(r if ('!' not in yt and i!='Q') else ''))
+          print(('\033[48;5'+whatrupto+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '')+coloreddict[i],end=(r if ('!' not in yt and i!='Q') else ''))
         else:
           if coi in dang:
             if i not in ['~','▢']:
-              print('\033[48;5;88m ',end=r)
+              print('\033[48;5;88m ',end=r)dd
             else:
               print('\033[48;5;88m'+(YY if i=='▢' else '')+coloreddict[i],end=r)
           elif coi in theows:
-            print('\033[48;5;235m'+(coloreddict['r'][:-1] if coi in thereds else coloreddict['w'][:-1] if coi in thewhites else '')+(coloreddict[i]+(YY if i=='▢' else '') if i!='~' else  coloreddict['w'] if coi in thewhites else '\033[38;5;88m◌'),end=r)
+            print('\033[48;5;'+whatrupto+(coloreddict['r'][:-1] if coi in thereds else coloreddict['w'][:-1] if coi in thewhites else '')+(coloreddict[i]+(YY if i=='▢' else '') if i!='~' else  coloreddict['w'] if coi in thewhites else '\033[38;5;88m◌'),end=r)
           else:
-            print("\033[48;5;235m\033[38;5;208m"+{'~':'◌','▢':'▢'+YY}[i],end=r)
+            print("\033[48;5;"+whatrupto+"\033[38;5;208m"+{'~':'◌','▢':'▢'+YY}[i],end=r)
       else:
         print(i,end='')
   def movi(dire): #8 left to right, 192 up/down
@@ -1355,7 +1357,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         c()
         afk=True
         printman(YS[:960])
-        coloreddict['m'],okle='\033[48;5;3m ' if bhp>=600*bmulti else '\033[48;5;131m ' if bhp>=300*bmulti else '\033[48;5;196m ',yehp
+        coloreddict['m'],okle=" " if xtreme and bmulti==2 and nonr else '\033[48;5;3m ' if bhp>=600*bmulti else '\033[48;5;131m ' if bhp>=300*bmulti else '\033[48;5;196m ',yehp
         while attackin and yehp>0:
           whereheat=playin.index('▢')
           if not cutscene:
@@ -1385,7 +1387,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
   musicstop()
   
   if bhp<0:
-    achieve('s',False)
+    achieve('s',[[False],False,False,False,False])
     c()
     coloreddict['m']='\033[48;5;166m '
     coloreddict['W']='\033[48;5;9m '
@@ -1437,11 +1439,9 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         c()
         yskysn()
   elif yehp<=0 and not theender:
-    achieve('s',False)
-    c()
-    time.sleep(1)
-    printt(r+"...")
-    slepy(2)
+    achieve('s',[[False],False,False,False,False])
+    c(1)
+    printt(r+"...",2)
     if nonr:
       printt(["It happened, was bound to.","\033[38;5;88mYour life is worth nothing!\033[0m"],[1,.03])
     elif noheal:
