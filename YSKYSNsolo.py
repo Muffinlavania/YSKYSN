@@ -4,15 +4,14 @@ from threading import Thread
 
 #Change doomsday to darkness minus red lightning/eyes ?, "The Last One Standing." make doomsday dialogues
 
-if os.name == 'nt': #doesnt work on mac?
+if os.name == 'nt': #doesnt work on mac? 
   from ctypes import windll
 
   mid = (windll.user32.GetSystemMetrics(78)//2, windll.user32.GetSystemMetrics(79)//2)
 
 def changespeed(file, speed=1.0):
-    #11025 framerate on here, im an idiot!!!!
-    return AUDIO.spawnsound(open(file_name(file), mode='rb'),speed)[0] #6 being the speed, need to adjust this!
-  
+    return AUDIO.spawnsound(file, (1/speed)*4.25) #*4.25 cause idk
+
 #PYINSTALLER:
 #windows:
 #pyinstaller -F --add-data "YSKYSN/*.wav;YSKYSN/" --add-data "YSKYSN/*.mp3;YSKYSN/" YSKYSNsolo.py 
@@ -52,6 +51,9 @@ added bonus of Doomsday!
 '''
 
 r='\033[0m'
+def rc():
+  print("\033[H", end="")
+  
 def c(time_sleep=0,skip=False):
   print(r);os.system('clear' if os.name!='nt' else 'cls')
   if time_sleep==0: return ""
@@ -123,7 +125,7 @@ c()
 
 
 #-----Music-----
-mixer.init()
+mixer.init(channels = 2)
 #works?????
 
 Music = mixer.music
@@ -221,7 +223,7 @@ def acheck(thing):
   return achievements.get(thing,False)
 
 def s(jh,achievement=True):
-  return '\033[48;5;46m \033[0m' if (achievements.get(jh,False) if achievement else jh) else '\033[48;5;160m \033[0m'
+  return ('\033[48;5;46m' if (acheck(jh) if achievement else jh) else '\033[48;5;160m') + (" " if not achievement or not acheck(jh+"A") else "A") + r
 
 def upped_achieves():
   te = all([acheck(i) for i in ['True Chad','LYS','LEAN','Double takedown','YSLYSN']])
@@ -234,7 +236,7 @@ def upped_achieves():
   |True chad - average no heal enjoyer :moai:     {s('True Chad')}|
   |lean destroyer - purple power                  {s('LEAN')}|
   |Double takedown - twice the hp is nothing.     {s('Double takedown')}|
-  |YSLYSN - The TRUE ending, good luck...         {s('YSLYSN')}|
+  |YSLYSN - The true ending, good luck...         {s('YSLYSN')}|
   |------------------------------------------------|
   |{"??????" if not acheck("LEAN") else "Cancer"} - {"Beat lean mode first.    " if not acheck("LEAN") else "you asked, i merely gave."}             {s("Cancer")}|
   |{"???????" if not acheck("LEAN") else "CLOUD 9"} - {"Beat lean mode first.   " if not acheck("LEAN") else "and so drugs truly lose."}             {s("CLOUD 9")}|
@@ -428,27 +430,29 @@ def move2(dir): #for alter
     mixer.pause()
   if ischar(dir,'-└┘┌┐',True,ALTER1):
     ALTER1 += 52 if dir=='down' else -52 if dir=='up' else -1 if dir=='left' else 1
+  if ischar(dir,'e',False,ALTER1) and mazeq==main:
+    yskysn()
   
 #-------minigame stuff-------
 
 
-level,maxlevel,speed,message,both,ALTER1 = 1,1,5,"Pink to start...",False,135 #find both
+level,maxlevel,speed,message,both,ALTER1 = 1,2 if acheck("aint no way") else 1,5,"Pink to start...",False,135 #find both
 
 
 #find songs
-song1 = [7, ["8", 34], ["C", 1], ["B", 1], ["A", 1], ["9", 1], ["A", 1], ["9", 1], ["A", 1], ["B", 32], ["5", 1], ["6", 1], ["5", 1], ["6", 1], ["5", 1], ["6", 1], ["7", 32], ["C", 1], ["B", 1], ["A", 1], ["B", 1], ["A", 1], ["9", 1], ["8", 19], ["6", 1], ["7", 1], ["8", 7], ["7", 1], ["6", 1], ["5", 7], ["4", 1], ["5", 1],["6",1]] #tuples = ([note positions to spawn (STRING)],iterations to wait)
+song1 = [7.5, ["8", 34], ["C", 1], ["B", 1], ["A", 1], ["9", 1], ["A", 1], ["9", 1], ["A", 1], ["B", 32], ["5", 1], ["6", 1], ["5", 1], ["6", 1], ["5", 1], ["6", 1], ["7", 32], ["C", 1], ["B", 1], ["A", 1], ["B", 1], ["A", 1], ["9", 1], ["8", 19], ["6", 1], ["7", 1], ["8", 7], ["7", 1], ["6", 1], ["5", 7], ["4", 1], ["5", 1],["6",1]] #tuples = ([note positions to spawn (STRING)],iterations to wait)
 song2 = song1.copy() #yea lol
-song2[0] = 6.2
+song2[0] = 6.75
 
 song2_ALTER = [["AMONGUS",23],["4", 4], ["3", 4], ["4", 4], ["5", 3], ["5", 3], ["5", 22], ["A", 3], ["B", 3], ["A", 4], ["9", 3], ["9", 3], ["9", 23], ["D", 3], ["C", 3], ["B", 4], ["D", 4], ["E", 3], ["D", 20], ["B", 4], ["A", 4], ["9", 4], ["8", 3],["7",3]]
 
-SPEEDSBEFORE = {"1":0.113,"2":0.126,"3":0.144,"4":0.167,"5":0.2,"6":0.245,"7":0.32,"8":0.45,"9":0.8}
-SPEEDS = {i:k*(.209/.2) for i,k in SPEEDSBEFORE.items()}
+SPEEDS = {"1": 0.48025, "2": 0.5355, "3": 0.612, "4": 0.70975, "5": 0.85, "6": 1.04125, "7": 1.36, "8": 1.9125, "9": 3.4} #updated :DDD
 
 nextone2,candie,hassseen2 = [],True,False #for testing stuff
 
 def spawners(skip=False,alter_song=song2_ALTER): #find minigame
   global gamering,maxlevel,level,colors,SCREENUP,ALTER1,message,nextone,nextone2,both
+  
   song = song1 if level==1 else song2
   #alter ego moment
   both,ALTER1 = level == 2, 135
@@ -590,25 +594,29 @@ def thingthing(key):
     keyz=key
 
 #-------------------------YSKYSN----------------------
-YL='''\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no----------------------GGGGGGGGGGGGG--------------------------o\no--------------------GGGGGGGGGGGGGGGG-------------------------o\no--------------------GbbbbbbbbbbbbbGGG------------------------o\no--------------------bbbbbbbbbbbbbbbGG------------------------o\no--------------------bbbWWWbbbbWWWbbbB------------------------o\no--------------------bbbbbbbbbbbbbbbbB------------------------o\no---------------------bbbbbbbbbbbbbbB-------------------------o\no---------------------BbbbmmmmmbbbBB--------------------------o\no----------------------BbbbbbbbbbBB---------------------------o\no-----------------------BBBBBBBBBBb---------------------------o\no-------------------nnnnbbbbbbbbbbbnnn------------------------o\no---------------nnnnnnnnnnnnnnnnnnnnnnn-----------------------o\no--------------nnnnnnnnnnnnnnnnnnnnnnnnn----------------------o\no--------------nnnnnnnnnnnnnnnnnnnnnnnnnnn--------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnn-------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn------------------o'''
-YS='''\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o'''
-ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSRRggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggRRgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------\n'
+YL='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no----------------------GGGGGGGGGGGGG--------------------------o\no--------------------GGGGGGGGGGGGGGGG-------------------------o\no--------------------GbbbbbbbbbbbbbGGG------------------------o\no--------------------bbbbbbbbbbbbbbbGG------------------------o\no--------------------bbbWWWbbbbWWWbbbB------------------------o\no--------------------bbbbbbbbbbbbbbbbB------------------------o\no---------------------bbbbbbbbbbbbbbB-------------------------o\no---------------------BbbbmmmmmbbbBB--------------------------o\no----------------------BbbbbbbbbbBB---------------------------o\no-----------------------BBBBBBBBBBb---------------------------o\no-------------------nnnnbbbbbbbbbbbnnn------------------------o\no---------------nnnnnnnnnnnnnnnnnnnnnnn-----------------------o\no--------------nnnnnnnnnnnnnnnnnnnnnnnnn----------------------o\no--------------nnnnnnnnnnnnnnnnnnnnnnnnnnn--------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnn-------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn------------------o'''
+YS='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o'''
+ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSRRggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggRRgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------'
 r='\033[0m'
 #vars you can change in settings, preferences
 centerit,centermodes,skipintro = "center",["center","right","left"],False # make settings!/hell mode things
+
 def yskysn():
   global afk,centerit,skipintro
+  if both:
+    printt("Something feels off... Maybe its you?\n[ALTER mode activated...]")
+    anykey()
   playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwR\n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwwR\n wwwg____________________________________________________gggwwR\n wgg__~_______~_______~_______~_______~_______~_______~___gwwwR\n wwg_____________________________________________________ggggwR\n wwwg____________________________________________________gwwgwR\n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwwwR\n wgwg_____________________________________________________gwgwR\n wgg______________________________________________________ggwwR\n wg___~_______~_______~_______~_______~_______~_______~___wgwwR\n wwg_____________________________________________________ggwwwR\n wgwg____________________________________________________gwgwwR\n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgwR\n wwwg____________________________________________________gwwgwR\n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwwwR\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwR''')
   playinref = playin.copy()
   playinref[415] = "~"
-  bhp,yehp,owie,iframamo=1000,100,0,1.5
+  bhp,yehp,owie,iframamo=1000,100,0,1.5 
   dang,orang,theows,thereds,thewhites=[],[],[],[],[]
   cutscene,iframes,attackin=False,True,True
   thesymlist,theintlim=['⊿','▲','△','▴','▵'],-1 #was going to be for attack 1 multiple words at once so eh
   upimps,leftside,leftimps,rightside,rightimps,spaced=[135,143,151,159,167,175,183],[134,198,262,326,390,454,518,582,646,710,774,838],[198,390,582,774],[185,249,313,377,441,505,569,633,697,761,825,889],[249,441,633,825],[199,207,215,223,231,239,247,391,399,407,415,423,431,439,583,591,599,607,615,623,631,775,783,791,799,807,815,823]
   turnramp={0:-1,1:-1,2:-1,3:-1,4:-1,5:-1} #:flushed:
   JUSTUPIT,kys,itsafirst,hasspidy=False,False,not acheck("LYS"),False #itsafirst first attacking turn, 2.6 spidy cycle
-  zeeeee,whereheat,dmgmul,whatrupto=0,0,1,"235m" #doomsday change this to 0 so like i need it
+  zeeeee,whereheat,dmgmul,backer=0,0,1,"\033[48;5;235m" #doomsday change this to 0 so like i need it
   noheal,xtreme,bmulti,hell,hell2,cloud9,cancer,nonr=False,False,1,False,False,False,False,False #different modes
   coloreddict={
     'o':'\033[48;5;0m ', #black for the border
@@ -627,7 +635,11 @@ def yskysn():
     '~':'\033[38;5;62m◌'#empty space to move in
   }
   #HELLMODE STUFF
-  ITEM_spots = { #distance thing, stats (plus defense, heal etc), description, check (only for the ones at the top, red pill, light etc)
+  iinv, ITEM_l_real,ITEM_r_real = ["Apple","Jalepeno"],["Apple","Cherry","Gum","Vanilla Cone","Placebo","Chocolate Cone","Jalepeno","Cheesecake"],["Red Pill","Blue Pill","Heaven's Light","Heaven's Bow","Heaven's Arrow"] #order to view items 
+  HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = False,False,False
+  #theres gotta be a better way for this
+  def up_items():
+    return { #distance thing, stats (plus defense, heal etc), description, check (only for the ones at the top, red pill, light etc)
     'Jalepeno': [[[1106, 0], 3, 66, 0],"+75 HP","Scorching hot... A fiery start leads to a smoother end."],
     'Cheesecake': [[[1180, 0], 3, 66, 1],"+100 HP, 2x damage taken next turn","A treat for the tolerant. Not for the lactose intolerant."],
     'Chocolate Cone': [[[1096, 0], 3, 66, 1],"+25 HP, +1 defense!","A dark delight, made for the tough."],
@@ -636,42 +648,47 @@ def yskysn():
     'Gum': [[[1135, 0], 2, 66, 2],"+25 HP, +defense next turn","A tough chew...  Not the most nutritious, but hard to hurt."],
     'Cherry': [[[996, 997], 2, 66, 2],"+50 HP, +defense next turn","A lucky break, a jackpot of sorts. A quick fix to lost attention."],
     'Apple': [[[1192, 0], 2, 66, 1],"+10 HP","An apple a day keeps the defibrillator away... The first resort."],
-    "Heaven's Bow": [[[559, 0], 6, 66, 5],"Delivery. (Part 2/3)","A glow trapped in gold. Limitless potential, yet limited to the gods.","HEAVEN_BOW"],
-    "Heaven's Arrow": [[[559, 0], 6, 66, 5],"Swift justice. (Part 3/3)","A message straight to the point.","HEAVEN_ARROW"],
-    "Heaven's Light": [[[494, 0], 6, 66, 18],"Radiance. (Part 1/3)","A blessing from above, in times of need.","HEAVEN_LIGHT"],
-    'Red Pill': [[[494, 0], 6, 66, 25],"+15 crit damage, can be heightened...","The sky lights up, replaced with blood red. Once taken, never forgotten.","pill=='r'"],
-    'Blue Pill': [[[494, 0], 6, 66, 25],"+5 blue shield, can be heightened...","The sky lights up, replaced with a solid blue. Once taken, never forgotten.","pill=='b'"],
-    "None1":[[[1088, 0], 6, 66, 25],"None","None"],"None2":[[[494, 0], 6, 66, 25],"None","None","True"]}
-  iinv, ITEM_l_real,ITEM_r_real = [],["Apple","Cherry","Gum","Vanilla Cone","Placebo","Chocolate Cone","Jalepeno","Cheesecake"],["Red Pill","Blue Pill","Heaven's Light","Heaven's Bow","Heaven's Arrow"] #order to view items 
-  ITEMSd = {
-    '-':" ",'g' : '\033[48;5;242m ',
-    " " : '"\033[48;5;52m " if pill=="r" else "\033[48;5;17m " pill=="b" else " "',
-    'o' : '"\033[48;5;0m " if not HEAVEN_LIGHT else "\033[48;5;234m "',
-    'l' : '"\033[48;5;7m " if HEAVEN_LIGHT else eval(ITEMSd[" "])',
-    's' : '"\033[48;5;100m " if HEAVEN_BOW else eval(ITEMSd["l"])', #bow string
-    'b' : '"\033[48;5;226m " if HEAVEN_BOW else eval(ITEMSd["l"]) ', #bow well bow
-    'a' : '"\033[48;5;231m " if HEAVEN_ARROW else eval(ITEMSd["l"]) ', #arrow shaft
-    't' : '"\033[48;5;195m " if HEAVEN_ARROW else eval(ITEMSd["l"]) ', #arrow tip
-    'A': '"\033[48;5;196m " if "Apple" in iinv else ITEMSd["g"]', #apple red
-    'B': '"\033[48;5;131m " if "Apple" in iinv else ITEMSd["g"]', #apple brown (stem)
-    'L': '"\033[48;5;112m " if "Apple" in iinv else ITEMSd["g"]', #apple leaf
-    'P': '"\033[48;5;124m " if pill=="r" else "\033[48;5;27m " if pill=="b" else ITEMSd["g"]',#placebo pill
-    '=': '"\033[48;5;253m " if pill in "br" else ITEMSd["g"]',#placebo middle
-    'R': '"\033[48;5;160m " if "Cherry" in iinv else ITEMSd["g"]', #cherry red
-    'S': '"\033[48;5;64m " if "Cherry" in iinv else ITEMSd["g"]', #cheery stem/connector
-    'C': '"\033[48;5;230m " if "Cheesecake" in iinv else ITEMSd["g"]', #cheesecake top
-    'c': '"\033[48;5;222m " if "Cheesecake" in iinv else ITEMSd["g"]', #cheesecake bottom
-    'Z': '"\033[48;5;162m " if "Cheesecake" in iinv else ITEMSd["g"]', #cheesecake strawberry
-    'J': '"\033[48;5;1m " if "Jalepeno" in iinv else ITEMSd["g"]', #jalepeno red
-    'H': '"\033[48;5;28m " if "Jalepeno" in iinv else ITEMSd["g"]', #jalepeno green
-    'G': '"\033[48;5;207m " if "Gum" in iinv else ITEMSd["g"]', #gum pink
-    'V': '"\033[48;5;255m " if "Vanilla Cone" in iinv else ITEMSd["g"]', #vanilla ice cream
-    'O': '"\033[48;5;94m " if "Chocolate Cone" in iinv else ITEMSd["g"]', #chocolate ice cream
-    '1': '"\033[48;5;215m " if "Vanilla Cone" in iinv else ITEMSd["g"]', #vanilla cone
-    '2': '"\033[48;5;215m " if "Chocolate Cone" in iinv else ITEMSd["g"]' #choc cone
-  }
+    "Heaven's Bow": [[[559, 0], 6, 66, 5],"Delivery. (Part 2/3)","A glow trapped in gold. Limitless potential, yet limited to the gods.",HEAVEN_BOW],
+    "Heaven's Arrow": [[[559, 0], 6, 66, 5],"Swift justice. (Part 3/3)","A message straight to the point. Dont give up now!",HEAVEN_ARROW],
+    "Heaven's Light": [[[494, 0], 6, 66, 18],"Radiance. (Part 1/3)","A blessing from above, in times of need.",HEAVEN_LIGHT],
+    'Red Pill': [[[494, 0], 6, 66, 25],"+15 crit damage, can be heightened...","The sky lights up, replaced with blood red. Once taken, never forgotten.",pill=='r'],
+    'Blue Pill': [[[494, 0], 6, 66, 25],"+5 blue shield, can be heightened...","The sky lights up, replaced with a solid blue. Once taken, never forgotten.",pill=='b'],
+    "None1":[[[1088, 0], 5, 66, 25],"None","None"],"None2":[[[494, 0], 6, 66, 25],"None","None",True]}
+  def up_symbs():
+    def_space = "\033[48;5;52m " if pill=="r" else "\033[48;5;17m " if pill=="b" else " "
+    def_l, def_g =  "\033[48;5;7m " if HEAVEN_LIGHT else def_space, '\033[48;5;242m ' 
+    return  {
+      '-':" ",'g' : def_g,
+      " " : def_space,
+      'o' : "\033[48;5;0m " if not HEAVEN_LIGHT else "\033[48;5;234m ",
+      'l' : "\033[48;5;7m " if HEAVEN_LIGHT else def_space,
+      's' : "\033[48;5;100m " if HEAVEN_BOW else def_l, #bow string
+      'b' : "\033[48;5;226m " if HEAVEN_BOW else def_l, #bow well bow
+      'a' : "\033[48;5;231m " if HEAVEN_ARROW else def_l, #arrow shaft
+      't' : "\033[48;5;195m " if HEAVEN_ARROW else def_l, #arrow tip
+      'A': "\033[48;5;196m " if "Apple" in iinv else def_g, #apple red
+      'B': "\033[48;5;131m " if "Apple" in iinv else def_g, #apple brown (stem)
+      'L': "\033[48;5;112m " if "Apple" in iinv else def_g, #apple leaf
+      'P': "\033[48;5;124m " if pill=="r" else "\033[48;5;27m " if pill=="b" else def_g,#placebo pill
+      '=': "\033[48;5;253m " if pill in "br" else def_g,#placebo middle
+      'R': "\033[48;5;160m " if "Cherry" in iinv else def_g, #cherry red
+      'S': "\033[48;5;64m " if "Cherry" in iinv else def_g, #cheery stem/connector
+      'C': "\033[48;5;230m " if "Cheesecake" in iinv else def_g, #cheesecake top
+      'c': "\033[48;5;222m " if "Cheesecake" in iinv else def_g, #cheesecake bottom
+      'Z': "\033[48;5;162m " if "Cheesecake" in iinv else def_g, #cheesecake strawberry
+      'J': "\033[48;5;1m " if "Jalepeno" in iinv else def_g, #jalepeno red
+      'H': "\033[48;5;28m " if "Jalepeno" in iinv else def_g, #jalepeno green
+      'G': "\033[48;5;207m " if "Gum" in iinv else def_g, #gum pink
+      'V': "\033[48;5;255m " if "Vanilla Cone" in iinv else def_g, #vanilla ice cream
+      'O': "\033[48;5;94m " if "Chocolate Cone" in iinv else def_g, #chocolate ice cream
+      '1': "\033[48;5;215m " if "Vanilla Cone" in iinv else def_g, #vanilla cone
+      '2': "\033[48;5;215m " if "Chocolate Cone" in iinv else def_g #choc cone
+    }
+  pill = " "
   def distance(spot,dist=2,W=52,ex_W=0):
     #top/bottom parts
+    if len(spot) == 4 : #splitting up list
+      spot,dist,W,ex_W = spot[0], spot[1], spot[2], spot[3]
     spot=[spot,0] if type(spot)==int else spot
     multi = spot[1]>spot[0]
     y = [i for k in [-1,1] for i in range(spot[0]-dist+(W*dist*k)+(W if k==1 and multi else 0) - ex_W,spot[0]+(2 if multi else 1)+dist+(W*dist*k)+(W if k==1 and multi else 0) + ex_W)]
@@ -679,28 +696,38 @@ def yskysn():
     return y
 
   distant = distance([410,500],3,66,-1)
-  pill = '' #change pill to be 'r' for Red Pill, 'b' for Blue Pill
-  HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = False,False,False
   def printItem(distant=distant):
-    temper = {i:(e if '"' not in (e:=ITEMSd[i]) else eval(e)) for i in ITEMSd}
-    for ind,i in enumerate(ITEMS):
-        print(temper.get(i,i) if ind not in distant or i=='\n' else "\033[48;5;203m ",end="\033[0m")
+    upped,fina = up_symbs(),""
+    for ind,i in enumerate(ITEMS): #does something, but doesnt actually work
+        fina += (upped.get(i,i) if ind not in distant or i=='\n' else "\033[48;5;203m ") + "\033[0m"
+    print(fina)
   
   def itemView():
-    nonlocal distant,pill,HEAVEN_LIGHT,HEAVEN_ARROW,HEAVEN_BOW
-    ITEM_l,ITEM_r = f if (f:=[i for i in ITEM_l_real if i in iinv])!=[] else ["None1"],f if (f:=[i for i in ITEM_r_real if eval(ITEM_spots.get(i,['','','',False])[3])]) else ["None2"]
+    nonlocal distant,HEAVEN_LIGHT,HEAVEN_ARROW,HEAVEN_BOW,pill
+    ITEM_items = up_items()
+    pill = "r" if "Red Pill" in iinv else "b" if "Blue Pill" in iinv else " "
+    ITEM_l,ITEM_r = f if (f:=[i for i in ITEM_l_real if i in iinv])!=[] else ["None1"],f if (f:=[i for i in ITEM_r_real if ITEM_items.get(i,['','','',False])[3]]) else ["None2"]
     CUR,current = ITEM_l,0
+    c()
     while True:
-      distant = ITEM_spots[CUR[current]]
-      printItem(distant[0])
-      print(f"{CUR[current]}({iinv.count(CUR[current])}) - {distant[1]}\n\t{distant[2]}\n(Arrow keys to move, enter to select)")
+      clearline(5)
+      rc()
+      distant = ITEM_items[CUR[current]]
+      print("(WASD/Arrow keys, enter/z to select, x to exit)",end="")
+      printItem(distance(distant[0]))
+      print(f"{CUR[current]}({iinv.count(CUR[current])})...    {distant[1]}\n\t{distant[2]}")
       if (g:=getkey1()) in ['a','d',LEFT,RIGHT]:
-        current+=1 if current<len(CUR) and g in ['d',RIGHT] else -1 if current>0 and g in ['a',LEFT] else 0
+        current += 1 if current<len(CUR)-1 and g in ['d',RIGHT] else -1 if current>0 and g in ['a',LEFT] else 0
+      elif g == 'x':
+        break
       elif g in ['w','s',UP,DOWN]:
-        CUR = ITEM_l if g in ['w',UP] else ITEM_r
-      elif g==ENTER and "None" not in CUR[current]:
-        pass
-      
+        CUR = ITEM_r if g in ['w',UP] else ITEM_l
+        current = 0
+      elif g==ENTER:
+        sound("YSKYSN/iselect.wav")
+        if "None" not in CUR[current]:
+          pass #actually use
+    c()
       
 
   stats4nerds={'turns':0,'speak':0,'magic':0,'heal up':0,'kys':0,'yskysn heals':0,'dream mask':0,'rusty mask':0,'hockey mask':0,'doctors':0,'damage taken':0,'useless turns':0}
@@ -775,7 +802,7 @@ def yskysn():
       elif t in [ENTER,LEFT,RIGHT,'z','a','d']:
         sound('YSKYSN/sel.wav',True,"sel",.5)
         if curlist==modes_allow:
-          (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (curlist:=save_allow) + [c(),(cur:=0)] if g=='-' else ''
+          (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' and not nonr else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (curlist:=save_allow) + [c(),(cur:=0)] if g=='-' else ''
           if g=='x':
             return c()
           if g=='z':
@@ -793,7 +820,7 @@ def yskysn():
         prints("Selected mode: ",'def',False,"mode()")
       prints(buts if curlist==modes_allow else buts_settings if curlist==sets_allow else buts_save,'f',True)
     c()
-    if not SAVEITPLEASE: #loading save things, maybe use monke print to make it look cool?
+    if not SAVEITPLEASE: #loading save things, maybe use monke print to make it look cool? (that would be damn hard)
       if hell:
         printt(["....","You know what you've done.","Instead of giving in, or merely fighting back, you decided to end this, once and for all.","\033[38;5;88mGood luck mortal. You rats always need it.\033[0m"],[3,1,2,.03])
         print("[Any key to continue to hell. Good luck.]")
@@ -824,20 +851,22 @@ def yskysn():
           printt('\033[38;5;88mYSKYSN\033[0m looks back in anger. He expected more.')
           print("[Normal mode active!]")
       anykey(not hell)
+      yehp = 1 if nonr else 100
     else:
       noheal, xtreme, bmulti, nonr, hell, hell2, cloud9, cancer, yehp, bhp, stats4nerds, hasspidy = \
       '12' in SAVE[0],'16' in SAVE[0], 2 if '3' in SAVE[0] else 1, '94' in SAVE[0], '64' in SAVE[0], '65' in SAVE[0], '49' in SAVE[0],'50' in SAVE[0],\
       SAVE[1],SAVE[2],SAVE[3],SAVE[4]
       print("Game loaded!")
       anykey()
-  elif (SAVE:=acheck("s"))[0]!=False:
+  elif (SAVE:=acheck("s")) != False and SAVE[0] != False: #prevent it from erroring!!
     print(f"\033[38;5;153mSave data detected! (l to load, any other key to overide and start fight!)\033[0m\n\tMode: Normal{r}\n\tYour hp: {SAVE[1]}\n\tBoss hp: {SAVE[2]}\n\tSpidy?: {SAVE[4]}\n\tOther stats: Would take up too much space rn. L.")
     time.sleep(.5)
     if getkey1()=='l':
       print("\033[38;5;88mYSKYSN\033[0m smiles.\n(Loaded game!)")
-      noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy=SAVE[0] not in ['16','3','22','64','61','49'],SAVE[0] in ["16",'49','50'],2 if SAVE[0]=="3" else 1,SAVE[0] not in ['49','50','16','3','12','22','64','61'],SAVE[0] in ['64','61'],SAVE[0]=='61',SAVE[0]=='49',SAVE[0]=='50',SAVE[1],SAVE[2],SAVE[3],SAVE[4]
+      noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp=SAVE[0] not in ['16','3','22','64','61','49'],SAVE[0] in ["16",'49','50'],2 if SAVE[0]=="3" else 1,SAVE[0] not in ['49','50','16','3','12','22','64','61'],SAVE[0] in ['64','61'],SAVE[0]=='61',SAVE[0]=='49',SAVE[0]=='50',SAVE[1],SAVE[2],SAVE[3],SAVE[4],SAVE[5]
       anykey()
-  yehp = 1 if nonr else 100
+  else:
+    pass #stuff for normal mode
   if cancer:
     for i in ['shields','reds','red bulls']: stats4nerds[i]=0
   #setting up colored stuff
@@ -849,9 +878,9 @@ def yskysn():
     coloreddict['n'],coloreddict['g'],coloreddict['w'] = "\033[48;5;0m ",'\033[48;5;52m ','\033[48;5;90m '
     #hell mode 2: coloreddict['W'] = '\033[48;5;1m '
   if xtreme and bmulti==2 and nonr: #doomsday
-    for thing,col in zip(['-','_','g','r','G','n','B','b','w','W','m'],['0','0','0','0','0','0','254','0','34','52','0']):
+    for thing,col in zip(['-','_','g','r','G','n','B','b','w','W','m'],['0','0','0','0','232','232','232','232','34','52','232']):
       coloreddict[thing] = f"\033[48;5;{col}m "
-    whatrupto = "0m"
+    backer = "\033[48;5;0m"
   
   
   #------------------------- End Save/load data stuff ------------------------------
@@ -867,12 +896,14 @@ def yskysn():
   
   #optimize these sayings, this looks hella spaget
   saying = ['Why are you here, just to worship me?', 'You serve ZERO purpose.', 'YSKYSN hates the crowd, YSKYSN kills the crowd.', 'There is no more crowd.', 'Lightning crackles all around you.', 'YSKYSN is getting mad...', "Get a life.", 'But something about him seems less menacing.', 'YSKYSN looks very tired...', 'An ending in reach.', 'Peace soon to come.']
-  HELL_s = ["It's time.|Another soul captured.|The start of the end.|The last story.|To end it all.|A maze impossibly complex.","Make it last.|Small amounts of ",""] #Completed: 0,1
+  HELL_s = ["It's time.|Another soul captured.|The start of the end.|The last story.|To end it all.|A maze impossibly complex.","Make it last.|Chaos from below.|Sparks fly around him.","Could it be possible?|Stay alive.|Adapt to the lightning.","He hasn't broken a sweat.|Still going strong?|This new world is his.","Unfathomable rage.|Did you want to be here?|Sonic boom!","Halfway through?|A fragment of light can be seen...|The power of words compels him!",""] #Completed: 0,1,2,3,4,5 ,6,7,8,9
   def up(gu=False):
-    print("\033[H",end="\n"*15)
+    print("\033[H",end="\n"*14)
     if gu:
       printman(playin,False)
-      print('\n\033[38;5;'+str(93-(5-(yehp//20)))+f'm{("Shields: "+str(stats4nerds["shields"]) if cancer else "")+"  Health - "+str(yehp)+("  Red bulls: "+str(stats4nerds["red bulls"]) if cancer else "  "):^63}')
+      if not nonr: 
+        print('\n\033[38;5;'+str(93-(5-(yehp//20)))+\
+          f'm{("Shields: "+str(stats4nerds["shields"]) if cancer else "")+"  Health - "+str(yehp)+("  RBs: "+str(stats4nerds["red bulls"]) if cancer else "  ")+("DMG: "+str(dmgmul) if both else ""):^63}')
       
   def turn2(ab,lol):
     nonlocal turnramp
@@ -944,10 +975,10 @@ def yskysn():
   phase1li= ["BURN"]*5 + ["KYSN"] * 4 + ["DIE."]*3 + ["HATE"]*3 + ["CRY."]*3 + ["STOP"]*2 + ["HAHA","HEHE",'hihi','LMAO','XDXD','BUMB','LUCI'] #words
   RED = False #red bull
   def attack(lol=9): #find attack
-    nonlocal playin,attackin,theintlim,coloreddict,iframes,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds
+    nonlocal dmgmul,playin,attackin,theintlim,coloreddict,iframes,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds
     time.sleep(1)
-    if yehp<1:
-      return
+    if both: dmgmul *= random.choice([i/10 for i in range(8,26)])
+    if yehp<1: return
     
     lol2=99 if not cloud9 else random.randrange(0,7)
     
@@ -1041,8 +1072,8 @@ def yskysn():
       for i in range(random.randrange((7 if lol!=4 else 13),(14 if lol!=4 else 18))):
         if yehp>0:
           spacer=random.choice(random.choice([leftimps,rightimps]))
-          surt=danger(spacer,51,(.75 if lol!=4 else .5)-(.25 if xtreme else 0))
-          more(spacer,51,'r',surt,(.5 if lol!=4 else .3)-(.25 if xtreme else 0))
+          surt=danger(spacer,51,(.75 if lol!=4 else .5)-(.2 if xtreme else 0))
+          more(spacer,51,'r',surt,(.5 if lol!=4 else .3)-(.2 if xtreme else 0))
           time.sleep((.5 if lol!=4 and not xtreme else 0))
           thereds=[]
     elif (bhp>=100*bmulti and not cloud9) or lol==5 or lol2==5:
@@ -1077,7 +1108,7 @@ def yskysn():
         for i in lists[ni2]:
           hib.append(i)
         danger(0,hib,(.75 if lol!=5 else .5)-(.4 if xtreme and lol!=5 else .25 if lol==5 and xtreme else 0))
-        more(hib,0,'w',1,((.5 if lol!=5 else .3)))
+        more(hib,0,'w',1,(.4 if lol!=5 else .25) - (.1 if xtreme else 0))
     else: #phase 6, random attacks
       for i in turnramp.keys():
         turnramp[i]=-1
@@ -1085,26 +1116,28 @@ def yskysn():
     attackin=False
   
   
-  def printman(yt,l=True): #find print
-    YY=''
+  def printman(yt,l=True, ever = ""): #find print
+    YY,final='',''
     if cancer and stats4nerds['shields']>0:
         YY='\033[48;5;21m'
     for coi,i in enumerate(yt):
-      if i in coloreddict.keys() and l or (not l and (i in ['!','@','#','$','R','w','_','g','~','▢','r','x'] or i in thesymlist)):
+      final += ever
+      if i in coloreddict.keys() and l or (not l and (i in thesymlist or i in ['!','@','#','$','R','w','_','g','~','▢','r','x'])):
         if coi not in dang and ((coi not in theows and coi not in orang) or i not in ['~','▢']) or l:
-          print(('\033[48;5'+whatrupto+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '')+coloreddict[i],end=(r if ('!' not in yt and i!='Q') else ''))
+          final += (backer+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '')+coloreddict[i] + (r if ('!' not in yt and i!='Q') else '')
         else:
           if coi in dang:
             if i not in ['~','▢']:
-              print('\033[48;5;88m ',end=r)dd
+              final += '\033[48;5;88m '
             else:
-              print('\033[48;5;88m'+(YY if i=='▢' else '')+coloreddict[i],end=r)
+              final += '\033[48;5;88m'+(YY if i=='▢' else '')+ coloreddict[i] + r
           elif coi in theows:
-            print('\033[48;5;'+whatrupto+(coloreddict['r'][:-1] if coi in thereds else coloreddict['w'][:-1] if coi in thewhites else '')+(coloreddict[i]+(YY if i=='▢' else '') if i!='~' else  coloreddict['w'] if coi in thewhites else '\033[38;5;88m◌'),end=r)
+            final += backer+(coloreddict['r'][:-1] if coi in thereds else coloreddict['w'][:-1] if coi in thewhites else '')+(coloreddict[i]+(YY if i=='▢' else '') if i!='~' else  coloreddict['w'] if coi in thewhites else '\033[38;5;88m◌') + r
           else:
-            print("\033[48;5;"+whatrupto+"\033[38;5;208m"+{'~':'◌','▢':'▢'+YY}[i],end=r)
+            final += backer+"\033[38;5;208m"+{'~':'◌','▢':'▢'+YY}[i]+r
       else:
-        print(i,end='')
+        final += i
+    print(final)
   def movi(dire): #8 left to right, 192 up/down
     nonlocal playin
     beez=playin.index('▢')
@@ -1165,13 +1198,12 @@ def yskysn():
   def heal(at,y=True): #a lil spaget but who cares
     nonlocal bhp,yehp
     softlimit = 100
-    if y==True:
+    if y:
       if not noheal:
         if yehp>softlimit:
           return 0
-        if yehp>=softlimit-at:
-          yehp=softlimit
-          return softlimit-yehp
+        if yehp >= softlimit-at:
+          return -1 * yehp - (yehp:=softlimit)
         else:
           yehp+=at
     else:
@@ -1181,9 +1213,8 @@ def yskysn():
       else:
         bhp+=at
     return at if not noheal or not y else 'no'
+  
   c()
-  
-  
   
   
   selection,turn,theender,pause,noballs,hddict=0,'gamer',False,False,['!','@','#','$'],{4:'\033[38;5;46m',3:'\033[38;5;46m',2:'\033[38;5;6m',1:'\033[38;5;166m',0:'\033[38;5;196m'}
@@ -1198,28 +1229,29 @@ def yskysn():
       printman(YS[0:960])
     if turn=='gamer':
       c()
-      dmgmul=1
       while pickin:
         print("\033[H",end="")
         printman(YS)
-        printman('''\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no               Q       YSKYSN HP: '''+' '*(4-len(str(bhp)))+str(bhp)+'''                        o\nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo''')
-        j=10 - bhp//(100*bmulti) #saying things
-        print("\n"+("\033[38;5;180m" if not (hell or cancer) else '')+f'{saying[j] if not (hell or cancer) else "Cancer." if cancer else random.choice(HELL_s[j].split("|")) if not hell2 else "This is it. The end.":^63}'+r+(' (no)' if j==9 and not (hell or cancer) else ''))
+        printman('o                      QYSKYSN HP: '+f"{bhp:>5}"+'                       o\n'+'o'*63,True,coloreddict['-'][:-1])
+        j=10 - bhp//(100*bmulti) #find saying things
+        print("\n"+("\033[38;5;180m" if not (hell or cancer) else '')+f'{"?" if xtreme and bhp==2 and nonr else saying[j] if not (hell or cancer) else "Cancer." if cancer else random.choice(HELL_s[j].split("|")) if not hell2 else "This is it. The end.":^63}'+r)
         print(f"\n{'[A/D to move, Z to select, N = stats, P = Toggle music]':^63}\n{'[C to reset screen, l = leave, game saves!]':^63}")
-        if hasspidy:
-          print(f'\033[38;5;1m{"[Spidy]":^63}'+r)
+        print(f'\033[38;5;1m{"[Spidy]":^63}'+r if hasspidy else "")
+        
         coloreddict[noballs[selection]]='\033[38;5;177m'
-        print(f"\n\n\033[38;5;79m{'Health - '+str(yehp):^63}")
+        
+        print(f"\033[38;5;79m{'Health - '+str(yehp):^63}")
         printman(buttons,False)
         zeeeee = stats4nerds['rusty mask']*20
-        achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[not any([bmulti==2,xtreme,noheal,cloud9,cancer,hell]),bmulti==2,xtreme,noheal,nonr,cloud9,cancer,hell,hell2]) if y],yehp,bhp,stats4nerds,hasspidy])
+        
+        achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[not any([bmulti==2,xtreme,noheal,cloud9,cancer,hell]),bmulti==2,xtreme,noheal,nonr,cloud9,cancer,hell,hell2]) if y],yehp,bhp,stats4nerds,hasspidy,turnramp])
         wee=getkey1() #yskysn input (INPUT NPUT oiDWNIOWNDJKFdkkfnkalKWMDLKWmd)
         if wee in [RIGHT,LEFT,'a','d']:
           coloreddict[noballs[selection]]='\033[38;5;174m'
         if wee in [LEFT,'a']:
-          selection-=1
+          selection -= 1
         elif wee in [RIGHT,'d']:
-          selection+=1
+          selection += 1
         elif wee=='c':
           c()
         elif wee in ['-','=','+']:
@@ -1242,19 +1274,16 @@ def yskysn():
           selection=0
         elif selection==-1:
           selection=3
-      clearline(5)
+      clearline(11)
       print(r)
       if theender:
         pass
       elif selection==0: #attack
         stats4nerds['speak']+=1
-        printt('A'+random.choice([' loving',' graceful',' caring',' thoughtful','n emotional',' kind',' heartfelt',' cool'])+' remark makes \033[38;5;88mYSKYSN'+r+' feel a little more love...')
-        slepy(2)
         damdan=random.randrange(40,101)
-        que='\033[38;5;26m' if damdan>50 else '\033[38;5;32m' if damdan>60 else '\033[38;5;38m' if damdan>70 else '\033[38;5;44m' if damdan>80 else '\033[38;5;50m' if damdan>90 else '\033[38;5;135m'
-        printt('Just a small bit though...' if damdan<60 else 'It had some effect..' if damdan<74 else 'He seems to have felt that...' if damdan<90  else 'You hit him in a sensitive spot...')
-        print(que+'('+str(damdan+zeeeee)+' damage dealt!)'+r)
-        bhp-=damdan+zeeeee
+        printt(['A'+random.choice([' loving',' graceful',' caring',' thoughtful','n emotional',' kind',' heartfelt',' cool'])+' remark makes \033[38;5;88mYSKYSN'+r+' feel a little more love...',('Just a small bit though...' if damdan<60 else 'It had some effect..' if damdan<74 else 'He seems to have felt that...' if damdan<90  else 'You hit him in a sensitive spot...')],[2,.03])
+        print(f'\033[38;5;{26 if damdan>50 else 32 if damdan>60 else 38 if damdan>70 else 44 if damdan>80 else 50 if damdan>90 else 135}m('+str(damdan+zeeeee)+' damage dealt!)'+r)
+        bhp -= damdan + zeeeee
       elif selection==1: #magic
         stats4nerds['magic']+=1
         printt("If only you were a wizard...",1)
@@ -1287,7 +1316,7 @@ def yskysn():
           if not hasspidy:
             printt(["Suddenly a man in a red suit breaks through the wall...","Spiderman is that you??/1?!?!?","He leaves just as fast as he came.",'Seems like he forgot something...'],[2,2,1,1])
             hasspidy=True
-            print("\033[38;5;1m(Spidy web obtained!)\033[0m")
+            print("\033[38;5;1m(Spidy bot obtained!)\033[0m")
           else:
             Music.pause()
             printt(["What is this? A red bull?","You start floating??","...."],[2,1,1])
@@ -1301,16 +1330,16 @@ def yskysn():
         elif theeven in [(2 if not cancer else 6),5]: #funny (defib)
           stats4nerds['doctors']+=1
           printt(['Suddenly, a full doctors kit appears.',"It is loaded with a military grade med-kit, a defibrillator, medical gause, and much more.","Luckily, there are a few band-aids® nearby that useless set."],[1,2,.03])
-          q=heal((40 if not xtreme else 30))
+          q = heal((40 if not xtreme else 30))
           print('\033[38;5;123m(Healed '+str(q)+' hp!)')
           if q=='no':
-            print("\033[38;5;88m(The lightning prevents it.)\033[0m")
+            print("\033[38;5;88m(The lightning prevents it.)"+r)
           elif q<10:
             print('(How useful...)')
           if q in ['no',0]:
-            stats4nerds['useless turns']+=1
+            stats4nerds['useless turns'] += 1
         elif theeven==3: #heal him
-          stats4nerds['yskysn heals']+=1
+          stats4nerds['yskysn heals'] += 1
           if not cloud9:
             printt("Suddenly the thunder outside gets even more intense...",2)
             printt("His eyes crackle even brighter.")
@@ -1357,7 +1386,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         c()
         afk=True
         printman(YS[:960])
-        coloreddict['m'],okle=" " if xtreme and bmulti==2 and nonr else '\033[48;5;3m ' if bhp>=600*bmulti else '\033[48;5;131m ' if bhp>=300*bmulti else '\033[48;5;196m ',yehp
+        coloreddict['m'],okle="\033[48;5;232m " if xtreme and bmulti==2 and nonr else '\033[48;5;3m ' if bhp>=600*bmulti else '\033[48;5;131m ' if bhp>=300*bmulti else '\033[48;5;196m ',yehp
         while attackin and yehp>0:
           whereheat=playin.index('▢')
           if not cutscene:
@@ -1378,8 +1407,8 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         if yehp>0:
           time.sleep(.1)
           c()
-          stats4nerds['damage taken']+=okle-yehp
-          dmgmul=1
+          stats4nerds['damage taken'] += okle-yehp
+          dmgmul = 1
           print(r+"\nAttack cleared!")
           time.sleep(.5)
           anykey()
@@ -1486,7 +1515,7 @@ lancd=[i for i in range(1000) if remains(i,[32,37,33,34,35,36])]
 lanc = {'black':[i for i in range(1000) if remains(i,[14,19,32,37])],'gray':[i for i in range(1000) if remains(i,[15,16,17,18,33,34,35,36])]}
 #--------main stuff-------
 def printr(t,ok=True):
-  print(("\033[38;5;0m" if any([i in t for i in '└┘┌┐╘╛']) and ok==True else '\033[38;5;95m' if ok==False else "" if ok==True else ("\033[38;5;57m" if ok[0] else ''))+t,end=r) #come here to add
+  return ('\033[38;5;95m' if ok==False else "\033[38;5;0m" if [i for i in '└┘┌┐╘╛' if i in t] and ok==True else "" if ok==True or not ok[0] else "\033[38;5;57m") + t + r #come here to add
 ez = {'-':' ','e':' '}
 def retalter(alternum,condition,back=False):
   j = '3' if not back else '4'
@@ -1494,39 +1523,39 @@ def retalter(alternum,condition,back=False):
 def printmaze(maze):
   global both
   g = maze!=gamering
+  final = ""
   for counti,i in enumerate(maze):
     if i not in ['-','e','┌','┐','└','┘'] and i not in charss2 and g:
-      printr(colors.get(i,i))
+      final += colors.get(i,i) + r
     else:
       if g:
         if counti in lanc['gray']:
-          printr('\033[48;5;238m ')
+          final += '\033[48;5;238m '+r
         elif counti in lanc['black']:
-          printr('\033[48;5;232m ')
-        elif both and (i in '┌┐└┘' or counti in [ALTER1,ALTER1+1,ALTER1+52,ALTER1+53]):
-          printr(("\033[48;5;178m" if ((counti-52)//104)%2==1 else "\033[48;5;172m")+retalter(1 if i in '┌┐└┘' else 2,(i in '┌┐└┘' and counti in [ALTER1,ALTER1+1,ALTER1+52,ALTER1+53]))+(i if i in '┌┐└┘' else "┌┐└┘"[[ALTER1,ALTER1+1,ALTER1+52,ALTER1+53].index(counti)]))
-        elif ((counti-52)//104)%2==1:
-          printr('\033[48;5;178m'+ez.get(i,i if i not in charss2 else [charss[k] for k in charss if i in k][0]),i not in charss2)
+          final += '\033[48;5;232m '+r
+        elif both and any([(TMP2:=i in '┌┐└┘'),(TMP3:=counti in [ALTER1,ALTER1+1,ALTER1+52,ALTER1+53])]):
+          final += printr('\033[48;5;' + ('178m' if ((counti-52)//104)%2==1 else '172m') + retalter(1 if TMP2 else 2,(TMP2 and TMP3))+(i if TMP2 else "┌┐└┘"[[ALTER1,ALTER1+1,ALTER1+52,ALTER1+53].index(counti)]))
         else:
-          printr('\033[48;5;172m'+ez.get(i,i if i not in charss2 else [charss[k] for k in charss if i in k][0]),i not in charss2)
+          final += printr('\033[48;5;' + ('178m' if ((counti-52)//104)%2==1 else '172m') + ez.get(i,i if (TMP:=i not in charss2) else [charss[k] for k in charss if i in k][0]),TMP)
       else:
         if i=='+':
-          printr(colors[('+1' if counti+1 not in nextone else "+2") if not both else ("+1" if counti+1 not in nextone and counti+1 not in nextone2 else "++1" if counti+1 not in nextone2 else "++2")])
+          final += printr(colors[('+1' if counti+1 not in nextone else "+2") if not both else ("+1" if counti+1 not in nextone and counti+1 not in nextone2 else "++1" if counti+1 not in nextone2 else "++2")])
         elif i=='(':
           o = [(counti-55<ALTER1<counti+3 and ALTER1%52==31),(counti-55<box1<counti+3 and box1%52==31)] #saves a lot of space lol
-          printr(colors['(2' if box1%52==31 and counti-55<box1<counti+3 else '(1'] if not both or not any(o) else retalter(1 if o[1] else 2,all(o),True)+' ') #find hit thing
+          final += printr(colors['(2' if box1%52==31 and counti-55<box1<counti+3 else '(1'] if not both or not any(o) else retalter(1 if o[1] else 2,all(o),True)+' ') #find hit thing
         elif i=='=':
-          printr(f"\033[48;5;243m{message:^19}")
+          final += f"\033[48;5;243m{message:^19}" + r
         elif i=='W':
-          printr(colors['W1' if counti%52<45 else 'W2']+{510:"L",511:"V",514:str(level)[0]}.get(counti,' '))
+          final += colors['W1' if counti%52<45 else 'W2']+{510:"L",511:"V",514:str(level)[0]}.get(counti,' ') + r
         elif i=='Q':
-          printr(colors['Q1' if counti%52<45 else 'Q2']+{146:"S",147:"P",151:str(speed)[0]}.get(counti,' '))
+          final += colors['Q1' if counti%52<45 else 'Q2']+{146:"S",147:"P",151:str(speed)[0]}.get(counti,' ') + r
         elif i=='1':
-          printr(colors['1' if not both else '21'])
+          final += colors['1' if not both else '21'] + r
         elif both and (i in '┌┐└┘' or counti in [ALTER1,ALTER1+1,ALTER1+52,ALTER1+53]):
-          printr(("\033[48;5;172m" if counti%52>30 else "\033[48;5;178m")+retalter(1 if i in '┌┐└┘' else 2,(i in '┌┐└┘' and counti in [ALTER1,ALTER1+1,ALTER1+52,ALTER1+53]))+(i if i in '┌┐└┘' else "┌┐└┘"[[ALTER1,ALTER1+1,ALTER1+52,ALTER1+53].index(counti)]))
+          final += printr(("\033[48;5;172m" if counti%52>30 else "\033[48;5;178m")+retalter(1 if i in '┌┐└┘' else 2,(i in '┌┐└┘' and counti in [ALTER1,ALTER1+1,ALTER1+52,ALTER1+53]))+(i if i in '┌┐└┘' else "┌┐└┘"[[ALTER1,ALTER1+1,ALTER1+52,ALTER1+53].index(counti)]))
         else:
-          printr(colors.get(i,("\033[48;5;172m" if counti%52>30 else "\033[48;5;178m")+(i if i not in 'ABCD-' else " " if i=='-' else [charss[k] for k in charss if i in k][0])),i not in charss2)
+          final += printr(colors.get(i,("\033[48;5;172m" if counti%52>30 else "\033[48;5;178m")+(i if i not in 'ABCD-' else " " if i=='-' else [charss[k] for k in charss if i in k][0])),i not in charss2)
+  print(final)
   for i in ['Q1','Q2','W1','W2']: colors[i] = "\033[48;5;27m" if 'Q' in i else '\033[48;5;41m'
 SCREENUP=False
 def setvolume(h):
@@ -1545,7 +1574,7 @@ while True:
   while afk:
     if SCREENUP:
       print("\033[H",end="")
-      printmaze(mazeq)
+      printmaze(mazeq) 
       SCREENUP=False
   h=keyz
   if clear:
@@ -1559,8 +1588,6 @@ while True:
     c()
   if h == 'v':
     achievers()
-  if h == 'g':
-    music("ok","YSKYSN/KYSAFE.wav")
   if h == TAB:
     print("hi "+name)
     clear = True
@@ -1569,21 +1596,23 @@ while True:
     if getkey1()=='y':
       break
     c()
+  if h=='t':
+    sound(changespeed("YSKYSN/dial2.wav", 2),False,'DIAL')
   if h == '5' and '207m' in colors['Z'] and mazeq==gamering:
     checkthing()
     THREAD(target=spawners, args=(True)).start()
-  if h in ['[',']']:
+  if h in '[]':
     s_offset = round(s_offset-.02 if h=='[' and s_offset>.5 else s_offset+.02,2)
     print(f"Song speed: x{s_offset}, only applies to minigame!")
     clear=True
-  if h in [';',"'"]:
+  if h in ";'":
     offset = round(offset-.05 if h==';' else offset+.05,2)
     print(f"Song offset: {offset}sec, only applies to minigame!")
     clear=True
   print("\033[H",end="")
   if h in ['=','-','+']:
     setvolume(h)
-    print(f"Volume multiplier: {defaultvolume}, Applies to everything!")
+    print(f"Volume multiplier: {defaultvolume}, Applies to everything!",end="")
     clear=True
 
 sys.stdout.write("\033[?25h")
