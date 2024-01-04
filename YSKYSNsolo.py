@@ -724,7 +724,7 @@ def yskysn():
         CUR = ITEM_r if g in ['w',UP] else ITEM_l
         current = 0
       elif g==ENTER:
-        sound("YSKYSN/iselect.wav")
+        sound("YSKYSN/iselect.wav",True,"bep",2.5)
         if "None" not in CUR[current]:
           pass #actually use
     c()
@@ -1494,7 +1494,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
 
 KeyboardThread(thingthing)
 #-------start game--------
-printt("\033[38;5;88mWelcome to the YSKYSN boss!\033[0m\nPress 'a' to view achievements!\n") 
+printt("\033[38;5;88mWelcome to the YSKYSN boss!\033[0m\nPress 'a' to view achievements!\n")
 print("\033[?25l",end='') #hide cursor
 while True:
   if acheck("LYS"):
@@ -1574,7 +1574,7 @@ while True:
   while afk:
     if SCREENUP:
       print("\033[H",end="")
-      printmaze(mazeq) 
+      printmaze(mazeq)
       SCREENUP=False
   h=keyz
   if clear:
@@ -1650,7 +1650,7 @@ keyz things:
     print(LOGS)
     anykey()
   if h=='5':
-    mixer.pause() 
+    mixer.pause()
     level=2
     THREAD(target=spawners).start()
 '''
