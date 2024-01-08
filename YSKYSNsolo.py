@@ -204,6 +204,9 @@ def anykey(ffg=True):
 
 def achieve(h='`',h1=True):
   global achievements
+  if type(h) == list:
+    achieve(i for i in h)
+    return
   f=achievements[h] if h in achievements.keys() else False
   if h!='`':
     if not f or h in ['s','m1','m2']:
@@ -636,7 +639,7 @@ def yskysn():
   }
   #HELLMODE STUFF
   iinv, ITEM_l_real,ITEM_r_real = ["Apple","Jalepeno"],["Apple","Cherry","Gum","Vanilla Cone","Placebo","Chocolate Cone","Jalepeno","Cheesecake"],["Red Pill","Blue Pill","Heaven's Light","Heaven's Bow","Heaven's Arrow"] #order to view items 
-  HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = False,False,False
+  HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = True,True,True
   #theres gotta be a better way for this
   def up_items():
     return { #distance thing, stats (plus defense, heal etc), description, check (only for the ones at the top, red pill, light etc)
@@ -1195,24 +1198,8 @@ def yskysn():
       time.sleep(iframamo)
       coloreddict['▢']='\033[38;5;51m▢'
       iframes,JUSTUPIT=False,True
-  def heal(at,y=True): #a lil spaget but who cares
-    nonlocal bhp,yehp
-    softlimit = 100
-    if y:
-      if not noheal:
-        if yehp>softlimit:
-          return 0
-        if yehp >= softlimit-at:
-          return -1 * yehp - (yehp:=softlimit)
-        else:
-          yehp+=at
-    else:
-      if bhp>=(1000*bmulti-at):
-        bhp=1000*bmulti
-        return 1000*bmulti-bhp
-      else:
-        bhp+=at
-    return at if not noheal or not y else 'no'
+  def heal(at,playering=True): #a lil spaget but who cares
+    return ((0 if yehp > 100 else 100 - yehp if yehp >= 100 - at else at) if not noheal else 'no') if playering else (1000*bmulti-bhp if bhp>=(1000*bmulti-at) else at)
   
   c()
   
@@ -1330,7 +1317,7 @@ def yskysn():
         elif theeven in [(2 if not cancer else 6),5]: #funny (defib)
           stats4nerds['doctors']+=1
           printt(['Suddenly, a full doctors kit appears.',"It is loaded with a military grade med-kit, a defibrillator, medical gause, and much more.","Luckily, there are a few band-aids® nearby that useless set."],[1,2,.03])
-          q = heal((40 if not xtreme else 30))
+          yehp += q if type(q:=heal((40 if not xtreme else 30))) == int else 0
           print('\033[38;5;123m(Healed '+str(q)+' hp!)')
           if q=='no':
             print("\033[38;5;88m(The lightning prevents it.)"+r)
@@ -1343,14 +1330,15 @@ def yskysn():
           if not cloud9:
             printt("Suddenly the thunder outside gets even more intense...",2)
             printt("His eyes crackle even brighter.")
-            print('(\033[38;5;88mYSKYSN\033[0m healed '+str(heal(random.randrange(40,65),kys))+'..)')
-            if heal(10,kys)==0:
+            print('(\033[38;5;88mYSKYSN\033[0m healed '+str(HEALING:=heal(random.randrange(40,65),kys))+'..)')
+            bhp += HEALING
+            if HEALING==0:
               stats4nerds['useless turns']+=1
               print("(What a loser...)")
       elif selection==2: #heal up
         stats4nerds['heal up']+=1
         printt(random.choice(['Staring straight into his eyes gives you a sudden confidence...','You remember that KYS can mean keep yourself safe...','The lightning seems to fill YOU with strength...','You try to imagine his face as the man face...']),1)
-        miheal=heal(random.randrange(10,31))
+        hp += miheal if (miheal:=heal(random.randrange(20,31)))!='no' else 0
         if miheal=='no':
           stats4nerds['useless turns']+=1
           print("\033[38;5;88m(The lightning prevents it.)\033[0m")
@@ -1413,8 +1401,9 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
           time.sleep(.5)
           anykey()
           turn='gamer'
+
   musicstop()
-  
+
   if bhp<0:
     achieve('s',[[False],False,False,False,False])
     c()
@@ -1610,7 +1599,7 @@ while True:
     print(f"Song offset: {offset}sec, only applies to minigame!")
     clear=True
   print("\033[H",end="")
-  if h in ['=','-','+']:
+  if h in '=-+':
     setvolume(h)
     print(f"Volume multiplier: {defaultvolume}, Applies to everything!",end="")
     clear=True
