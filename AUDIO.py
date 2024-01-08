@@ -1,5 +1,5 @@
 import struct
-try:
+try: 
     import audioop
 except ImportError:
     import pyaudioop as audioop
