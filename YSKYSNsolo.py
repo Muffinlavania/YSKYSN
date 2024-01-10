@@ -607,12 +607,12 @@ centerit,centermodes,skipintro = "center",["center","right","left"],False # make
 def yskysn():
   global afk,centerit,skipintro
   if both:
-    printt("Something feels off... Maybe its you?\n[ALTER mode activated...]")
+    printt("Something feels off... \033[38;5;12mMaybe its you?\033[0m\n[ALTER mode activated...]")
     anykey()
   playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwR\n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwwR\n wwwg____________________________________________________gggwwR\n wgg__~_______~_______~_______~_______~_______~_______~___gwwwR\n wwg_____________________________________________________ggggwR\n wwwg____________________________________________________gwwgwR\n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwwwR\n wgwg_____________________________________________________gwgwR\n wgg______________________________________________________ggwwR\n wg___~_______~_______~_______~_______~_______~_______~___wgwwR\n wwg_____________________________________________________ggwwwR\n wgwg____________________________________________________gwgwwR\n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgwR\n wwwg____________________________________________________gwwgwR\n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwwwR\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwR''')
   playinref = playin.copy()
   playinref[415] = "~"
-  bhp,yehp,owie,iframamo=1000,100,0,1.5 
+  bhp,yehp,owie,iframamo=1000,100,0,1.5
   dang,orang,theows,thereds,thewhites=[],[],[],[],[]
   cutscene,iframes,attackin=False,True,True
   thesymlist,theintlim=['⊿','▲','△','▴','▵'],-1 #was going to be for attack 1 multiple words at once so eh
@@ -718,7 +718,7 @@ def yskysn():
       distant = ITEM_items[CUR[current]]
       print("(WASD/Arrow keys, enter/z to select, x to exit)",end="")
       printItem(distance(distant[0]))
-      print(f"{CUR[current]}({iinv.count(CUR[current])})...    {distant[1]}\n\t{distant[2]}")
+      print(f"{CUR[current]} {f'({iinv.count(CUR[current])})' if 'Heaven' not in CUR[current] else ''}...    {distant[1]}\n\t{distant[2]}")
       if (g:=getkey1()) in ['a','d',LEFT,RIGHT]:
         current += 1 if current<len(CUR)-1 and g in ['d',RIGHT] else -1 if current>0 and g in ['a',LEFT] else 0
       elif g == 'x':
@@ -735,11 +735,10 @@ def yskysn():
 
   stats4nerds={'turns':0,'speak':0,'magic':0,'heal up':0,'kys':0,'yskysn heals':0,'dream mask':0,'rusty mask':0,'hockey mask':0,'doctors':0,'damage taken':0,'useless turns':0}
   def mode(data:list=[]):
-    if '22' in data: return "Normal" #quick normal loading moment
     LEAN,NOHIT,NOHEAL,HP2X,CANCER,CLOUD9,HELL,HELL2 = \
     xtreme or '16' in data, nonr or '94' in data, noheal or '12' in data, bmulti==2 or '3' in data,'50' in data,cloud9 or '49' in data,hell or '64' in data, hell2 or '65' in data
     return f'\033[38;5;{"88" if (e:=all([LEAN,NOHIT,HP2X])) else "0" if HELL or HELL2 else "99" if (LEAN and NOHIT) or CANCER else "171" if LEAN or CLOUD9 else "202" if HP2X else "194" if NOHIT else "7"}m'+\
-      ("Hell." if HELL else "Doomsday." if e else "Cloud 9." if cloud9 else "Cancer." if (LEAN and NOHIT) or CANCER else f"NO HIT{'+' if any([LEAN,HP2X]) else ''}" if NOHIT else\
+      ("Hell." if HELL else "Doomsday." if e else "Cloud 9." if CLOUD9 else "Cancer." if (LEAN and NOHIT) or CANCER else f"NO HIT{'+' if any([LEAN,HP2X]) else ''}" if NOHIT else\
         f"LEAN{'+' if any([NOHEAL,HP2X]) else ''}" if LEAN else f"NO HEALS{'+' if HP2X else ''}" if NOHEAL else "2x HP" if HP2X else "Normal")+\
         "\033[0m"
 
@@ -747,11 +746,9 @@ def yskysn():
     c()
     #new select!!!!!!!
     
-    SAVE,modes_allow,sets_allow,save_allow = ['','','','',''],['0','1','2','3'],['0','1','y'],['x','y'] #set up list of things you can see/do in main menu
-    for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,(SAVE:=acheck("s"))[0][0]!=False]):
+    SAVE,modes_allow,sets_allow,save_allow = acheck("s"),['0','1','2','3'],['0','1'],['x','y'] #set up list of things you can see/do in main menu
+    for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,SAVE[0][0] != False]):
       if casee: modes_allow.append(i)
-    
-    
     #special printing things
     special_ends,special_starts = ['^','0','1','2','4'],{";":both,"}":"Hell" not in mode(SAVE[0])}
     def blinks(): return {'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both}
@@ -832,7 +829,8 @@ def yskysn():
         print("(No heals/Lean mode activated! Your hp: 1. You asked, I delivered. This IS possible, \033[38;5;16mthere are new tools to help.\033[0m)")
         xtreme,nonr,noheal = True,True,True
       elif cloud9:
-        printt(["A single sip of the stuff sends you higher than you've ever dreamt of.....","The world is spinning, spinning!"],[2,.03])
+        printt(["A single sip of the stuff sends you higher than you've ever dreamt of...","The world is spinning, spinning!"],[2,.03])
+        print("(\033[38;5;171m[Cloud 9 enabled!]",end=slepy(1))
         xtreme = True
       elif xtreme and nonr and bmulti==2:
         printt(["There's really no hope left.","\033[38;5;88mThere's only time to suffer."],[2,.03])
@@ -881,7 +879,7 @@ def yskysn():
     coloreddict['n'],coloreddict['g'],coloreddict['w'] = "\033[48;5;0m ",'\033[48;5;52m ','\033[48;5;90m '
     #hell mode 2: coloreddict['W'] = '\033[48;5;1m '
   if xtreme and bmulti==2 and nonr: #doomsday
-    for thing,col in zip(['-','_','g','r','G','n','B','b','w','W','m'],['0','0','0','0','232','232','232','232','34','52','232']):
+    for thing,col in zip(['-','_','g','r','G','n','B','b','w','W','m'],['232','232','232','232','0','0','0','0','34','52','0']):
       coloreddict[thing] = f"\033[48;5;{col}m "
     backer = "\033[48;5;0m"
   
@@ -904,7 +902,7 @@ def yskysn():
     print("\033[H",end="\n"*14)
     if gu:
       printman(playin,False)
-      if not nonr: 
+      if not nonr:
         print('\n\033[38;5;'+str(93-(5-(yehp//20)))+\
           f'm{("Shields: "+str(stats4nerds["shields"]) if cancer else "")+"  Health - "+str(yehp)+("  RBs: "+str(stats4nerds["red bulls"]) if cancer else "  ")+("DMG: "+str(dmgmul) if both else ""):^63}')
       
@@ -1205,7 +1203,7 @@ def yskysn():
   
   
   selection,turn,theender,pause,noballs,hddict=0,'gamer',False,False,['!','@','#','$'],{4:'\033[38;5;46m',3:'\033[38;5;46m',2:'\033[38;5;6m',1:'\033[38;5;166m',0:'\033[38;5;196m'}
-  
+  doomsday = xtreme and bhp==2 and nonr
   #start yskysn
   music("yskysn","YSKYSN/smiling.mp3" if cancer or hell else "YSKYSN/election.mp3" if xtreme else "YSKYSN/tears.mp3" if nonr else "YSKYSN/unwave.mp3",True)
   while bhp>0 and (yehp>0 or iframamo!=1.5):
@@ -1221,7 +1219,7 @@ def yskysn():
         printman(YS)
         printman('o                      QYSKYSN HP: '+f"{bhp:>5}"+'                       o\n'+'o'*63,True,coloreddict['-'][:-1])
         j=10 - bhp//(100*bmulti) #find saying things
-        print("\n"+("\033[38;5;180m" if not (hell or cancer) else '')+f'{"?" if xtreme and bhp==2 and nonr else saying[j] if not (hell or cancer) else "Cancer." if cancer else random.choice(HELL_s[j].split("|")) if not hell2 else "This is it. The end.":^63}'+r)
+        print("\n"+("\033[38;5;180m" if not (hell or cancer) else '')+f'{"?" if doomsday else saying[j] if not (hell or cancer) else "Cancer." if cancer else random.choice(HELL_s[j].split("|")) if not hell2 else "This is it. The end.":^63}'+r)
         print(f"\n{'[A/D to move, Z to select, N = stats, P = Toggle music]':^63}\n{'[C to reset screen, l = leave, game saves!]':^63}")
         print(f'\033[38;5;1m{"[Spidy]":^63}'+r if hasspidy else "")
         
