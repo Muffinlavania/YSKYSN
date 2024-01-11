@@ -1,6 +1,9 @@
 import os,time,sys,random,json,AUDIO
 from pygame import mixer
 from threading import Thread
+from WindowMoving import *
+
+experimental = True
 
 #Change doomsday to darkness minus red lightning/eyes ?, "The Last One Standing." make doomsday dialogues
 
@@ -599,7 +602,7 @@ def thingthing(key):
 #-------------------------YSKYSN----------------------
 YL='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no----------------------GGGGGGGGGGGGG--------------------------o\no--------------------GGGGGGGGGGGGGGGG-------------------------o\no--------------------GbbbbbbbbbbbbbGGG------------------------o\no--------------------bbbbbbbbbbbbbbbGG------------------------o\no--------------------bbbWWWbbbbWWWbbbB------------------------o\no--------------------bbbbbbbbbbbbbbbbB------------------------o\no---------------------bbbbbbbbbbbbbbB-------------------------o\no---------------------BbbbmmmmmbbbBB--------------------------o\no----------------------BbbbbbbbbbBB---------------------------o\no-----------------------BBBBBBBBBBb---------------------------o\no-------------------nnnnbbbbbbbbbbbnnn------------------------o\no---------------nnnnnnnnnnnnnnnnnnnnnnn-----------------------o\no--------------nnnnnnnnnnnnnnnnnnnnnnnnn----------------------o\no--------------nnnnnnnnnnnnnnnnnnnnnnnnnnn--------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnn-------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn------------------o\no-------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn------------------o'''
 YS='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o'''
-ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSRRggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggRRgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------'
+ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSXXggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggXXgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------'
 r='\033[0m'
 #vars you can change in settings, preferences
 centerit,centermodes,skipintro = "center",["center","right","left"],False # make settings!/hell mode things
@@ -609,7 +612,7 @@ def yskysn():
   if both:
     printt("Something feels off... \033[38;5;12mMaybe its you?\033[0m\n[ALTER mode activated...]")
     anykey()
-  playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwR\n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwwR\n wwwg____________________________________________________gggwwR\n wgg__~_______~_______~_______~_______~_______~_______~___gwwwR\n wwg_____________________________________________________ggggwR\n wwwg____________________________________________________gwwgwR\n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwwwR\n wgwg_____________________________________________________gwgwR\n wgg______________________________________________________ggwwR\n wg___~_______~_______~_______~_______~_______~_______~___wgwwR\n wwg_____________________________________________________ggwwwR\n wgwg____________________________________________________gwgwwR\n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgwR\n wwwg____________________________________________________gwwgwR\n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwwwR\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwR''')
+  playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww\n wwwg____________________________________________________gggww\n wgg__~_______~_______~_______~_______~_______~_______~___gwww\n wwg_____________________________________________________ggggw\n wwwg____________________________________________________gwwgw\n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww\n wgwg_____________________________________________________gwgw\n wgg______________________________________________________ggww\n wg___~_______~_______~_______~_______~_______~_______~___wgww\n wwg_____________________________________________________ggwww\n wgwg____________________________________________________gwgww\n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw\n wwwg____________________________________________________gwwgw\n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwww\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww''')
   playinref = playin.copy()
   playinref[415] = "~"
   bhp,yehp,owie,iframamo=1000,100,0,1.5
@@ -634,7 +637,7 @@ def yskysn():
     'g':'\033[48;5;242m ', #gray (for background)
     'G':'\033[48;5;236m ', #gray (for hair)
     'Q':'\033[38;5;46m','!':'\033[38;5;177m','@':'\033[38;5;174m','#':'\033[38;5;174m','$':'\033[38;5;174m',
-    'R':'\033[0m','▢':'\033[38;5;51m▢', #player
+    'X':'\033[0m','▢':'\033[38;5;51m▢', #player
     '~':'\033[38;5;62m◌'#empty space to move in
   }
   #HELLMODE STUFF
@@ -790,17 +793,22 @@ def yskysn():
     buts_settings = """\nSettings \n\n0Center mode: ^\n1Show introduction text: | &\n\nyExit Settings#\n"""
     buts_save = """Save Data \nWill be overidden if you start another game! \nLoaded game will instantly start! \n\n#Mode: 0\n#Your hp: 1\n#Boss hp: 2\n}Spidy?: 4\n\nxLoad Save#\nyBack#\n"""
     SAVEITPLEASE, cur,curlist = False, 0, modes_allow #saveitplease = load the save after it breaks or something idk what im doing
+    
+    if experimental:
+      window.moveInTop()
+      time.sleep(.25)
+    
     print("\033[38;5;88m")
     prints("YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse Up/Down to move, Z/Enter/Left/Right to select!\n\n",'','','',True)
     prints("Selected mode: ",'def',False,"mode()")
     prints(buts,'default',True)
-    while (t:=getkey1()):
+    while (t:=getkey1()): #find select
       if t in ['w','s',UP,DOWN]:
-        sound('YSKYSN/sel.wav',True,"sel",.5)
+        sound('YSKYSN/sel.wav',True,"sel",.25)
         cur+=1 if t in ['s',DOWN] else -1
         cur = 0 if cur==len(curlist) else len(curlist)-1 if cur==-1 else cur
       elif t in [ENTER,LEFT,RIGHT,'z','a','d']:
-        sound('YSKYSN/sel.wav',True,"sel",.5)
+        sound('YSKYSN/sel.wav',True,"sel",.25)
         if curlist==modes_allow:
           (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' and not nonr else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (curlist:=save_allow) + [c(),(cur:=0)] if g=='-' else ''
           if g=='x':
@@ -820,6 +828,8 @@ def yskysn():
         prints("Selected mode: ",'def',False,"mode()")
       prints(buts if curlist==modes_allow else buts_settings if curlist==sets_allow else buts_save,'f',True)
     c()
+    cancer = cancer or (xtreme and nonr)
+    doomsday = xtreme and nonr and bmulti==2
     if not SAVEITPLEASE: #loading save things, maybe use monke print to make it look cool? (that would be damn hard)
       if hell:
         printt(["....","You know what you've done.","Instead of giving in, or merely fighting back, you decided to end this, once and for all.","\033[38;5;88mGood luck mortal. You rats always need it.\033[0m"],[3,1,2,.03])
@@ -832,7 +842,7 @@ def yskysn():
         printt(["A single sip of the stuff sends you higher than you've ever dreamt of...","The world is spinning, spinning!"],[2,.03])
         print("(\033[38;5;171m[Cloud 9 enabled!]",end=slepy(1))
         xtreme = True
-      elif xtreme and nonr and bmulti==2:
+      elif doomsday:
         printt(["There's really no hope left.","\033[38;5;88mThere's only time to suffer."],[2,.03])
         print("\033[0m(Doomsday activated! Good luck!!!!)")
       else:
@@ -844,7 +854,7 @@ def yskysn():
           print('\033[38;5;124m[Healing has been disabled!]')
         if xtreme:
           printt("With one chug, his face grows even brighter...",)
-          print("(\033[38;5;171m[Extreme mode enabled!]",end=slepy(1))
+          print("\033[38;5;171m[Extreme mode enabled!]",end=slepy(1))
         if bmulti==2:
           printt('The window opens, letting in even more lightning.')
           print("[\033[38;5;88mYSKYSN\033[0m HP x2!]",end=slepy(1))
@@ -871,26 +881,30 @@ def yskysn():
   if cancer:
     for i in ['shields','reds','red bulls']: stats4nerds[i]=0
   #setting up colored stuff
-  coloreddict['r']='\033[48;5;52m ' if hell else '\033[48;5;253m ' if noheal else '\033[48;5;91m ' if xtreme else coloreddict['r']
-  if nonr: coloreddict['n']='\033[48;5;52m '
+  coloreddict['r']= '\033[48;5;52m ' if hell else '\033[48;5;91m ' if xtreme else '\033[48;5;253m ' if noheal else coloreddict['r']
+  if nonr and not cancer: coloreddict['n']='\033[48;5;52m '
   if cloud9: coloreddict['o'] = '\033[48;5;91m '
-  if cancer: coloreddict['w'] = '\033[48;5;5m '
+  if cancer: 
+    coloreddict['w'] = '\033[48;5;5m '
+    for i in ['shields','reds','red bulls']: stats4nerds[i]=0
   if hell:
     coloreddict['n'],coloreddict['g'],coloreddict['w'] = "\033[48;5;0m ",'\033[48;5;52m ','\033[48;5;90m '
     #hell mode 2: coloreddict['W'] = '\033[48;5;1m '
-  if xtreme and bmulti==2 and nonr: #doomsday
+  if doomsday:
     for thing,col in zip(['-','_','g','r','G','n','B','b','w','W','m'],['232','232','232','232','0','0','0','0','34','52','0']):
       coloreddict[thing] = f"\033[48;5;{col}m "
     backer = "\033[48;5;0m"
   
+  if experimental:
+    window.moveOutBottom()
   
   #------------------------- End Save/load data stuff ------------------------------
   
   
   buttons='''
-   !╓─────────╖  R @╓─────────╖      R #╓─────────╖    R$╓─────────╖
-   !║  SPEAK  ║ R  @║  '''+("MAGIC" if not hell else "PRAY ")+'''  ║      R #║ '''+("HEAL UP" if not hell else "ITEM  ")+''' ║   R $║   KYS   ║
-   !╙─────────╜ R  @╙─────────╜     R  #╙─────────╜  R  $╙─────────╜
+   !╓─────────╖    @╓─────────╖        #╓─────────╖     $╓─────────╖
+   !║  SPEAK  ║    @║  '''+("MAGIC" if not hell else "PRAY ")+'''  ║        #║ '''+("HEAL UP" if not hell else "ITEM  ")+''' ║     $║   KYS   ║
+   !╙─────────╜    @╙─────────╜        #╙─────────╜     $╙─────────╜
   '''
   #thresholds: 600, 300
   #for health: 750, 500, 250
@@ -902,7 +916,7 @@ def yskysn():
     print("\033[H",end="\n"*14)
     if gu:
       printman(playin,False)
-      if not nonr:
+      if (not nonr) or cancer:
         print('\n\033[38;5;'+str(93-(5-(yehp//20)))+\
           f'm{("Shields: "+str(stats4nerds["shields"]) if cancer else "")+"  Health - "+str(yehp)+("  RBs: "+str(stats4nerds["red bulls"]) if cancer else "  ")+("DMG: "+str(dmgmul) if both else ""):^63}')
       
@@ -1123,7 +1137,7 @@ def yskysn():
         YY='\033[48;5;21m'
     for coi,i in enumerate(yt):
       final += ever
-      if i in coloreddict.keys() and l or (not l and (i in thesymlist or i in ['!','@','#','$','R','w','_','g','~','▢','r','x'])):
+      if i in coloreddict.keys() and l or (not l and (i in thesymlist or i in ['!','@','#','$','X','w','_','g','~','▢','r','x'])):
         if coi not in dang and ((coi not in theows and coi not in orang) or i not in ['~','▢']) or l:
           final += (backer+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '')+coloreddict[i] + (r if ('!' not in yt and i!='Q') else '')
         else:
@@ -1203,7 +1217,8 @@ def yskysn():
   
   
   selection,turn,theender,pause,noballs,hddict=0,'gamer',False,False,['!','@','#','$'],{4:'\033[38;5;46m',3:'\033[38;5;46m',2:'\033[38;5;6m',1:'\033[38;5;166m',0:'\033[38;5;196m'}
-  doomsday = xtreme and bhp==2 and nonr
+  notmoved = True
+  
   #start yskysn
   music("yskysn","YSKYSN/smiling.mp3" if cancer or hell else "YSKYSN/election.mp3" if xtreme else "YSKYSN/tears.mp3" if nonr else "YSKYSN/unwave.mp3",True)
   while bhp>0 and (yehp>0 or iframamo!=1.5):
@@ -1229,7 +1244,12 @@ def yskysn():
         printman(buttons,False)
         zeeeee = stats4nerds['rusty mask']*20
         
-        achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[not any([bmulti==2,xtreme,noheal,cloud9,cancer,hell]),bmulti==2,xtreme,noheal,nonr,cloud9,cancer,hell,hell2]) if y],yehp,bhp,stats4nerds,hasspidy,turnramp])
+        achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[not any([bmulti==2,xtreme,noheal,cloud9,cancer,hell]),bmulti==2,xtreme,noheal,nonr,cloud9,cancer,hell,hell2]) if y],yehp,bhp,stats4nerds,hasspidy,turnramp]) #find saving, find big saving
+        
+        if experimental and notmoved:
+          window.moveInTop()
+          notmoved = False
+        
         wee=getkey1() #yskysn input (INPUT NPUT oiDWNIOWNDJKFdkkfnkalKWMDLKWmd)
         if wee in [RIGHT,LEFT,'a','d']:
           coloreddict[noballs[selection]]='\033[38;5;174m'
