@@ -3,8 +3,6 @@ from pygame import mixer
 from threading import Thread
 from WindowMoving import *
 
-experimental = True
-
 if os.name == 'nt': #doesnt work on mac?
   from ctypes import windll
   mid = (windll.user32.GetSystemMetrics(78)//2, windll.user32.GetSystemMetrics(79)//2)
@@ -210,7 +208,7 @@ def achieve(h='`',h1=True):
     return
   f=achievements[h] if h in achievements.keys() else False
   if h!='`':
-    if not f or h in ['s','m1','m2']:
+    if not f or h in ['s','m1','m2','prefs']:
       achievements[h]=h1
       if h1==True:
         print(r+'[You got \033[38;5;86m'+h+r+'!]')
@@ -223,8 +221,8 @@ def achieve(h='`',h1=True):
   with open('yskysndata.json','w') as j:
     j.write(json.dumps(achievements2))
 
-def acheck(thing):
-  return achievements.get(thing,False)
+def acheck(thing, default = False):
+  return achievements.get(thing,default)
 
 def s(jh,achievement=True):
   return ('\033[48;5;46m' if (acheck(jh) if achievement else jh) else '\033[48;5;160m') + (" " if not achievement or not acheck(jh+"A") else "A") + r
@@ -602,21 +600,24 @@ YL='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--------
 YS='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o'''
 ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSXXggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggXXgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------'
 r='\033[0m'
-#vars you can change in settings, preferences
-centerit,centermodes,skipintro = "center",["center","right","left"],False # make settings!/hell mode things
 
 def yskysn():
-  global afk,centerit,skipintro
+  global afk
+  
+  #vars you can change in settings, preferences
+  PREFS = acheck("prefs",["center",False,False])
+  centerit,centermodes,skipintro,experimental = PREFS[0],["center","right","left"],PREFS[1],PREFS[2] # make settings!/hell mode things
+  
   if both:
     printt("Something feels off... \033[38;5;12mMaybe its you?\033[0m\n[ALTER mode activated...]")
     anykey()
-  playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww\n wwwg____________________________________________________gggww\n wgg__~_______~_______~_______~_______~_______~_______~___gwww\n wwg_____________________________________________________ggggw\n wwwg____________________________________________________gwwgw\n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww\n wgwg_____________________________________________________gwgw\n wgg______________________________________________________ggww\n wg___~_______~_______~_______~_______~_______~_______~___wgww\n wwg_____________________________________________________ggwww\n wgwg____________________________________________________gwgww\n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw\n wwwg____________________________________________________gwwgw\n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwww\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww''')
+  playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n  wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww\n  wwwg____________________________________________________gggww\n  wgg__~_______~_______~_______~_______~_______~_______~___gwww\n  wwg_____________________________________________________ggggw\n  wwwg____________________________________________________gwwgw\n  wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww\n  wgwg_____________________________________________________gwgw\n  wgg______________________________________________________ggww\n  wg___~_______~_______~_______~_______~_______~_______~___wgww\n  wwg_____________________________________________________ggwww\n  wgwg____________________________________________________gwgww\n  wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw\n  wwwg____________________________________________________gwwgw\n  wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwww\n  wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww''')
   playinref = playin.copy()
   playinref[415] = "~"
   bhp,yehp,owie,iframamo=1000,100,0,1.5
   dang,orang,theows,thereds,thewhites=[],[],[],[],[]
   cutscene,iframes,attackin=False,True,True
-  thesymlist,theintlim=['⊿','▲','△','▴','▵'],-1 #was going to be for attack 1 multiple words at once so eh
+  thesymlist = {'⊿':True,'▲':True,'△':True,'▴':True,'▵':True,'⎣':True,'╗':True,'╨':True,'╠':True,'╝':True} #if 10 isnt enough for how words there are gonna be, let the game break!!!
   upimps,leftside,leftimps,rightside,rightimps,spaced=[135,143,151,159,167,175,183],[134,198,262,326,390,454,518,582,646,710,774,838],[198,390,582,774],[185,249,313,377,441,505,569,633,697,761,825,889],[249,441,633,825],[199,207,215,223,231,239,247,391,399,407,415,423,431,439,583,591,599,607,615,623,631,775,783,791,799,807,815,823]
   turnramp={0:-1,1:-1,2:-1,3:-1,4:-1,5:-1} #:flushed:
   JUSTUPIT,kys,itsafirst,hasspidy=False,False,not acheck("LYS"),False #itsafirst first attacking turn, 2.6 spidy cycle
@@ -747,15 +748,15 @@ def yskysn():
     c()
     #new select!!!!!!!
     
-    SAVE,modes_allow,sets_allow,save_allow = acheck("s"),['0','1','2','3'],['0','1'],['x','y'] #set up list of things you can see/do in main menu
+    SAVE,modes_allow,sets_allow,save_allow = acheck("s"),['0','1','2','3'],['0','1','2','y'],['x','y'] #set up list of things you can see/do in main menu
     for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,SAVE[0][0] != False]):
       if casee: modes_allow.append(i)
     #special printing things
     special_ends,special_starts = ['^','0','1','2','4'],{";":both,"}":"Hell" not in mode(SAVE[0])}
-    def blinks(): return {'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both}
+    def blinks(): return {'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both,"%":experimental} #this is for the ending red/greens!!!!
     def endit(ending): #update this with special_ends!!!
       return str({"^":f"< {centerit} >","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
-
+  
     #if there is a colorcode, add on that # ofchars to the left offset
     def CENTEROFF(st):
       if '\033' not in st: return 0
@@ -788,10 +789,10 @@ def yskysn():
 
     #extra space (" ") after word means its 100% normal, a hashtag ("#") is for ones that can be selected but not achiev
     buts = '\n-Save Data#\n\n0Double Boss HP | a\n\n1No hit (1 hp)  | b\n2     No heals  | c\n\n3Extreme mode   | d\n\n4CLOUD 9        | e\n5Hell.          | f\n\nySettings#\nxExit#\nzContinue#\n;ALTER          | :\n'
-    buts_settings = """\nSettings \n\n0Center mode: ^\n1Show introduction text: | &\n\nyExit Settings#\n"""
+    buts_settings = """\nSettings (these will save!) \n\n0Center mode: ^\n1Show introduction text: | &\n2Experimental things!! | %\n\nyExit Settings#\n"""
     buts_save = """Save Data \nWill be overidden if you start another game! \nLoaded game will instantly start! \n\n#Mode: 0\n#Your hp: 1\n#Boss hp: 2\n}Spidy?: 4\n\nxLoad Save#\nyBack#\n"""
     SAVEITPLEASE, cur,curlist = False, 0, modes_allow #saveitplease = load the save after it breaks or something idk what im doing
-    
+
     if experimental:
       window.moveToMid()
       time.sleep(.25)
@@ -814,7 +815,8 @@ def yskysn():
           if g=='z':
             break
         elif curlist==sets_allow:
-          (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if t in [LEFT,'a'] else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) + c() if g=='0' else (skipintro:=not skipintro) if g=='1' else ''
+          (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if t in [LEFT,'a'] else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) + c() if g=='0' else (skipintro:=not skipintro) if g=='1' else (experimental:=not experimental) if g=='2' else ""
+          achieve("prefs",[centerit,skipintro,experimental])
         elif curlist==save_allow:
           (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (SAVEITPLEASE := True)
           if g=='x':
@@ -829,17 +831,17 @@ def yskysn():
     cancer = cancer or (xtreme and nonr)
     doomsday = xtreme and nonr and bmulti==2
     if not SAVEITPLEASE: #loading save things, maybe use monke print to make it look cool? (that would be damn hard)
-      if hell:
+      if skipintro:
+        pass
+      elif hell:
         printt(["....","You know what you've done.","Instead of giving in, or merely fighting back, you decided to end this, once and for all.","\033[38;5;88mGood luck mortal. You rats always need it.\033[0m"],[3,1,2,.03])
         print("[Any key to continue to hell. Good luck.]")
       elif cancer:
         printt(["As he sips his lean, you start to tremble.","\033[38;5;88mHe\033[0m stands over you, entirely omniscient...."],[2,2])
         print("(No heals/Lean mode activated! Your hp: 1. You asked, I delivered. This IS possible, \033[38;5;16mthere are new tools to help.\033[0m)")
-        xtreme,nonr,noheal = True,True,True
       elif cloud9:
         printt(["A single sip of the stuff sends you higher than you've ever dreamt of...","The world is spinning, spinning!"],[2,.03])
         print("(\033[38;5;171m[Cloud 9 enabled!]",end=slepy(1))
-        xtreme = True
       elif doomsday:
         printt(["There's really no hope left.","\033[38;5;88mThere's only time to suffer."],[2,.03])
         print("\033[0m(Doomsday activated! Good luck!!!!)")
@@ -859,8 +861,14 @@ def yskysn():
         if bmulti!=2 and not xtreme and not noheal:
           printt('\033[38;5;88mYSKYSN\033[0m looks back in anger. He expected more.')
           print("[Normal mode active!]")
-      anykey(not hell)
+      
+      if not skipintro:
+        anykey(not hell)
       yehp = 1 if nonr else 100
+
+      #set up stuff
+      if cancer:  xtreme,nonr,noheal = True,True,True
+      if cloud9:  xtreme = True
     else:
       noheal, xtreme, bmulti, nonr, hell, hell2, cloud9, cancer, yehp, bhp, stats4nerds, hasspidy = \
       '12' in SAVE[0],'16' in SAVE[0], 2 if '3' in SAVE[0] else 1, '94' in SAVE[0], '64' in SAVE[0], '65' in SAVE[0], '49' in SAVE[0],'50' in SAVE[0],\
@@ -898,7 +906,7 @@ def yskysn():
   #------------------------- End Save/load data stuff ------------------------------
   
   def stat(stat_name, stat_change = 1):
-    global stats4nerds
+    nonlocal stats4nerds
     '''Input stat name (stats4nerds[stat_name]) and the int to change it by (+= stat_change)
     will also set the thing if it doesnt exist!!!!!!'''
     stats4nerds[stat_name] = stats4nerds.get(stat_name, 0) + stat_change
@@ -932,20 +940,39 @@ def yskysn():
         elif i!=ab and turnramp[i]>-1:
           turnramp[i]-=1
     turnramp[ab]+=(1 if not xtreme or cloud9 else random.randrange(1,3) if not cloud9 else random.randint(1,3))
+  
+  def MARK(spots): #kinda like a helper helper func?
+    nonlocal dang
+    return dang.append(spots) if type(spots) == int else dang.extend(spots) if hasattr(spots,"__iter__") else False
+  
+  def UNMARK(spots):
+    nonlocal dang
+    if not hasattr(spots,"__iter__"):
+      if spots in dang:
+        dang.remove(spots)
+    else:
+      for i in spots:
+        if i in dang:
+          dang.remove(i)
+      
   def danger(space,nubi=1,timee=2):
     nonlocal JUSTUPIT,dang
     if type(nubi)==int:
-      for i in range(0,nubi):
-        dang.append(space-i if space in rightside else space+i if space in leftside else space+(64*i))
+      MARK([space-i if space in rightside else space+i if space in leftside else space+(64*i) for i in range(0,nubi)])
     else:
-      for i in nubi:
-        dang.append(i)
+      MARK(i for i in nubi)
+    
+    if timee == 'no': 
+      return -1 if space in rightside else 1
+    
     JUSTUPIT=True
     time.sleep(timee)
-    dang=[];JUSTUPIT=True
+    dang=[]
+    JUSTUPIT=True
     return -1 if space in rightside else 1
-  def more(theone,amoint,symb,dirt=1,timri=.5): #space to place, amount more, symbol to place, direction going (1/-1), time inbetween moves
-    nonlocal playin,theows,JUSTUPIT,thereds
+  
+  def more(theone,amoint,symb,dirt=1,timri=.5, RETURN = False): #space to place, amount more, symbol to place, direction going (1/-1), time inbetween moves
+    nonlocal playin,theows,thereds,thewhites
     if type(theone)!=list:
       for ib in range(amoint):
         if playin[theone+(ib*dirt)] not in ['▢','g','w','\n','R']:
@@ -967,40 +994,65 @@ def yskysn():
         thewhites.append(i)
         if playin[i]!='▢':
           playin[i]=symb
-    JUSTUPIT=True
-    time.sleep(timri)
-    if type(theone)!=list:
-      for ib in range(amoint): #undo the stuff
-        if playin[theone+(ib*dirt)]!='▢': #no killing yourself >:(
-          playin[theone+(ib*dirt)]=playinref[theone+(ib*dirt)]
-        theows.remove(theone+(ib*dirt))
-    else:
-      for i in theone:
-        if playin[i]!='▢':
-          playin[i]=playinref[i]
-        theows.remove(i)
-        thewhites.remove(i)
+    if timri > 0:
+      upit(timri)
+    def RETURNER(theone = theone, amoint = amoint, dirt = dirt):
+      nonlocal playin, theows, thewhites
+      if type(theone)!=list:
+        for ib in range(amoint): #undo the stuff
+          if playin[theone+(ib*dirt)]!='▢': #no killing yourself >:(
+            playin[theone+(ib*dirt)]=playinref[theone+(ib*dirt)]
+          theows.remove(theone+(ib*dirt))
+      else:
+        for i in theone:
+          if playin[i]!='▢':
+            playin[i]=playinref[i]
+          theows.remove(i)
+          thewhites.remove(i)
+    
+    if not RETURN:
+      RETURNER()
+    
+    return "done" if not RETURN else RETURNER
+        
   def returnit(h=False):#True=in left, False = in right
     return ((198 if h else 249) if (e:=playin.index('▢')) in [199,207,215,223,231,239,247] else (390 if h else 441) if e in [391,399,407,415,423,431,439] else (582 if h else 633) if e in [583,591,599,607,615,623,631] else (774 if h else 825))
   
-  def upit():
+  def upit(TIME = 0):
     nonlocal JUSTUPIT
     JUSTUPIT = True
+    time.sleep(TIME if type(TIME) == float and TIME >= 0 else 0)
   
   # -------------------------------------------------------- Attacks --------------------------------------------------------------
   
   #attack vars
   phase1li= ["BURN"]*5 + ["KYSN"] * 4 + ["DIE."]*3 + ["HATE"]*3 + ["CRY."]*3 + ["STOP"]*2 + ["HAHA","HEHE",'hihi','LMAO','XDXD','BUMB','LUCI'] #words
   RED = False #red bull
+  
+  #phase 1 helping funcs
+  def reset_sym(SYM = False):
+    nonlocal thesymlist
+    if not SYM:
+      for i in thesymlist: 
+        thesymlist[i] = True
+    else:
+      thesymlist[SYM] = True
+  def next_sym():
+    nonlocal thesymlist
+    thesymlist[(toret := next((i for i in thesymlist if thesymlist[i])))] = False #stupid optimization, but next is for a generator, aka doesnt have to go through entire list!!!
+    return toret
+  
+  
   def attack(lol=9): #find attack
-    nonlocal dmgmul,playin,attackin,theintlim,coloreddict,iframes,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds
+    nonlocal dmgmul,playin,attackin,coloreddict,iframes,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds,dang,thesymlist
     time.sleep(1)
     if both: dmgmul *= random.choice([i/10 for i in range(8,26)])
     if yehp<1: return
     
     lol2=99 if not cloud9 else random.randrange(0,7)
     
-    if bhp in [420,69,666]:
+    #not a secret....
+    if bhp in [420,69,666] and not hell:
       yehp=999999
       c()
       cutscene=True
@@ -1013,7 +1065,7 @@ def yskysn():
       cutscene=False
       c()
       printman(YS[0:960])
-      upit();time.sleep(2)
+      upit(2)
       sound("YSKYSN/KYSAFE.wav")
       iframamo=.25
       yehp+=round(690*dmgmul) #even though this is almost perfect, theres a way to cheese it...
@@ -1022,30 +1074,67 @@ def yskysn():
         if yehp>40:
           orang=spaced.copy()
           orang.remove(random.choice(orang))
-          upit();time.sleep(.1)
+          upit(.1)
           for i in orang:
             theows.append(i)
-          upit();time.sleep(.1)
-          theows=[];upit()
+          upit(.1)
+          theows=[]
+          upit()
       yehp,iframamo,attackin=1,1.5,False #set hp to 1 :)
       return
-    elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0:#phase 1, words come frop left/right
+    
+    elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0:#phase 1, ALMOST entirely works (ghost things???????)
       turn2(0,lol)
-      owie=5+turnramp[0]
+      owie = 5+turnramp[0]
       
-      for i in range(random.randrange(7,(10 if lol!=0 else 15)+turnramp[0])):
-        kf,rw=random.choice(random.choice([leftimps,rightimps])),((1 if lol!=0 else .25)-(.25 if xtreme else 0)-turnramp[0]/10)
-        tru = danger(kf,4,rw if rw>0 else 0) #returns the direction its gonna go (-1 or 1)
-        metan=thesymlist[(theintlim:=theintlim+1)] #this and thesymlist were for if i was gonna make many words at once which i never did lol (maybe some day!!!)
-        coloreddict[metan]=random.choice(phase1li)
-        h4='hehehaha'
-        while h4 not in ['end','hit']:
-          hei=(.4 if lol!=0 else .2)-(.1 if xtreme else 0)-turnramp[0]/40/(3 if xtreme else 1)
-          h4=more(kf,4,metan,tru,hei if hei>.1 else .1)
-          kf+=(8*tru)
-        if h4=='hit' and not iframes:
-          damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0))*dmgmul)
-        theintlim-=1
+      #REVAMP FOR HELL:
+      #change it so that its an array of spots, [[condition (end/hit/None), needed stuffs],[],]
+      #use MARK to just mark no sleep, IF spawning new one on same turn use danger(), else time.sleep
+      #every 8 guarantee spawn one?
+      #as of rn, upit() being buggy, havent tested to seen how they move...
+      reset_sym()
+      
+      #assign each symlist thing a word!!!!!
+      for i in thesymlist:
+        coloreddict[i] = random.choice(phase1li)
+        
+      poins, dang_time = [], (1 if lol!=0 else .25) - (.25 if xtreme else 0) - turnramp[0]/10
+      NU, ending = -1, random.randrange(7,(10 if lol!=0 else 15)+turnramp[0]) * 8
+      while NU < ending or poins:
+        if NU < ending: NU += 1
+        
+        undos,spotser = [],[]
+        for i in poins: #should be good if for i in points, 0 wait time works?, use this and just insert it below, change stuff tho!!!!
+          if i[3] == 'starting':
+            i[3] = 'dun'
+            spotser.append([i[0], i[0] + 1*i[1], i[0] + 2*i[1], i[0] + 3*i[1]])
+          elif (WHATHAPPEN := more(i[0], 4, i[2], i[1], 0, True)) in ['end','hit']:
+            reset_sym(i[2])
+            poins.remove(i)
+            
+            if WHATHAPPEN == 'hit':
+              damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0))*dmgmul)
+          else:
+            i[0] += (8 * i[1])
+            undos.append(WHATHAPPEN)
+        
+        #spawning new ones, if NU%8 (one full turn w/o the uh random ones) OR hell and the random chance
+        poins += [[initial, danger(initial, 4, "no"), next_sym(), 'starting'] for i in [NU % 8 == 0, hell and random.randint(0, 5) < random.randint(1,2)] if i and NU < ending and (initial:= random.choice(leftimps + rightimps)) not in dang] 
+        
+        upit(dang_time/2)
+        for i in undos:
+          i()
+        
+        for i in spotser:
+          UNMARK(i)
+        #h4 = 'hehehaha'
+        #while h4 not in ['end','hit']:
+        #  hei = (.4 if lol!=0 else .2)-(.1 if xtreme else 0)-turnramp[0]/40/(3 if xtreme else 1)
+        #  h4 = more(kf,4,metan,tru,hei if hei>.1 else .1) #0 wait time, let danger do the waiting
+        #  kf += (8*tru)
+        #if h4=='hit':
+        #  damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0))*dmgmul)
+        
     
     elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1:#phase2, random spaces
       turn2(1,lol)
@@ -1055,15 +1144,13 @@ def yskysn():
           orang=[]
           for i in range(random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21))):
             orang.append(random.choice(spaced))
-          upit()
-          time.sleep((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0))
+          upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0))
           for i in orang:
             theows.append(i)
-          upit()
-          time.sleep((1 if lol!=1 else .25)-(.2 if xtreme else 0))
-          theows,orang=[],[];upit()
-          wer=(1 if lol!=1 else .5)-(.5 if xtreme else 0)-turnramp[1]/20
-          time.sleep(wer if wer>0 else 0)
+          upit((1 if lol!=1 else .25)-(.2 if xtreme else 0))
+          theows,orang=[],[]
+          upit((1 if lol!=1 else .5) - (.5 if xtreme else 0) - turnramp[1]/20)
+          
     elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2:#phase3, lasers up/down
       turn2(2,lol)
       owie=(10 if lol!=2 else 15)+(5 if xtreme else 0)+turnramp[2]
@@ -1140,7 +1227,7 @@ def yskysn():
         YY='\033[48;5;21m'
     for coi,i in enumerate(yt):
       final += ever
-      if i in coloreddict.keys() and l or (not l and (i in thesymlist or i in ['!','@','#','$','X','w','_','g','~','▢','r','x'])):
+      if i in coloreddict and l or (not l and (i in thesymlist or i in '!@#$Xw_g~▢rx')):
         if coi not in dang and ((coi not in theows and coi not in orang) or i not in ['~','▢']) or l:
           final += (backer+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '')+coloreddict[i] + (r if ('!' not in yt and i!='Q') else '')
         else:
@@ -1237,12 +1324,13 @@ def yskysn():
       printman(YS[0:960])
     if turn=='gamer':
       c()
+      j=10 - bhp//(100*bmulti) #find saying things
+      CURT = random.choice(HELL_s[j].split("|"))
       while pickin:
         rc()
         printman(YS)
         printman('o                      QYSKYSN HP: '+f"{bhp:>5}"+'                       o\n'+'o'*63,True,coloreddict['-'][:-1])
-        j=10 - bhp//(100*bmulti) #find saying things
-        print("\n"+("\033[38;5;180m" if not (hell or cancer or doomsday) else '')+f'{"The Last One Standing?" if doomsday else saying[j] if not (hell or cancer) else "Cancer." if cancer else random.choice(HELL_s[j].split("|")) if not hell2 else "This is it. The eradication.":^63}'+r)
+        print("\n"+("\033[38;5;180m" if not (hell or cancer or doomsday) else '')+f'{"The Last One Standing?" if doomsday else saying[j] if not (hell or cancer) else "Cancer." if cancer else CURT if not hell2 else "This is it. The eradication.":^63}'+r)
         print(f"\n{'[A/D to move, Z to select, N = stats, P = Toggle music]':^63}\n{'[C to reset screen, l = leave, game saves!]':^63}")
         print(f"\033[38;5;63m{f'[Parts: {len(i for i in [HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW] if i)}/3]':^63}\033[0m" if hell2 else f'\033[38;5;1m{"[Spidy]":^63}'+r if hasspidy else "")
         
@@ -1622,6 +1710,8 @@ while True:
   if h == '5' and '207m' in colors['Z'] and mazeq==gamering:
     checkthing()
     THREAD(target=spawners, args=(True)).start()
+  if h == '1':
+    print("Experimental things: " + str(experimental:=not experimental))
   if h in '[]':
     s_offset = round(s_offset-.02 if h=='[' and s_offset>.5 else s_offset+.02,2)
     print(f"Song speed: x{s_offset}, only applies to minigame!")
