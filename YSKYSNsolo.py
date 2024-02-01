@@ -610,7 +610,7 @@ def yskysn():
   
   if both:
     printt("Something feels off... \033[38;5;12mMaybe its you?\033[0m\n[ALTER mode activated...]")
-    anykey() #NEED TO FIX THIS, 
+    anykey()
   playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww \n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww \n wwwg____________________________________________________gggww \n wgg__~_______~_______~_______~_______~_______~_______~___gwww \n wwg_____________________________________________________ggggw \n wwwg____________________________________________________gwwgw \n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww \n wgwg_____________________________________________________gwgw \n wgg______________________________________________________ggww \n wg___~_______~_______~_______~_______~_______~_______~___wgww \n wwg_____________________________________________________ggwww \n wgwg____________________________________________________gwgww \n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw \n wwwg____________________________________________________gwwgw \n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwww \n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww ''')
   playinref = playin.copy()
   playinref[415] = "~"
@@ -920,8 +920,8 @@ def yskysn():
   #for health: 750, 500, 250
   
   #optimize these sayings, this looks hella spaget
-  saying = ['Why are you here, just to worship me?', 'You serve ZERO purpose.', 'YSKYSN hates the crowd, YSKYSN kills the crowd.', 'There is no more crowd.', 'Lightning crackles all around you.', 'YSKYSN is getting mad...', "Get a life.", 'But something about him seems less menacing.', 'YSKYSN looks very tired...', 'An ending in reach.', 'Peace soon to come.']
-  HELL_s = ["It's time.|Another soul captured.|The start of the end.|The last story.|To end it all.|A maze impossibly complex.","Make it last.|Chaos from below.|Sparks fly around him.","Could it be possible?|Stay alive.|Adapt to the lightning.","He hasn't broken a sweat.|Still going strong?|This new world is his.","Unfathomable rage.|Did you want to be here?|Sonic boom!","Halfway through?|A fragment of light can be seen...|The power of words compels him!","This is hell?|It could be worse...|Possible is in impossible...","An armageddon.|A catastrophe.|A home for none.","There has to be an end.|A finale meant for none.","Withered down, is this the end?"] #Completed: 0,1,2,3,4,5,6,7,8 ,9
+  saying = ['Why are you here, just to worship me?', 'You serve ZERO purpose.', 'YSKYSN hates the crowd, YSKYSN kills the crowd.', 'There is no more crowd.', 'Lightning crackles all around you.', 'YSKYSN is getting mad...', "Get a life.", 'But something about him seems less menacing.', 'YSKYSN looks very tired...', 'An ending in reach.', 'Peace soon to come.',"..."]
+  HELL_s = ["It's time.|Another soul captured.|The start of the end.|The last story.|To end it all.|A maze impossibly complex.","Make it last.|Chaos from below.|Sparks fly around him.","Could it be possible?|Stay alive.|Adapt to the lightning.","He hasn't broken a sweat.|Still going strong?|This new world is his.","Unfathomable rage.|Did you want to be here?|Sonic boom!","Halfway through?|A fragment of light can be seen...|The power of words compels him!","This is hell?|It could be worse...|Possible is in impossible...","An armageddon.|A catastrophe.|A home for none.","There has to be an end.|A finale meant for none.","Withered down, is this the end?","..."] #Completed: 0,1,2,3,4,5,6,7,8 ,9
   
   def up(gu=False):
     print("\033[H",end="\n"*14)
@@ -971,7 +971,7 @@ def yskysn():
     JUSTUPIT=True
     return -1 if space in rightside else 1
   def more(theone,amoint,symb,dirt=1,timri=.5, RETURN = False): #space to place, amount more, symbol to place, direction going (1/-1), time inbetween moves
-    nonlocal playin,theows,thereds,thewhites,
+    nonlocal playin,theows,thereds,thewhites
     if type(theone)!=list:
       for ib in range(amoint):
         if playin[theone+(ib*dirt)] not in ['▢','g','w','\n','R']:
@@ -1102,22 +1102,25 @@ def yskysn():
       while NU < ending or poins:
         if NU < ending: NU += 1
         
-        undos,spotser = [],[]
+        undos,spotser,UNDOERS = [],[],[]
         for i in poins: #should be good if for i in points, 0 wait time works?, use this and just insert it below, change stuff tho!!!!
           if i[3] == 'starting':
             i[3] = 'dun'
             spotser.append([i[0], i[0] + 1*i[1], i[0] + 2*i[1], i[0] + 3*i[1]])
           elif (WHATHAPPEN := more(i[0], 4, i[2], i[1], 0, True)) in ['end','hit']: #this will move every symb
             reset_sym(i[2])
-            poins.remove(i)
+            UNDOERS.append(i)
             
             if WHATHAPPEN == 'hit':
               damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0))*dmgmul)
           else:
             i[0] += (8 * i[1])
             undos.append(WHATHAPPEN)
+        
+        for i in UNDOERS: poins.remove(i) #I HATE LIST MUTATION AAA
+        
         #spawning new ones, if NU%8 (one full turn w/o the uh random ones) OR hell and the random chance
-        poins += [[initial, danger(initial, 4, "no"), next_sym(), 'starting'] for i in [NU % 8 == 0, hell and random.randint(0, 5) < random.randint(1,2)] if i and NU < ending and (initial:= random.choice(leftimps + rightimps)) not in dang] 
+        poins += [[initial, danger(initial, 4, "no"), next_sym(), 'starting'] for i in [NU % 8 == 0, hell and random.randint(0, 5) < random.randint(1,2)] if i and NU < ending and (initial:= random.choice(leftimps + rightimps)) not in dang]
         
         upit(dang_time/2)
         for i in undos:
@@ -1125,14 +1128,6 @@ def yskysn():
         
         for i in spotser:
           UNMARK(i)
-        #h4 = 'hehehaha'
-        #while h4 not in ['end','hit']:
-        #  hei = (.4 if lol!=0 else .2)-(.1 if xtreme else 0)-turnramp[0]/40/(3 if xtreme else 1)
-        #  h4 = more(kf,4,metan,tru,hei if hei>.1 else .1) #0 wait time, let danger do the waiting
-        #  kf += (8*tru)
-        #if h4=='hit':
-        #  damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0))*dmgmul)
-        
     
     elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1:#phase2, random spaces
       turn2(1,lol)
@@ -1312,7 +1307,7 @@ def yskysn():
   def s4(key, defa = 0):
     return stats4nerds.get(key,defa)
   def STATS(start = "\n----------------\nStats for nerds:"):
-    print(r+start+'\n\n\033[38;5;82m\nHealth: '+str(yehp)+'\nBoss Health: '+str(bhp)+'\nTotal Turns: '+str(s4('turns'))+'\nTotal Speaks: '+str(s4('speak'))+'\nTotal Magics: '+str(s4('magic'))+'\nTotal Heal Ups: '+str(s4('heal up'))+'\nTotal KYS: '+str(s4('kys'))+'\nTotal Dream Masks: '+str(s4('dream mask'))+f'\n{"Total Hockey Masks" if not cancer else "Total Shields"}: '+str(s4('hockey mask'))+("\nShields avaliable: "+str(s4('shields'))+'\nTotal Red Bulls: '+str(s4('reds'))+"\nRed bulls available: "+str(s4('red bulls')) if cancer else "")+'\nTotal Rusty Masks: '+str(s4('rusty mask'))+'\nTotal Doctor\'s Kits: '+str(s4('doctors'))+'\nTotal YSKYSN Heals: '+str(s4('yskysn heals'))+'\nTotal Damage Taken: '+str(s4('damage taken'))+'\nTotal Useless Turns: '+str(s4('useless turns'))+r+'\n----------------')
+    print(r+start+'\n\n\033[38;5;82m\nHealth: '+str(yehp)+'\nBoss Health: '+str(bhp if bhp>0 else 0)+'\nTotal Turns: '+str(s4('turns'))+'\nTotal Speaks: '+str(s4('speak'))+'\nTotal Magics: '+str(s4('magic'))+'\nTotal Heal Ups: '+str(s4('heal up'))+'\nTotal KYS: '+str(s4('kys'))+'\nTotal Dream Masks: '+str(s4('dream mask'))+f'\n{"Total Hockey Masks" if not cancer else "Total Shields"}: '+str(s4('hockey mask'))+("\nShields avaliable: "+str(s4('shields'))+'\nTotal Red Bulls: '+str(s4('reds'))+"\nRed bulls available: "+str(s4('red bulls')) if cancer else "")+'\nTotal Rusty Masks: '+str(s4('rusty mask'))+'\nTotal Doctor\'s Kits: '+str(s4('doctors'))+'\nTotal YSKYSN Heals: '+str(s4('yskysn heals'))+'\nTotal Damage Taken: '+str(s4('damage taken'))+'\nTotal Useless Turns: '+str(s4('useless turns'))+r+'\n----------------')
     anykey()
   music("yskysn","YSKYSN/smiling.mp3" if cancer or hell else "YSKYSN/election.mp3" if xtreme else "YSKYSN/tears.mp3" if nonr else "YSKYSN/unwave.mp3",True)
   while bhp>0 and (yehp>0 or iframamo!=1.5):
@@ -1532,7 +1527,6 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
     time.sleep(2)
     printt("\n\033[38;5;204m...")
     slepy(2)
-    s4=stats4nerds
     if hasspidy:
       
       #revamp this achievement system
