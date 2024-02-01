@@ -3,7 +3,7 @@ from pygame import mixer
 from threading import Thread
 from WindowMoving import *
 
-if os.name == 'nt': #doesnt work on mac?
+if os.name == 'nt': #doesnt work on mac?a
   from ctypes import windll
   mid = (windll.user32.GetSystemMetrics(78)//2, windll.user32.GetSystemMetrics(79)//2)
 
@@ -610,8 +610,8 @@ def yskysn():
   
   if both:
     printt("Something feels off... \033[38;5;12mMaybe its you?\033[0m\n[ALTER mode activated...]")
-    anykey()
-  playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n  wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww\n  wwwg____________________________________________________gggww\n  wgg__~_______~_______~_______~_______~_______~_______~___gwww\n  wwg_____________________________________________________ggggw\n  wwwg____________________________________________________gwwgw\n  wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww\n  wgwg_____________________________________________________gwgw\n  wgg______________________________________________________ggww\n  wg___~_______~_______~_______~_______~_______~_______~___wgww\n  wwg_____________________________________________________ggwww\n  wgwg____________________________________________________gwgww\n  wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw\n  wwwg____________________________________________________gwwgw\n  wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwww\n  wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww''')
+    anykey() #NEED TO FIX THIS, 
+  playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww \n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww \n wwwg____________________________________________________gggww \n wgg__~_______~_______~_______~_______~_______~_______~___gwww \n wwg_____________________________________________________ggggw \n wwwg____________________________________________________gwwgw \n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww \n wgwg_____________________________________________________gwgw \n wgg______________________________________________________ggww \n wg___~_______~_______~_______~_______~_______~_______~___wgww \n wwg_____________________________________________________ggwww \n wgwg____________________________________________________gwgww \n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw \n wwwg____________________________________________________gwwgw \n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwww \n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww ''')
   playinref = playin.copy()
   playinref[415] = "~"
   bhp,yehp,owie,iframamo=1000,100,0,1.5
@@ -970,9 +970,8 @@ def yskysn():
     dang=[]
     JUSTUPIT=True
     return -1 if space in rightside else 1
-  
   def more(theone,amoint,symb,dirt=1,timri=.5, RETURN = False): #space to place, amount more, symbol to place, direction going (1/-1), time inbetween moves
-    nonlocal playin,theows,thereds,thewhites
+    nonlocal playin,theows,thereds,thewhites,
     if type(theone)!=list:
       for ib in range(amoint):
         if playin[theone+(ib*dirt)] not in ['▢','g','w','\n','R']:
@@ -1083,7 +1082,7 @@ def yskysn():
       yehp,iframamo,attackin=1,1.5,False #set hp to 1 :)
       return
     
-    elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0:#phase 1, ALMOST entirely works (ghost things???????)
+    elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0:
       turn2(0,lol)
       owie = 5+turnramp[0]
       
@@ -1108,7 +1107,7 @@ def yskysn():
           if i[3] == 'starting':
             i[3] = 'dun'
             spotser.append([i[0], i[0] + 1*i[1], i[0] + 2*i[1], i[0] + 3*i[1]])
-          elif (WHATHAPPEN := more(i[0], 4, i[2], i[1], 0, True)) in ['end','hit']:
+          elif (WHATHAPPEN := more(i[0], 4, i[2], i[1], 0, True)) in ['end','hit']: #this will move every symb
             reset_sym(i[2])
             poins.remove(i)
             
@@ -1117,7 +1116,6 @@ def yskysn():
           else:
             i[0] += (8 * i[1])
             undos.append(WHATHAPPEN)
-        
         #spawning new ones, if NU%8 (one full turn w/o the uh random ones) OR hell and the random chance
         poins += [[initial, danger(initial, 4, "no"), next_sym(), 'starting'] for i in [NU % 8 == 0, hell and random.randint(0, 5) < random.randint(1,2)] if i and NU < ending and (initial:= random.choice(leftimps + rightimps)) not in dang] 
         
@@ -1225,6 +1223,7 @@ def yskysn():
     YY,final='',''
     if cancer and stats4nerds['shields']>0:
         YY='\033[48;5;21m'
+    
     for coi,i in enumerate(yt):
       final += ever
       if i in coloreddict and l or (not l and (i in thesymlist or i in '!@#$Xw_g~▢rx')):
