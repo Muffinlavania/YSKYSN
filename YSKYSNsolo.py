@@ -1032,7 +1032,7 @@ def yskysn():
   def reset_sym(SYM = False):
     nonlocal thesymlist
     if not SYM:
-      for i in thesymlist: 
+      for i in thesymlist:
         thesymlist[i] = True
     else:
       thesymlist[SYM] = True
@@ -1043,7 +1043,7 @@ def yskysn():
   
   
   def attack(lol=9): #find attack
-    nonlocal dmgmul,playin,attackin,coloreddict,iframes,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds,dang,thesymlist
+    nonlocal dmgmul,playin,attackin,coloreddict,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds,dang,thesymlist
     time.sleep(1)
     if both: dmgmul *= random.choice([i/10 for i in range(8,26)])
     if yehp<1: return
@@ -1082,15 +1082,9 @@ def yskysn():
       yehp,iframamo,attackin=1,1.5,False #set hp to 1 :)
       return
     
-    elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0:
+    elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0: #
       turn2(0,lol)
       owie = 5+turnramp[0]
-      
-      #REVAMP FOR HELL:
-      #change it so that its an array of spots, [[condition (end/hit/None), needed stuffs],[],]
-      #use MARK to just mark no sleep, IF spawning new one on same turn use danger(), else time.sleep
-      #every 8 guarantee spawn one?
-      #as of rn, upit() being buggy, havent tested to seen how they move...
       reset_sym()
       
       #assign each symlist thing a word!!!!!
@@ -1103,7 +1097,7 @@ def yskysn():
         if NU < ending: NU += 1
         
         undos,spotser,UNDOERS = [],[],[]
-        for i in poins: #should be good if for i in points, 0 wait time works?, use this and just insert it below, change stuff tho!!!!
+        for i in poins:
           if i[3] == 'starting':
             i[3] = 'dun'
             spotser.append([i[0], i[0] + 1*i[1], i[0] + 2*i[1], i[0] + 3*i[1]])
@@ -1118,7 +1112,7 @@ def yskysn():
             undos.append(WHATHAPPEN)
         
         for i in UNDOERS: poins.remove(i) #I HATE LIST MUTATION AAA
-        
+
         #spawning new ones, if NU%8 (one full turn w/o the uh random ones) OR hell and the random chance
         poins += [[initial, danger(initial, 4, "no"), next_sym(), 'starting'] for i in [NU % 8 == 0, hell and random.randint(0, 5) < random.randint(1,2)] if i and NU < ending and (initial:= random.choice(leftimps + rightimps)) not in dang]
         
@@ -1128,22 +1122,23 @@ def yskysn():
         
         for i in spotser:
           UNMARK(i)
-    
-    elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1:#phase2, random spaces
+
+    elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1: #phase2, random spaces
       turn2(1,lol)
       owie=(8 if lol!=1 else 10)+(5 if xtreme else 0)+turnramp[1]
       for i in range(random.randrange((5 if lol!=1 else 8)+turnramp[1],(9 if lol!=1 else 14)+turnramp[1])):
         if yehp>0:
-          orang=[]
-          for i in range(random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21))):
-            orang.append(random.choice(spaced))
-          upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0))
-          for i in orang:
-            theows.append(i)
+
+          orang = [random.choice(spaced) for _ in range(random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21)))]
+          upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0) / (1 if not hell else 2))
+          if hell: #append to dang2 (blue?
+            pass
+
+          theows.extend(orang)
           upit((1 if lol!=1 else .25)-(.2 if xtreme else 0))
           theows,orang=[],[]
           upit((1 if lol!=1 else .5) - (.5 if xtreme else 0) - turnramp[1]/20)
-          
+
     elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2:#phase3, lasers up/down
       turn2(2,lol)
       owie=(10 if lol!=2 else 15)+(5 if xtreme else 0)+turnramp[2]
