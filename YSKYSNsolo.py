@@ -615,8 +615,8 @@ def yskysn():
   playinref = playin.copy()
   playinref[415] = "~"
   bhp,yehp,owie,iframamo=1000,100,0,1.5
-  dang,orang,theows,thereds,thewhites=[],[],[],[],[]
-  cutscene,iframes,attackin=False,True,True
+  dang,orang,theows,thereds,thewhites,imblue = [],[],[],[],[],[]
+  cutscene,iframes,attackin = False,True,True
   thesymlist = {'⊿':True,'▲':True,'△':True,'▴':True,'▵':True,'⎣':True,'╗':True,'╨':True,'╠':True,'╝':True} #if 10 isnt enough for how words there are gonna be, let the game break!!!
   upimps,leftside,leftimps,rightside,rightimps,spaced=[135,143,151,159,167,175,183],[134,198,262,326,390,454,518,582,646,710,774,838],[198,390,582,774],[185,249,313,377,441,505,569,633,697,761,825,889],[249,441,633,825],[199,207,215,223,231,239,247,391,399,407,415,423,431,439,583,591,599,607,615,623,631,775,783,791,799,807,815,823]
   turnramp={0:-1,1:-1,2:-1,3:-1,4:-1,5:-1} #:flushed:
@@ -962,7 +962,7 @@ def yskysn():
     else:
       MARK(i for i in nubi)
     
-    if timee == 'no': 
+    if timee == 'no':
       return -1 if space in rightside else 1
     
     JUSTUPIT=True
@@ -1043,7 +1043,7 @@ def yskysn():
   
   
   def attack(lol=9): #find attack
-    nonlocal dmgmul,playin,attackin,coloreddict,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds,dang,thesymlist
+    nonlocal dmgmul,playin,attackin,coloreddict,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds,thesymlist, imblue
     time.sleep(1)
     if both: dmgmul *= random.choice([i/10 for i in range(8,26)])
     if yehp<1: return
@@ -1132,14 +1132,18 @@ def yskysn():
           orang = [random.choice(spaced) for _ in range(random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21)))]
           upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0) / (1 if not hell else 2))
           if hell: #append to dang2 (blue?
-            pass
-
-          theows.extend(orang)
+            imblue = [random.choice(spaced) for _ in range(random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21)))]
+            upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0) / 2)
+            imblue2, orang2 = imblue.copy(), orang.copy()
+            imblue,orang = [], []
+            upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0))
+            theows.extend(imblue2)
+          theows.extend(orang if not hell else orang2)
           upit((1 if lol!=1 else .25)-(.2 if xtreme else 0))
           theows,orang=[],[]
           upit((1 if lol!=1 else .5) - (.5 if xtreme else 0) - turnramp[1]/20)
 
-    elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2:#phase3, lasers up/down
+    elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2: #phase3, lasers up/down
       turn2(2,lol)
       owie=(10 if lol!=2 else 15)+(5 if xtreme else 0)+turnramp[2]
       for i in range(random.randrange((7 if lol!=2 else 10),(10 if lol!=2 else 13)+turnramp[2])):
@@ -1228,10 +1232,11 @@ def yskysn():
           elif coi in theows:
             final += backer+(coloreddict['r'][:-1] if coi in thereds else coloreddict['w'][:-1] if coi in thewhites else '')+(coloreddict[i]+(YY if i=='▢' else '') if i!='~' else  coloreddict['w'] if coi in thewhites else '\033[38;5;88m◌') + r
           else:
-            final += backer+"\033[38;5;208m"+{'~':'◌','▢':'▢'+YY}[i]+r
+            final += backer + f"\033[38;5;{208 if coi not in imblue else 75 if coi not in orang else 55}m"+{'~':'◌','▢':'▢'+YY}[i]+r
       else:
         final += i
     print(final)
+
   def movi(dire): #8 left to right, 192 up/down
     nonlocal playin
     beez=playin.index('▢')
@@ -1265,6 +1270,7 @@ def yskysn():
         else:
           yehp-=round(amo)
       JUSTUPIT=True
+
   def OWW():
     nonlocal owie
     while attackin and yehp>0:
@@ -1274,12 +1280,14 @@ def yskysn():
         time.sleep(.04)
       except:
         time.sleep(.1)
+  
   def redframes():
     nonlocal iframes,coloreddict,RED,JUSTUPIT
     RED,iframes,JUSTUPIT,coloreddict['▢']  = True,True,True,'\033[38;5;1m▢'
     time.sleep(5)
     iframes,RED,coloreddict['▢'],JUSTUPIT=False,False,'\033[38;5;51m▢',True
     return
+
   def iframe():
     nonlocal iframes,coloreddict,RED,JUSTUPIT
     while attackin and yehp>0:
