@@ -166,7 +166,9 @@ def musicstop():
   global all_music
   Music.pause()
   all_music = {}
-
+def musictoggle():
+  global pause
+  Music.pause() if (pause:=not pause) else Music.unpause()
 
 #-----getkey/big important things-----
 WINDOWS = os.name=='nt'
@@ -621,7 +623,7 @@ def yskysn():
   upimps,leftside,leftimps,rightside,rightimps,spaced=[135,143,151,159,167,175,183],[134,198,262,326,390,454,518,582,646,710,774,838],[198,390,582,774],[185,249,313,377,441,505,569,633,697,761,825,889],[249,441,633,825],[199,207,215,223,231,239,247,391,399,407,415,423,431,439,583,591,599,607,615,623,631,775,783,791,799,807,815,823]
   turnramp={0:-1,1:-1,2:-1,3:-1,4:-1,5:-1} #:flushed:
   JUSTUPIT,kys,itsafirst,hasspidy=False,False,not acheck("LYS"),False #itsafirst first attacking turn, 2.6 spidy cycle
-  zeeeee,whereheat,dmgmul,backer=0,0,1,"\033[48;5;235m" #doomsday change this to 0 so like i need it
+  zeeeee,whereheat,dmgmul,backer,tmpdmgmul=0,0,1,"\033[48;5;235m",1 #doomsday change this to 0 so like i need it
   noheal,xtreme,bmulti,hell,hell2,cloud9,cancer,nonr,doomsday=False,False,1,False,False,False,False,False,False #different modes
   coloreddict={
     'o':'\033[48;5;0m ', #black for the border
@@ -929,7 +931,7 @@ def yskysn():
       printman(playin,False)
       if (not nonr) or cancer:
         print('\n\033[38;5;'+str(93-(5-(yehp//20)))+\
-          f'm{("Shields: "+str(stats4nerds["shields"]) if cancer else "")+"  Health - "+str(yehp)+("  RBs: "+str(stats4nerds["red bulls"]) if cancer else "  ")+("DMG: "+str(dmgmul) if both else ""):^63}')
+          f'm{("Shields: "+str(stats4nerds["shields"]) if cancer else "")+"  Health - "+str(yehp)+("  RBs: "+str(stats4nerds["red bulls"]) if cancer else "  ")+("DMG: "+str(tmpdmgmul) if both else ""):^63}')
       
   def turn2(ab,lol):
     nonlocal turnramp
@@ -1040,12 +1042,12 @@ def yskysn():
     nonlocal thesymlist
     thesymlist[(toret := next((i for i in thesymlist if thesymlist[i])))] = False #stupid optimization, but next is for a generator, aka doesnt have to go through entire list!!!
     return toret
-  
-  
+  STOP = False #TESTING, GOD POWERS!!
+  poins = []
   def attack(lol=9): #find attack
-    nonlocal dmgmul,playin,attackin,coloreddict,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds,thesymlist, imblue
+    nonlocal tmpdmgmul,playin,attackin,coloreddict,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds,thesymlist,imblue,poins,STOP
     time.sleep(1)
-    if both: dmgmul *= random.choice([i/10 for i in range(8,26)])
+    if both: tmpdmgmul *= random.choice([i/10 for i in range(8,26)])
     if yehp<1: return
     
     lol2=99 if not cloud9 else random.randrange(0,7)
@@ -1067,7 +1069,7 @@ def yskysn():
       upit(2)
       sound("YSKYSN/KYSAFE.wav")
       iframamo=.25
-      yehp+=round(690*dmgmul) #even though this is almost perfect, theres a way to cheese it...
+      yehp+=round(690*tmpdmgmul) #even though this is almost perfect, theres a way to cheese it...
       owie=20
       for i in range(0,69):
         if yehp>40:
@@ -1082,7 +1084,7 @@ def yskysn():
       yehp,iframamo,attackin=1,1.5,False #set hp to 1 :)
       return
     
-    elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0: #
+    elif (bhp>=900*bmulti and not cloud9) or lol==0 or lol2==0: #find phase 1
       turn2(0,lol)
       owie = 5+turnramp[0]
       reset_sym()
@@ -1091,8 +1093,8 @@ def yskysn():
       for i in thesymlist:
         coloreddict[i] = random.choice(phase1li)
         
-      poins, dang_time = [], (1 if lol!=0 else .25) - (.25 if xtreme else 0) - turnramp[0]/10
-      NU, ending = -1, random.randrange(7,(10 if lol!=0 else 15)+turnramp[0]) * 8
+      poins, dang_time = [], (1 if lol!=0 else .25) - (.25 if xtreme else 0) - turnramp[0]/15 #ramping was kinda crazy, changed to /15 instead of 10
+      NU, ending = -1, random.randrange(7,(10 if lol!=0 else 15)+turnramp[0]) * 8 - 4
       while NU < ending or poins:
         if NU < ending: NU += 1
         
@@ -1106,7 +1108,7 @@ def yskysn():
             UNDOERS.append(i)
             
             if WHATHAPPEN == 'hit':
-              damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0))*dmgmul)
+              damage(((5 if lol!=0 else 10)+turnramp[0]+(2 if xtreme else 0)))
           else:
             i[0] += (8 * i[1])
             undos.append(WHATHAPPEN)
@@ -1114,36 +1116,47 @@ def yskysn():
         for i in UNDOERS: poins.remove(i) #I HATE LIST MUTATION AAA
 
         #spawning new ones, if NU%8 (one full turn w/o the uh random ones) OR hell and the random chance
-        poins += [[initial, danger(initial, 4, "no"), next_sym(), 'starting'] for i in [NU % 8 == 0, hell and random.randint(0, 5) < random.randint(1,2)] if i and NU < ending and (initial:= random.choice(leftimps + rightimps)) not in dang]
+        poins += [[initial, danger(initial, 4, "no"), next_sym(), 'starting'] for i in [NU % 8 == 0, hell and random.randint(0, 5) < 2] if i and NU < ending and (initial:= random.choice(leftimps + rightimps)) not in dang]
         
         upit(dang_time/2)
+        while STOP: time.sleep(.05) #TESTING
+
         for i in undos:
           i()
         
         for i in spotser:
           UNMARK(i)
+        upit()
 
-    elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1: #phase2, random spaces
+        
+    elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1: #find phase 2, random spaces
       turn2(1,lol)
-      owie=(8 if lol!=1 else 10)+(5 if xtreme else 0)+turnramp[1]
+      owie = (8 if lol!=1 else 10)+(5 if xtreme else 0)+turnramp[1]
+    
+      #working??????
+
       for i in range(random.randrange((5 if lol!=1 else 8)+turnramp[1],(9 if lol!=1 else 14)+turnramp[1])):
         if yehp>0:
-
-          orang = [random.choice(spaced) for _ in range(random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21)))]
+          orang = random.choices(spaced, k = random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21))+(7 if hell else 0))
           upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0) / (1 if not hell else 2))
-          if hell: #append to dang2 (blue?
-            imblue = [random.choice(spaced) for _ in range(random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21)))]
+          if hell:
+            imblue = random.choices(spaced, k = random.randrange((10 if lol!=1 else 15),(17 if lol!=1 else 21))+7)
             upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0) / 2)
             imblue2, orang2 = imblue.copy(), orang.copy()
             imblue,orang = [], []
             upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0))
-            theows.extend(imblue2)
-          theows.extend(orang if not hell else orang2)
-          upit((1 if lol!=1 else .25)-(.2 if xtreme else 0))
-          theows,orang=[],[]
+          theows = orang if not hell else orang2
+          TIMEN = .5 - (turnramp[1]/15) if turnramp[1] < 6 else .1 #flash both, theows both (NEED TO TEST)
+          if hell:
+            upit(TIMEN)
+            theows = []
+            upit(.75 - (turnramp[1]/20) if turnramp[1] < 10 else .25)
+            theows = imblue2
+          upit((1 if lol!=1 else .25)-(.2 if xtreme else 0) if not hell else TIMEN)
+          theows,orang = [],[]
           upit((1 if lol!=1 else .5) - (.5 if xtreme else 0) - turnramp[1]/20)
 
-    elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2: #phase3, lasers up/down
+    elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2: #find phase 3, lasers up/down
       turn2(2,lol)
       owie=(10 if lol!=2 else 15)+(5 if xtreme else 0)+turnramp[2]
       for i in range(random.randrange((7 if lol!=2 else 10),(10 if lol!=2 else 13)+turnramp[2])):
@@ -1221,7 +1234,7 @@ def yskysn():
     for coi,i in enumerate(yt):
       final += ever
       if i in coloreddict and l or (not l and (i in thesymlist or i in '!@#$Xw_g~▢rx')):
-        if coi not in dang and ((coi not in theows and coi not in orang) or i not in ['~','▢']) or l:
+        if coi not in dang and ((coi not in theows+orang+imblue) or i not in ['~','▢']) or l:
           final += (backer+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '')+coloreddict[i] + (r if ('!' not in yt and i!='Q') else '')
         else:
           if coi in dang:
@@ -1232,7 +1245,7 @@ def yskysn():
           elif coi in theows:
             final += backer+(coloreddict['r'][:-1] if coi in thereds else coloreddict['w'][:-1] if coi in thewhites else '')+(coloreddict[i]+(YY if i=='▢' else '') if i!='~' else  coloreddict['w'] if coi in thewhites else '\033[38;5;88m◌') + r
           else:
-            final += backer + f"\033[38;5;{208 if coi not in imblue else 75 if coi not in orang else 55}m"+{'~':'◌','▢':'▢'+YY}[i]+r
+            final += backer + f"\033[38;5;{208 if coi not in imblue else 226 if coi not in orang else 165}m"+{'~':'◌','▢':'▢'+YY}[i]+r
       else:
         final += i
     print(final)
@@ -1260,23 +1273,25 @@ def yskysn():
       sound("YSKYSN/hurt.wav")
       if not cancer:
         yehp-=round(amo)
+      elif stats4nerds['shields']>0:
+        stat('shields',-1)
+      elif stats4nerds['red bulls']>0:
+        stat('red bulls',-1)
+        sound('YSKYSN/break.mp3')
+        THREAD(target=redframes).start()
       else:
-        if stats4nerds['shields']>0:
-          stat('shields',-1)
-        elif stats4nerds['red bulls']>0:
-          stat('red bulls',-1)
-          sound('YSKYSN/break.mp3')
-          THREAD(target=redframes).start()
-        else:
-          yehp-=round(amo)
+        yehp-=round(amo)
       JUSTUPIT=True
-
+  
   def OWW():
-    nonlocal owie
+    nonlocal poins
     while attackin and yehp>0:
       try:
-        if playin.index('▢') in theows:
-          damage(round(owie*dmgmul))
+        if (ten:=playin.index('▢')) in theows:
+          if ten-1 in [i[0] for i in poins]:
+            reset_sym(playin[ten-1])
+            poins.remove(playin[ten-1])
+          damage(round(owie*tmpdmgmul))
         time.sleep(.04)
       except:
         time.sleep(.1)
@@ -1289,19 +1304,19 @@ def yskysn():
     return
 
   def iframe():
-    nonlocal iframes,coloreddict,RED,JUSTUPIT
+    nonlocal iframes,coloreddict
     while attackin and yehp>0:
       while not iframes or RED:
         time.sleep(.1)
-      coloreddict['▢'],JUSTUPIT='\033[38;5;225m▢',True
-      time.sleep(iframamo)
+      coloreddict['▢']='\033[38;5;225m▢'
+      upit(iframamo)
       coloreddict['▢']='\033[38;5;51m▢'
-      iframes,JUSTUPIT=False,True
+      iframes = False
+      upit()
   def heal(at,playering=True): #a lil spaget but who cares
     return ((0 if yehp > 100 else 100 - yehp if yehp >= 100 - at else at) if not noheal else 'no') if playering else (1000*bmulti-bhp if bhp>=(1000*bmulti-at) else at)
   
   c()
-  
   
   selection,turn,theender,pause,noballs,hddict=0,'gamer',False,False,['!','@','#','$'],{4:'\033[38;5;46m',3:'\033[38;5;46m',2:'\033[38;5;6m',1:'\033[38;5;166m',0:'\033[38;5;196m'}
   notmoved = True
@@ -1355,12 +1370,10 @@ def yskysn():
         elif wee in ['-','=','+']:
           setvolume(wee)
         elif wee=='p':
-          pause=not pause
-          Music.pause() if pause else Music.unpause()
+          musictoggle()
         elif wee=='n':
           c()
           STATS()
-          c()
         elif wee=='i': #item view testing
           itemView()
         if wee in [ENTER,'z','l']:
@@ -1411,7 +1424,7 @@ def yskysn():
             if not cancer:
               printt(["It's a big hockey mask.","Seems big enough to help for a little..."],[2,.03])
               print("\033[38;5;98m(Halved damage taken next attack!)\033[0m")
-              dmgmul=.5
+              tmpdmgmul *= .5
             else:
               stat('shields',1)
               printt(["A pink one! Looks like a very chubby face...","Seems to be able to absorb a hit...."],[2,.03])
@@ -1466,7 +1479,7 @@ def yskysn():
       elif selection==3: #kys
         stat('kys')
         printt(["You decide to Keep Yourself Safe.","(-25% damage next turn!)"],[1,.03])
-        dmgmul=.75
+        tmpdmgmul *= .75
       if not theender:
         anykey()
         stat('turns')
@@ -1482,8 +1495,8 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         getkey1()
         clearline(5)
       if bhp>0:
-        attackin=True
-        owie=5 #change what the damage is if you are in bad space
+        attackin = True
+        owie = 5 #change what the damage is if you are in bad space
         THREAD(target=attack).start()
         THREAD(target=iframe).start()
         THREAD(target=OWW).start()
@@ -1491,20 +1504,27 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         c()
         afk=True
         printman(YS[:960])
-        coloreddict['m'],okle="\033[48;5;232m " if xtreme and bmulti==2 and nonr else '\033[48;5;3m ' if bhp>=600*bmulti else '\033[48;5;131m ' if bhp>=300*bmulti else '\033[48;5;196m ',yehp
-        while attackin and yehp>0:
-          whereheat=playin.index('▢')
+        coloreddict['m'], okle = f"\033[48;5;{232 if doomsday else 3 if bhp >= 600*bmulti else 131 if bhp >= 300*bmulti else 196}m ",yehp #find change mouth color
+        while attackin and yehp>0: #find yskysn game inp, find game 
+          whereheat = playin.index('▢')
           if not cutscene:
             up(True)
           while afk and attackin and yehp>0:
             time.sleep(.05)
-            if JUSTUPIT==True and not cutscene:
+            if JUSTUPIT and not cutscene:
               JUSTUPIT=False
               up(True)
+          if keyz=='q': #TESTING
+            STOP = not STOP
+          if keyz=='g':
+            c()
+            for i in playin:
+              print(i,end='')
+            anykey()
           if keyz in ['a','s','w','d',LEFT,DOWN,UP,RIGHT] and yehp>0 and not cutscene:
-            h=movi(keyz)
-            if h=='bruh' and attackin:#hit walls, take damage
-              damage((10 if bhp in [666,420,69] else 5)*dmgmul)
+            if movi(keyz)=='bruh' and attackin: #hit walls, take damage
+              damage((10 if bhp in [666,420,69] else 5) * tmpdmgmul)
+          
           if keyz=='p':
             pause=not pause
             Music.pause() if pause else Music.unpause()
@@ -1513,7 +1533,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
           time.sleep(.1)
           c()
           stat('damage taken', okle-yehp)
-          dmgmul = 1
+          tmpdmgmul = dmgmul
           print(r+"\nAttack cleared!")
           time.sleep(.5)
           anykey()
