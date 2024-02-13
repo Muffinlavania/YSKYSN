@@ -44,8 +44,15 @@ ALTER:
 
 
 WHAT IVE DONE (so no forgor)
+alter mode
 changed achievement SAVING (only) to be a list of all modes' numbers, need to update reading of it etc
 made all modes mixable (minus the special one)
+added settings, volume control, things like that
+rebalanced phase 1 (faster ramping stuff like that)
+
+HELL MODE!!!!!
+- pray for a better day
+
 added bonus of Doomsday!
 '''
 
@@ -1245,7 +1252,7 @@ def yskysn():
           elif coi in theows:
             final += backer+(coloreddict['r'][:-1] if coi in thereds else coloreddict['w'][:-1] if coi in thewhites else '')+(coloreddict[i]+(YY if i=='▢' else '') if i!='~' else  coloreddict['w'] if coi in thewhites else '\033[38;5;88m◌') + r
           else:
-            final += backer + f"\033[38;5;{208 if coi not in imblue else 226 if coi not in orang else 165}m"+{'~':'◌','▢':'▢'+YY}[i]+r
+            final += backer + f"\033[38;5;{208 if coi not in imblue else 226 if coi not in orang else 196}m"+{'~':'◌','▢':'▢'+YY}[i]+r
       else:
         final += i
     print(final)
@@ -1288,9 +1295,13 @@ def yskysn():
     while attackin and yehp>0:
       try:
         if (ten:=playin.index('▢')) in theows:
-          if ten-1 in [i[0] for i in poins]:
-            reset_sym(playin[ten-1])
-            poins.remove(playin[ten-1])
+          if poins:
+            term = []
+            for i in poins:
+              if ten + 8*i[1] == i[0] + (1 if i[1]>0 else -2):
+                reset_sym(i[2])
+                term.append(i)
+            [poins.remove(i) for i in term]
           damage(round(owie*tmpdmgmul))
         time.sleep(.04)
       except:
