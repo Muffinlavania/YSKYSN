@@ -967,7 +967,7 @@ def yskysn():
   def danger(space,nubi=1,timee=2):
     nonlocal JUSTUPIT,dang
     if type(nubi)==int:
-      MARK([space-i if space in rightside else space+i if space in leftside else space+(64*i) for i in range(0,nubi)])
+      MARK([space-i if space in rightside else space+i if space in leftside else space+(64*i) for i in range(0,nubi)]) #left/right OR *64 for up/down
     else:
       MARK(i for i in nubi)
     
@@ -1103,6 +1103,7 @@ def yskysn():
       poins, dang_time = [], (1 if lol!=0 else .25) - (.25 if xtreme else 0) - turnramp[0]/15 #ramping was kinda crazy, changed to /15 instead of 10
       NU, ending = -1, random.randrange(7,(10 if lol!=0 else 15)+turnramp[0]) * 8 - 4
       while NU < ending or poins:
+        if yehp < 0: break
         if NU < ending: NU += 1
         
         undos,spotser,UNDOERS = [],[],[]
@@ -1135,7 +1136,6 @@ def yskysn():
           UNMARK(i)
         upit()
 
-        
     elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1: #find phase 2, random spaces
       turn2(1,lol)
       owie = (8 if lol!=1 else 10)+(5 if xtreme else 0)+turnramp[1]
@@ -1153,7 +1153,7 @@ def yskysn():
             imblue,orang = [], []
             upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0))
           theows = orang if not hell else orang2
-          TIMEN = .5 - (turnramp[1]/15) if turnramp[1] < 6 else .1 #flash both, theows both (NEED TO TEST)
+          TIMEN = .5 - (turnramp[1]/15) if turnramp[1] < 6 else .1
           if hell:
             upit(TIMEN)
             theows = []
@@ -1163,20 +1163,45 @@ def yskysn():
           theows,orang = [],[]
           upit((1 if lol!=1 else .5) - (.5 if xtreme else 0) - turnramp[1]/20)
 
+    #new phase 3/3.2, smoosh into one?
+    #maybe even phase 5 horizontals???
+    #phase 3 - normal - slow lasers, hell - multiple lasers
+    #phase 3.2  - normal - multiple lasers, hell - multiple? vertical AND horizontal
+    #phase 4 - normal - horizontal, hell - 2/3 horizontals
+
+    #need to combine these two or something!!!
     elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2: #find phase 3, lasers up/down
-      turn2(2,lol)
-      owie=(10 if lol!=2 else 15)+(5 if xtreme else 0)+turnramp[2]
-      for i in range(random.randrange((7 if lol!=2 else 10),(10 if lol!=2 else 13)+turnramp[2])):
-        if yehp>0:
-          spacer=random.choice(upimps)
-          danger(spacer,12,(1 if lol!=2 else .6)-(.3 if xtreme else 0))
-          more(spacer,12,'r',64,(.9 if lol!=2 else .5)-(.3 if xtreme else 0))
-          time.sleep((1 if lol!=2 else .25)-(.2 if xtreme else 0))
-          thereds=[]
+      p_num = 3 if (bhp>=500*bmulti and not cloud9) or lol==3 or lol2==3 else 2
+      EZ = lol != p_num
+      turn2(p_num,lol)
+      waiting,owie = (1 if EZ else .6) - (.3 if xtreme or hell else 0), (10 if EZ else 15) + (5 if xtreme else 0) + turnramp[p_num] #now extreme is a bit harder for 3.2 tho!!!
+
+      stg,end_amo = 0, 5 * random.randrange((5 if EZ else 8) + (4 if xtreme else 0), (5 if p_num==3 else 0) + (12 if EZ else 15) + (4 if xtreme else 0) + turnramp[p_num])
+      imafire,erndo = [],{} #ing my laserrr
+      while stg < end_amo: #do this!!!!
+        [imafire.append([0,random.choice(upimps)]) for i in [stg % 5 == 0, (hell or p_num==3) and (random.randint(0,3 if hell else 4) == 0)] if i] #rn does hell phase 1, normal phase 1/2, NEED TO DO HORIZONTAL FOR HELL 2
+        
+        for i in imafire: #idkwhat i just did but test it ok
+          i[0] += 1
+          if i[0] == 3:
+            UNMARK(i[1]+(i * 64) for i in range(12))
+            erndo[i[1]] = more(i[1], 12, 'r', 64, 0, True)
+          elif i[0] == 6:
+            erndo[i[1]]()
+        upit(waiting/5)
+        stg += 1
+      #for i in range(random.randrange((7 if EZ else 10),(10 if EZ else 13) + turnramp[p_num])):
+      #  if yehp<0: break
+      #  spacer=random.choice(upimps) #choose a random spot on the top
+      #  danger(spacer,12,(1 if EZ else .6)-(.3 if xtreme else 0))
+      #  more(spacer,12,'r',64,(.9 if EZ else .5)-(.3 if xtreme else 0))
+      #  time.sleep((1 if EZ else .25)-(.2 if xtreme else 0))
+      #  thereds=[]
+
     elif (bhp>=500*bmulti and not cloud9) or lol==3 or lol2==3: #phase3.2, lasers up/down but faster (MAYBE CHANGE TO 2 lasers??)
-      turn2(3,lol)
-      owie=(10 if lol!=3 else 13)+turnramp[3]
-      for i in range(random.randrange((0 if lol!=3 else 3)+(9 if not xtreme else 12),(0 if lol!=3 else 5)+(15 if not xtreme else 19)+turnramp[2])):
+      turn2(3,lol) #COMBINED
+      owie=(10 if lol!=3 else 13)+turnramp[3] #COMBINED
+      for i in range(random.randrange((0 if lol!=3 else 3)+(9 if not xtreme else 12),(0 if lol!=3 else 5)+(15 if not xtreme else 19)+turnramp[3])): #wtf was i doing range(0,15)??? COMBINED?
         if yehp>0:
           spacer=random.choice(upimps) #for this attack doesnt change for random one, cause its basically the one above but harder (at least not much)
           danger(spacer,12,.5-(.2 if xtreme else 0))
