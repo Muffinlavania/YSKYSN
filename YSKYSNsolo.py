@@ -145,7 +145,7 @@ def file_name(name):
       base_path = os.path.abspath(".")
   return os.path.join(base_path, name)
 
-all_sounds,sound_volume,music_volume = {},1,1
+all_sounds,sound_volume,music_volume,defaultvolume = {},1,1,1
 def sound(path:str,filename=True,name='SOUND',setvolume=1):
   global all_sounds,sound_volume
   all_sounds[name]=mixer.Sound(file_name(path) if filename else path)
@@ -157,7 +157,6 @@ def stopsound(name):
   if name in all_sounds:
     mixer.Sound.stop(all_sounds[name])
     del all_sounds[name]
-defaultvolume = 1
 def music(name:str,music_path:str,canloop:bool=True,setvolume=1):
   global all_music,music_volume
   if not all_music.get(name,False):
@@ -176,10 +175,12 @@ def musicstop():
   
 
 #for changing volume/pausing music
-def setvolume(h):
-  global defaultvolume
-  defaultvolume += .05*(-1 if h=='-' else 1)
-  defaultvolume = 2 if defaultvolume>2 else .01 if defaultvolume<.05 else .05 if round(defaultvolume,2)==.06 else round(defaultvolume,2)
+def setvolume(h, mode = "def"):
+  global defaultvolume, music_volume, sound_volume
+  termper =  music_volume if mode == 'music' else sound_volume if mode == 'sound' else defaultvolume
+  termper += .05*(-1 if h in ['-',False] else 1)
+  termper = 2 if termper>2 else .01 if termper<.05 else .05 if round(termper,2)==.06 else round(termper,2)
+  [(music_volume := termper) if mode == 'music' else (sound_volume := termper) if mode == 'sound' else (defaultvolume := termper)]
   Music.set_volume(music_volume*defaultvolume)
   if len(all_sounds)>0:
     for i in all_sounds:
@@ -630,9 +631,9 @@ YL='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--------
 YS='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o'''
 ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSXXggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggXXgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------'
 r='\033[0m'
-PREFS = acheck("prefs",["center",False,False,1,False])
+PREFS = acheck("prefs",["center",False,False,[1,1,1],False])
+defaultvolume,music_volume,sound_volume = PREFS[3]
 pause = PREFS[4]
-defaultvolume = PREFS[3]
 def yskysn():
   global afk
   
@@ -780,14 +781,14 @@ def yskysn():
     c()
     #new select!!!!!!!
     
-    SAVE,modes_allow,sets_allow,save_allow = acheck("s"),['0','1','2','3'],['0','1','2','y'],['x','y'] #set up list of things you can see/do in main menu
+    SAVE,modes_allow,sets_allow,save_allow = acheck("s"),['0','1','2','3'],['0','1','2','3','4','5','y'],['x','y'] #set up list of things you can see/do in main menu
     for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,SAVE[0][0] != False]):
       if casee: modes_allow.append(i)
     #special printing things
-    special_ends,special_starts = ['^','0','1','2','4'],{";":both,"}":"Hell" not in mode(SAVE[0])}
+    special_ends,special_starts = ['^','0','1','2','4','7','8','*'],{";":both,"}":"Hell" not in mode(SAVE[0])}
     def blinks(): return {'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both,"%":experimental} #this is for the ending red/greens!!!!
     def endit(ending): #update this with special_ends!!!
-      return str({"^":f"< {centerit} >","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
+      return str({"^":f"< {centerit} >",'*': f"{(round(defaultvolume*100,2))}%",'7': f"{(round(music_volume*100))}%", '8':f"{(round(sound_volume*100))}%","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
   
     #if there is a colorcode, add on that # ofchars to the left offset
     def CENTEROFF(st):
@@ -821,7 +822,7 @@ def yskysn():
 
     #extra space (" ") after word means its 100% normal, a hashtag ("#") is for ones that can be selected but not achiev
     buts = '\n-Save Data#\n\n0Double Boss HP | a\n\n1No hit (1 hp)  | b\n2     No heals  | c\n\n3Extreme mode   | d\n\n4CLOUD 9        | e\n5Hell.          | f\n\nySettings#\nxExit#\nzContinue#\n;ALTER          | :\n'
-    buts_settings = """\nSettings (these will save!) \n\n0Center mode: ^\n1Show introduction text: | &\n2\n3Experimental things!! | %\n\nyExit Settings#\n"""
+    buts_settings = """\nSettings (these will save!) \n\n0Center mode: ^\n1Show introduction text | &\n2Volume: *\n3    Music: 7\n4    Sounds: 8\n5Experimental things!! | %\n\nyExit Settings#\n"""
     buts_save = """Save Data \nWill be overidden if you start another game! \nLoaded game will instantly start! \n\n#Mode: 0\n#Your hp: 1\n#Boss hp: 2\n}Spidy?: 4\n\nxLoad Save#\nyBack#\n"""
     SAVEITPLEASE, cur,curlist = False, 0, modes_allow #saveitplease = load the save after it breaks or something idk what im doing
 
@@ -840,6 +841,7 @@ def yskysn():
         cur+=1 if t in ['s',DOWN] else -1
         cur = 0 if cur==len(curlist) else len(curlist)-1 if cur==-1 else cur
       elif t in [ENTER,LEFT,RIGHT,'z','a','d']:
+        Left = t in [LEFT,'a']
         sound('YSKYSN/sel.wav',True,"sel",.25)
         if curlist==modes_allow:
           (bmulti:=2 if bmulti==1 else 1) + (bhp:=2000 if bhp==1000 else 1000) if (g:=curlist[cur])=='0' else (nonr:=not nonr) + (noheal:=nonr) if g=='1' else (noheal:=not noheal) if g=='2' and not nonr else (xtreme:=not xtreme) if g=='3' else (cloud9:=not cloud9) if g=='4' else (hell:=not hell) if g=='5' else (curlist:=sets_allow) + [c(),(cur:=0)] if g=='y' else (curlist:=save_allow) + [c(),(cur:=0)] if g=='-' else ''
@@ -848,8 +850,8 @@ def yskysn():
           if g=='z':
             break
         elif curlist==sets_allow:
-          (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if t in [LEFT,'a'] else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) + c() if g=='0' else (skipintro:=not skipintro) if g=='1' else (experimental:=not experimental) if g=='2' else ""
-          achieve("prefs",[centerit,skipintro,experimental])
+          (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if Left else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) + c() if g=='0' else (skipintro:=not skipintro) if g=='1' else (experimental:=not experimental) if g=='5' else setvolume(not Left, 'def' if g=='2' else 'music' if g=='3' else 'sound') if g in ['3','4','2'] else ""
+          achieve("prefs",[centerit,skipintro,experimental,[defaultvolume,music_volume,sound_volume],pause])
         elif curlist==save_allow:
           (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (SAVEITPLEASE := True)
           if g=='x':
@@ -1773,7 +1775,7 @@ while True:
   if h == '5' and '207m' in colors['Z'] and mazeq==gamering:
     checkthing()
     THREAD(target=spawners, args=(True)).start()
-  if h == '1':
+  if h == '1': #TESTING
     print("Experimental things: " + str(experimental:=not experimental))
   if h in '[]':
     s_offset = round(s_offset-.02 if h=='[' and s_offset>.5 else s_offset+.02,2)
