@@ -173,10 +173,30 @@ def musicstop():
   global all_music
   Music.pause()
   all_music = {}
+  
+
+#for changing volume/pausing music
+def setvolume(h):
+  global defaultvolume
+  defaultvolume += .05*(-1 if h=='-' else 1)
+  defaultvolume = 2 if defaultvolume>2 else .01 if defaultvolume<.05 else .05 if round(defaultvolume,2)==.06 else round(defaultvolume,2)
+  Music.set_volume(music_volume*defaultvolume)
+  if len(all_sounds)>0:
+    for i in all_sounds:
+      mixer.Sound.set_volume(all_sounds[i],sound_volume*defaultvolume)
+
 def musictoggle():
   global pause
   Music.pause() if (pause:=not pause) else Music.unpause()
 
+def BASICCHECK(music_inp = ""):
+  if music_inp == 'p':
+    musictoggle()
+  elif music_inp in ['-','=','+']:
+    setvolume(music_inp)
+  elif music_inp == 'c':
+    c()
+  
 #-----getkey/big important things-----
 WINDOWS = os.name=='nt'
 if WINDOWS:
@@ -376,7 +396,8 @@ def ischar(direc,chars,both_needed=False,default=True):
   except: #for down cases
     return False
 def distance(spot,distance=2,limit=6969):
-  # returns distance to a spot (used for radio lol)
+  '''returns distance to a spot (used for radio lol)
+  Not the one used in yskysn thing!!!!!!!!'''
   y = [i for k in [-1,1] for i in range(spot-distance-52*distance*k,spot+1+distance-52*distance*k) if 0<i<limit]
   y.extend(spot+(distance*k)+(52*q) for k in [-1,1] for q in range(distance*-1,distance+1) if 0<spot+(distance*k)+(52*q)<limit)
   return y
@@ -609,12 +630,13 @@ YL='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--------
 YS='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o'''
 ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSXXggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggXXgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------'
 r='\033[0m'
-
+PREFS = acheck("prefs",["center",False,False,1,False])
+pause = PREFS[4]
+defaultvolume = PREFS[3]
 def yskysn():
   global afk
   
   #vars you can change in settings, preferences
-  PREFS = acheck("prefs",["center",False,False])
   centerit,centermodes,skipintro,experimental = PREFS[0],["center","right","left"],PREFS[1],PREFS[2] # make settings!/hell mode things
   
   if both:
@@ -700,6 +722,7 @@ def yskysn():
     }
   pill = " "
   def distance(spot,dist=2,W=52,ex_W=0):
+    '''Returns distance from SPOT, DIST distance, with a board of W width, with extra width horizontally of EX_W'''
     #top/bottom parts
     if len(spot) == 4 : #splitting up list
       spot,dist,W,ex_W = spot[0], spot[1], spot[2], spot[3]
@@ -775,10 +798,10 @@ def yskysn():
           fina += len(st[count:(count:=st.find('m',count))])+1
         return fina
     
-    def prints(e,width='default',butting=False,addon_mode=False,JUSTPRINT=False): #addon_mode cause color codes make centering bad
-      """Use JUSTPRINT to simply center/right/left the text"""
+    def prints(e,curlist,width='default',butting=False,addon_mode=False,JUSTPRINT=False): #addon_mode cause color codes make centering bad
+      """Used to print out the buttons and stuff with center mode!!!!
+      Use JUSTPRINT to simply center/right/left the text"""
       global both,skipintro
-      nonlocal curlist
       if type(width)==str or width<10: width=os.get_terminal_size().columns
       for i in e.split("\n"):
         if i.strip()=='':
@@ -798,7 +821,7 @@ def yskysn():
 
     #extra space (" ") after word means its 100% normal, a hashtag ("#") is for ones that can be selected but not achiev
     buts = '\n-Save Data#\n\n0Double Boss HP | a\n\n1No hit (1 hp)  | b\n2     No heals  | c\n\n3Extreme mode   | d\n\n4CLOUD 9        | e\n5Hell.          | f\n\nySettings#\nxExit#\nzContinue#\n;ALTER          | :\n'
-    buts_settings = """\nSettings (these will save!) \n\n0Center mode: ^\n1Show introduction text: | &\n2Experimental things!! | %\n\nyExit Settings#\n"""
+    buts_settings = """\nSettings (these will save!) \n\n0Center mode: ^\n1Show introduction text: | &\n2\n3Experimental things!! | %\n\nyExit Settings#\n"""
     buts_save = """Save Data \nWill be overidden if you start another game! \nLoaded game will instantly start! \n\n#Mode: 0\n#Your hp: 1\n#Boss hp: 2\n}Spidy?: 4\n\nxLoad Save#\nyBack#\n"""
     SAVEITPLEASE, cur,curlist = False, 0, modes_allow #saveitplease = load the save after it breaks or something idk what im doing
 
@@ -807,10 +830,11 @@ def yskysn():
       time.sleep(.25)
     
     print("\033[38;5;88m")
-    prints("YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse Up/Down to move, Z/Enter/Left/Right to select!\n\n",'','','',True)
-    prints("Selected mode: ",'def',False,"mode()")
-    prints(buts,'default',True)
-    while (t:=getkey1()): #find select
+    prints("YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse Up/Down to move, Z/Enter/Left/Right to select!\n\n",[],'','','',True)
+    prints("Selected mode: ",[],'def',False,"mode()")
+    prints(buts,[],'default',True)
+    while (t:=getkey1()): #find select, find selector
+      BASICCHECK(t)
       if t in ['w','s',UP,DOWN]:
         sound('YSKYSN/sel.wav',True,"sel",.25)
         cur+=1 if t in ['s',DOWN] else -1
@@ -834,8 +858,8 @@ def yskysn():
         nonr,bmulti,bhp,xtreme,noheal,cloud9 = False,1,1000,False,False,not hell
       print("\033[H",end="\n"*6)
       if curlist==modes_allow:
-        prints("Selected mode: ",'def',False,"mode()")
-      prints(buts if curlist==modes_allow else buts_settings if curlist==sets_allow else buts_save,'f',True)
+        prints("Selected mode: ",[],'def',False,"mode()")
+      prints(buts if curlist==modes_allow else buts_settings if curlist==sets_allow else buts_save,curlist,'f',True)
     c()
     cancer = cancer or (xtreme and nonr)
     doomsday = xtreme and nonr and bmulti==2
@@ -916,7 +940,7 @@ def yskysn():
   
   def stat(stat_name, stat_change = 1):
     nonlocal stats4nerds
-    '''Input stat name (stats4nerds[stat_name]) and the int to change it by (+= stat_change)
+    '''Input stat_name (stats4nerds[stat_name]) and the int to change it by (+= stat_change)
     will also set the thing if it doesnt exist!!!!!!'''
     stats4nerds[stat_name] = stats4nerds.get(stat_name, 0) + stat_change
   
@@ -1139,8 +1163,6 @@ def yskysn():
     elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1: #find phase 2, random spaces
       turn2(1,lol)
       owie = (8 if lol!=1 else 10)+(5 if xtreme else 0)+turnramp[1]
-    
-      #working??????
 
       for i in range(random.randrange((5 if lol!=1 else 8)+turnramp[1],(9 if lol!=1 else 14)+turnramp[1])):
         if yehp>0:
@@ -1184,7 +1206,7 @@ def yskysn():
         for i in imafire: #idkwhat i just did but test it ok
           i[0] += 1
           if i[0] == 3:
-            UNMARK(i[1]+(i * 64) for i in range(12))
+            UNMARK([(i[1]+(q * 64)) for q in range(12)])
             erndo[i[1]] = more(i[1], 12, 'r', 64, 0, True)
           elif i[0] == 6:
             erndo[i[1]]()
@@ -1354,7 +1376,7 @@ def yskysn():
   
   c()
   
-  selection,turn,theender,pause,noballs,hddict=0,'gamer',False,False,['!','@','#','$'],{4:'\033[38;5;46m',3:'\033[38;5;46m',2:'\033[38;5;6m',1:'\033[38;5;166m',0:'\033[38;5;196m'}
+  selection,turn,theender,noballs,hddict=0,'gamer',False,['!','@','#','$'],{4:'\033[38;5;46m',3:'\033[38;5;46m',2:'\033[38;5;6m',1:'\033[38;5;166m',0:'\033[38;5;196m'}
   notmoved = True
   
   #start yskysn
@@ -1395,18 +1417,15 @@ def yskysn():
           notmoved = False
         
         wee=getkey1() #yskysn input (INPUT NPUT oiDWNIOWNDJKFdkkfnkalKWMDLKWmd)
+        BASICCHECK(wee)
         if wee in [RIGHT,LEFT,'a','d']:
           coloreddict[noballs[selection]]='\033[38;5;174m'
         if wee in [LEFT,'a']:
           selection -= 1
         elif wee in [RIGHT,'d']:
           selection += 1
-        elif wee=='c':
-          c()
-        elif wee in ['-','=','+']:
-          setvolume(wee)
-        elif wee=='p':
-          musictoggle()
+        elif wee == '6' and name.lower() == "muffinlavania": #TESTING
+          bhp -= 50
         elif wee=='n':
           c()
           STATS()
@@ -1550,6 +1569,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
             if JUSTUPIT and not cutscene:
               JUSTUPIT=False
               up(True)
+          BASICCHECK(keyz)
           if keyz=='q': #TESTING
             STOP = not STOP
           if keyz=='g':
@@ -1557,13 +1577,12 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
             for i in playin:
               print(i,end='')
             anykey()
+          if keyz=='l': #TESTING
+            yehp -= 10
           if keyz in ['a','s','w','d',LEFT,DOWN,UP,RIGHT] and yehp>0 and not cutscene:
             if movi(keyz)=='bruh' and attackin: #hit walls, take damage
               damage((10 if bhp in [666,420,69] else 5) * tmpdmgmul)
           
-          if keyz=='p':
-            pause=not pause
-            Music.pause() if pause else Music.unpause()
           afk=True
         if yehp>0:
           time.sleep(.1)
@@ -1718,15 +1737,7 @@ def printmaze(maze):
           final += printr(colors.get(i,("\033[48;5;172m" if counti%52>30 else "\033[48;5;178m")+(i if i not in 'ABCD-' else " " if i=='-' else [charss[k] for k in charss if i in k][0])),i not in charss2)
   print(final)
   for i in ['Q1','Q2','W1','W2']: colors[i] = "\033[48;5;27m" if 'Q' in i else '\033[48;5;41m'
-SCREENUP=False
-def setvolume(h):
-  global defaultvolume
-  defaultvolume += .05*(-1 if h=='-' else 1)
-  defaultvolume = 2 if defaultvolume>2 else .01 if defaultvolume<.05 else .05 if round(defaultvolume,2)==.06 else round(defaultvolume,2)
-  Music.set_volume(music_volume*defaultvolume)
-  if len(all_sounds)>0:
-    for i in all_sounds:
-      mixer.Sound.set_volume(all_sounds[i],sound_volume*defaultvolume)
+SCREENUP=False      
 clear,s_offset,offset = False,1,0
 while True:
   box1,box2,box3,box4=mazeq.index('┌'),mazeq.index('┐'),mazeq.index('└'),mazeq.index('┘')
