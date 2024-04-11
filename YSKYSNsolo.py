@@ -3,6 +3,9 @@ from pygame import mixer
 from threading import Thread
 from WindowMoving import *
 
+
+#wtf is going ph with phase 3 lol
+
 if os.name == 'nt': #doesnt work on mac?a
   from ctypes import windll
   mid = (windll.user32.GetSystemMetrics(78)//2, windll.user32.GetSystemMetrics(79)//2)
@@ -30,6 +33,7 @@ Golden Arrow, (A message from a god... an arrow! A gold engraving says "Golden F
 - HELL MODE
   - two phases, need to kill him for 2nd phase, which is a savepoint you can continue from (since phase 2 not gonna be easy at all)
   - 2nd phase is actually completley different
+    - make the battle area increase in size, cutscene?
   - 100% random attack schedule thing, one more extra attack that can happen
   - Add multi word attack 1
   - Section where the board expands like a ton
@@ -49,6 +53,8 @@ changed achievement SAVING (only) to be a list of all modes' numbers, need to up
 made all modes mixable (minus the special one)
 added settings, volume control, things like that
 rebalanced phase 1 (faster ramping stuff like that)
+rebalanced phase 2 (A TINY BIT, also float != int and that took too much time)
+changed phase 3/4 attacks....
 
 HELL MODE!!!!!
 - pray for a better day
@@ -190,12 +196,12 @@ def musictoggle():
   global pause
   Music.pause() if (pause:=not pause) else Music.unpause()
 
-def BASICCHECK(music_inp = ""):
+def BASICCHECK(music_inp = "", c_able = True):
   if music_inp == 'p':
     musictoggle()
   elif music_inp in ['-','=','+']:
     setvolume(music_inp)
-  elif music_inp == 'c':
+  elif music_inp == 'c' and c_able:
     c()
   
 #-----getkey/big important things-----
@@ -424,6 +430,7 @@ def move(dir):
     mazeq=(main if mazeq==notmain else notmain) if dir=="right" else (notmain if mazeq==main else gamering)
     mixer.pause()
     both,canspam=False,mazeq==notmain
+    c()
   elif ischar(dir,'0'):
     printt(["It's an incredibly old radio, barely able to play audio...", "A poster on the back confirms a salesman used to own it...","Must not have sold."],[2,2,1])
     anykey()
@@ -788,7 +795,7 @@ def yskysn():
     special_ends,special_starts = ['^','0','1','2','4','7','8','*'],{";":both,"}":"Hell" not in mode(SAVE[0])}
     def blinks(): return {'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both,"%":experimental} #this is for the ending red/greens!!!!
     def endit(ending): #update this with special_ends!!!
-      return str({"^":f"< {centerit} >",'*': f"{(round(defaultvolume*100,2))}%",'7': f"{(round(music_volume*100))}%", '8':f"{(round(sound_volume*100))}%","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
+      return str({"^":f"< {centerit} >",'*': f"{round(defaultvolume*100,2):>03d}%",'7': f"{(round(music_volume*100))}%", '8':f"{(round(sound_volume*100))}%","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
   
     #if there is a colorcode, add on that # ofchars to the left offset
     def CENTEROFF(st):
@@ -809,10 +816,10 @@ def yskysn():
           print()
         elif (not JUSTPRINT and i[-1]!="#") and (not butting or (i[0] in curlist+['#'] or (special_starts.get(i[0],False)) or i[0].isupper())):
           Q = i[1:-1]+endit(i[-1]) if butting and i!='' and i[-1] != " " else i
-          cleft = CENTEROFF(Q+(eval(addon_mode) if addon_mode!=False else '')) + (1 if butting and i!='' and i[-1]!=" " else 0) #definitely brokenfor right lol
-          if (f:=CENTEROFF(Q)) > 0: cleft -= f*2 #stich fix :heart:
+          cleft = CENTEROFF(Q+(eval(addon_mode) if addon_mode!=False else '')) + (1 if butting and i!='' and i[-1]!=" " else 0) #last thing is to bump settings thing lol
+          #if (f:=CENTEROFF(Q)) > 0: cleft -= f*2 #stich fix :heart:
           print((seledchar:="\033[48;5;5m" if butting and i!='' and curlist[cur] == i[0] else '') + \
-            ((f"{Q:>{width//2+(len(Q))//2-(3 if addon_mode=='mode' else 0)}}" if '|' in i or addon_mode else f"{Q:^{width-cleft}}") if centerit=='center' else f"{Q:>{width-(len(eval(addon_mode))-cleft if addon_mode!=False else 1)}}" if centerit=='right' else Q) +\
+            ((f"{Q:>{width//2+len(Q)//2-((len(Q)-cleft)//2+1 if addon_mode=='mode()' else 0)}}" if '|' in i or addon_mode else f"{Q:^{width-cleft}}") if centerit=='center' else f"{Q:>{width-(len(eval(addon_mode))-cleft if addon_mode!=False else 1)}}" if centerit=='right' else Q) +\
             ('' if not butting or i[-1] in [" "]+special_ends else (s(blinks().get(i[-1],False),False))+seledchar+(" "*(width//2-len(i)//2 if centerit=='center' else 0 if centerit=="right" else width-len(i)-1)))+(mode()+("    " if centerit!='right' else '') if addon_mode=="mode()" else r))
         
         elif JUSTPRINT or (i[-1] == "#" and i[0] in curlist+['#']):
@@ -831,9 +838,7 @@ def yskysn():
       time.sleep(.25)
     
     print("\033[38;5;88m")
-    prints("YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse Up/Down to move, Z/Enter/Left/Right to select!\n\n",[],'','','',True)
-    prints("Selected mode: ",[],'def',False,"mode()")
-    prints(buts,[],'default',True)
+    prints("YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse Up/Down to move, Z/Enter/Left/Right to select!\n\n[Any key to continue...]",[],'','','',True)
     while (t:=getkey1()): #find select, find selector
       BASICCHECK(t)
       if t in ['w','s',UP,DOWN]:
@@ -858,7 +863,7 @@ def yskysn():
             break
       if cloud9 or hell:
         nonr,bmulti,bhp,xtreme,noheal,cloud9 = False,1,1000,False,False,not hell
-      print("\033[H",end="\n"*6)
+      print("\033[H",end="\n"*5)
       if curlist==modes_allow:
         prints("Selected mode: ",[],'def',False,"mode()")
       prints(buts if curlist==modes_allow else buts_settings if curlist==sets_allow else buts_save,curlist,'f',True)
@@ -923,7 +928,9 @@ def yskysn():
   #setting up colored stuff
   coloreddict['r']= '\033[48;5;52m ' if hell else '\033[48;5;91m ' if xtreme else '\033[48;5;253m ' if noheal else coloreddict['r']
   if nonr and not cancer: coloreddict['n']='\033[48;5;52m '
-  if cloud9: coloreddict['o'] = '\033[48;5;91m '
+  if cloud9:
+    coloreddict['o'] = '\033[48;5;91m '
+    coloreddict['w'] = '\033[48;5;54m '
   if cancer:
     coloreddict['w'] = '\033[48;5;5m '
     for i in ['shields','reds','red bulls']: stats4nerds[i]=0
@@ -980,9 +987,11 @@ def yskysn():
     nonlocal dang
     return dang.append(spots) if type(spots) == int else dang.extend(spots) if hasattr(spots,"__iter__") else False
   
-  def UNMARK(spots):
+  def UNMARK(spots=False):
     nonlocal dang
-    if not hasattr(spots,"__iter__"):
+    if not spots:
+      dang = []
+    elif not hasattr(spots,"__iter__"):
       if spots in dang:
         dang.remove(spots)
     else:
@@ -1036,13 +1045,14 @@ def yskysn():
         for ib in range(amoint): #undo the stuff
           if playin[theone+(ib*dirt)]!='▢': #no killing yourself >:(
             playin[theone+(ib*dirt)]=playinref[theone+(ib*dirt)]
-          theows.remove(theone+(ib*dirt))
+          if theone+(ib*dirt) in theows:
+            theows.remove(theone+(ib*dirt))
       else:
         for i in theone:
           if playin[i]!='▢':
             playin[i]=playinref[i]
-          theows.remove(i)
-          thewhites.remove(i)
+          if i in theows: theows.remove(i)
+          if i in thewhites: thewhites.remove(i)
     
     if not RETURN:
       RETURNER()
@@ -1055,7 +1065,7 @@ def yskysn():
   def upit(TIME = 0):
     nonlocal JUSTUPIT
     JUSTUPIT = True
-    time.sleep(TIME if type(TIME) == float and TIME >= 0 else 0)
+    time.sleep(TIME if type(TIME) in [float,int] and TIME >= 0 else 0)
   
   # -------------------------------------------------------- Attacks --------------------------------------------------------------
   
@@ -1080,6 +1090,7 @@ def yskysn():
   def attack(lol=9): #find attack
     nonlocal tmpdmgmul,playin,attackin,coloreddict,yehp,orang,theows,owie,turnramp,cutscene,iframamo,thereds,thesymlist,imblue,poins,STOP
     time.sleep(1)
+    theows = [] #so you cant get like destroyed lol
     if both: tmpdmgmul *= random.choice([i/10 for i in range(8,26)])
     if yehp<1: return
     
@@ -1164,7 +1175,7 @@ def yskysn():
 
     elif (bhp>=750*bmulti and not cloud9) or lol==1 or lol2==1: #find phase 2, random spaces
       turn2(1,lol)
-      owie = (8 if lol!=1 else 10)+(5 if xtreme else 0)+turnramp[1]
+      owie = (8 if lol!=1 else 10)+(5 if xtreme else 0)+(10 if hell else 0) + turnramp[1]
 
       for i in range(random.randrange((5 if lol!=1 else 8)+turnramp[1],(9 if lol!=1 else 14)+turnramp[1])):
         if yehp>0:
@@ -1176,63 +1187,64 @@ def yskysn():
             imblue2, orang2 = imblue.copy(), orang.copy()
             imblue,orang = [], []
             upit((1.5 if not xtreme else .75)-(.75 if lol==1 and not xtreme else .25 if lol==1 else 0))
-          theows = orang if not hell else orang2
+        
+          theows = orang[0:] if not hell else orang2
           TIMEN = .5 - (turnramp[1]/15) if turnramp[1] < 6 else .1
           if hell:
             upit(TIMEN)
             theows = []
             upit(.75 - (turnramp[1]/20) if turnramp[1] < 10 else .25)
             theows = imblue2
-          upit((1 if lol!=1 else .25)-(.2 if xtreme else 0) if not hell else TIMEN)
-          theows,orang = [],[]
+          orang = []
+          upit((.75 if lol!=1 else .25)-(.2 if xtreme else 0) if not hell else TIMEN)
+          theows = []
           upit((1 if lol!=1 else .5) - (.5 if xtreme else 0) - turnramp[1]/20)
 
     #new phase 3/3.2, smoosh into one?
+    
+    #current problem: horizontal lasers are just vertical ones that are SUPER long and go ut of bounds????? (normal mode)
+    #FIXED??????? YEAA, test hell mode
+          
     #maybe even phase 5 horizontals???
-    #phase 3 - normal - slow lasers, hell - multiple lasers
-    #phase 3.2  - normal - multiple lasers, hell - multiple? vertical AND horizontal
-    #phase 4 - normal - horizontal, hell - 2/3 horizontals
+    #phase 3   [2] 750>bhp>=600 - normal - normal lasers, hell - multiple lasers (DONE?)
+    #phase 3.2 [3] bhp>=450  - normal - horizontal, hell - multiple? vertical AND horizontal (DONE NOT HELL THO LIKE BRO WHAT WAS I THINKING)
+    #phase 4   [4] bhp>=300 - normal - multiple lasers, hell - 2/3 horizontals
+    #changed thresholds, 3.2 500 -> 450, 4 400 -> 300
 
-    #need to combine these two or something!!!
-    elif (bhp>=600*bmulti and not cloud9) or lol==2 or lol2==2: #find phase 3, lasers up/down
-      p_num = 3 if (bhp>=500*bmulti and not cloud9) or lol==3 or lol2==3 else 2
+    #need to keep combining!!!
+    elif (bhp>=300*bmulti and not cloud9) or lol<=4 or lol2<=4: #find phase 3, lasers up/down
+      p_num = 2 if (bhp>600*bmulti and not cloud9) or lol==2 or lol2==2 else 3 if (bhp>=450*bmulti and not cloud9) or lol==3 or lol2==3 else 4
       EZ = lol != p_num
       turn2(p_num,lol)
-      waiting,owie = (1 if EZ else .6) - (.3 if xtreme or hell else 0), (10 if EZ else 15) + (5 if xtreme else 0) + turnramp[p_num] #now extreme is a bit harder for 3.2 tho!!!
+      waiting,owie = (1 if EZ else .6) - (.3 if xtreme or hell else 0),   (10 if EZ else 15) + (5 if xtreme else 0) + turnramp[p_num] #now extreme is a bit harder for 3.2 tho!!!
 
-      stg,end_amo = 0, 5 * random.randrange((5 if EZ else 8) + (4 if xtreme else 0), (5 if p_num==3 else 0) + (12 if EZ else 15) + (4 if xtreme else 0) + turnramp[p_num])
+      stg,end_amo = 0, 5 * random.randrange((8 if EZ else 10) + (4 if xtreme else 0) + turnramp[p_num], (5 if p_num==3 else 0) + (12 if EZ else 15) + (4 if xtreme else 0) + turnramp[p_num])
       imafire,erndo = [],{} #ing my laserrr
-      while stg < end_amo: #do this!!!!
-        [imafire.append([0,random.choice(upimps)]) for i in [stg % 5 == 0, (hell or p_num==3) and (random.randint(0,3 if hell else 4) == 0)] if i] #rn does hell phase 1, normal phase 1/2, NEED TO DO HORIZONTAL FOR HELL 2
+      def updown(DEWIT = False): #returns true if up/down, false if horizontal, takes in that DEWIT so you can force a horizontal on !!!
+        return not (p_num != 2 and ((p_num == 3 and not hell) or (hell and (p_num==4 or DEWIT)))) #oops accidently like put it for horizontal lol
+      
+      while stg < end_amo:
+        DEWIT = True  #used to spawn a horizontal lazer immediately, the walrus operator thing should swap the 2nd time
+        [imafire.append([danger((D:=random.choice(upimps if updown(DEWIT) else random.choice([leftimps,rightimps]))),(12 if updown(DEWIT) else 51),'no') * 0, D, updown(DEWIT)] if (not hell or (DEWIT:=not DEWIT)) or True else []) for i in [stg % 5 == 0, (p_num == 4 or hell) and (random.randint(1,4 if hell else 5) == 1), hell and p_num != 2] if i] #rn does hell phase 1, normal phase 1/2, NEED TO DO HORIZONTAL FOR HELL 2
         
-        for i in imafire: #idkwhat i just did but test it ok
+        for i in imafire:
           i[0] += 1
           if i[0] == 3:
-            UNMARK([(i[1]+(q * 64)) for q in range(12)])
-            erndo[i[1]] = more(i[1], 12, 'r', 64, 0, True)
+            UNMARK([(i[1]+(q * 64 if i[2] else q*(1 if i[1] in leftimps else -1))) for q in range(12 if i[2] else 51)])
+            erndo[i[1]] = more(i[1], 12 if i[2] else 51, 'r', 64 if i[2] else (1 if i[1] in leftimps else -1), 0, True) #12/51 are amo of spaces, 64/1 is the multiplicitive
           elif i[0] == 6:
             erndo[i[1]]()
-        upit(waiting/5)
+        upit(waiting/(3+turnramp[p_num]/5)) #change to /5 cause idk whats happeneing
+        while STOP: time.sleep(.05) #TESTING
         stg += 1
-      #for i in range(random.randrange((7 if EZ else 10),(10 if EZ else 13) + turnramp[p_num])):
-      #  if yehp<0: break
-      #  spacer=random.choice(upimps) #choose a random spot on the top
-      #  danger(spacer,12,(1 if EZ else .6)-(.3 if xtreme else 0))
-      #  more(spacer,12,'r',64,(.9 if EZ else .5)-(.3 if xtreme else 0))
-      #  time.sleep((1 if EZ else .25)-(.2 if xtreme else 0))
-      #  thereds=[]
+        if stg >= end_amo: #undo the rest, if its the last one
+          for i in imafire:
+            if erndo.get(i[1],False):
+              erndo[i[1]]()
+      thereds = []
+      UNMARK()
 
-    elif (bhp>=500*bmulti and not cloud9) or lol==3 or lol2==3: #phase3.2, lasers up/down but faster (MAYBE CHANGE TO 2 lasers??)
-      turn2(3,lol) #COMBINED
-      owie=(10 if lol!=3 else 13)+turnramp[3] #COMBINED
-      for i in range(random.randrange((0 if lol!=3 else 3)+(9 if not xtreme else 12),(0 if lol!=3 else 5)+(15 if not xtreme else 19)+turnramp[3])): #wtf was i doing range(0,15)??? COMBINED?
-        if yehp>0:
-          spacer=random.choice(upimps) #for this attack doesnt change for random one, cause its basically the one above but harder (at least not much)
-          danger(spacer,12,.5-(.2 if xtreme else 0))
-          more(spacer,12,'r',64,.4-(.25 if xtreme else 0))
-          time.sleep((.5 if lol!=3 else .25)-(.25 if xtreme else 0))
-          thereds=[]
-    elif (bhp>=400*bmulti and not cloud9) or lol==4 or lol2==4: #phase 4, lasers on rows
+    elif (bhp>=400*bmulti and not cloud9) or lol==4 or lol2==4: #phase 4, lasers on rows, JUST USED FOR REFERENCE RN
       turn2(4,lol)
       owie=(15 if lol!=4 else 20)+(5 if xtreme else 0)+turnramp[4]
       for i in range(random.randrange((7 if lol!=4 else 13),(14 if lol!=4 else 18))):
@@ -1242,9 +1254,10 @@ def yskysn():
           more(spacer,51,'r',surt,(.5 if lol!=4 else .3)-(.2 if xtreme else 0))
           time.sleep((.5 if lol!=4 and not xtreme else 0))
           thereds=[]
+
     elif (bhp>=100*bmulti and not cloud9) or lol==5 or lol2==5:
       turn2(5,lol)
-      owie=13+(5 if xtreme else 0)+turnramp[5]
+      owie=10+(5 if xtreme else 0)+turnramp[5]
       for i4 in range(random.randrange((15 if lol!=5 else 20),(25 if lol!=5 else 30))):#phase 5, lightning bolts come from both sides to your space using algorithm thing
         ni1,ni2=random.choice(leftimps),random.choice(rightimps)
         pos=whereheat #so 0% chance for error lol (whereheat is player pos)
@@ -1418,7 +1431,7 @@ def yskysn():
           window.moveInTop()
           notmoved = False
         
-        wee=getkey1() #yskysn input (INPUT NPUT oiDWNIOWNDJKFdkkfnkalKWMDLKWmd)
+        wee=getkey1() #find yskysn input,find yskysn menu (INPUT NPUT oiDWNIOWNDJKFdkkfnkalKWMDLKWmd)
         BASICCHECK(wee)
         if wee in [RIGHT,LEFT,'a','d']:
           coloreddict[noballs[selection]]='\033[38;5;174m'
@@ -1431,7 +1444,7 @@ def yskysn():
         elif wee=='n':
           c()
           STATS()
-        elif wee=='i': #item view testing
+        elif wee=='i': #item view TESTING
           itemView()
         if wee in [ENTER,'z','l']:
           pickin=False
@@ -1486,9 +1499,10 @@ def yskysn():
               stat('shields',1)
               printt(["A pink one! Looks like a very chubby face...","Seems to be able to absorb a hit...."],[2,.03])
               print("\033[38;5;26m+1 Shield!\033[0m")
-        elif theeven==1: #spiderman is that you
+
+        elif theeven==1: #spiderman is that you, MAKE INTOBOW FOR HELL2
           if not hasspidy:
-            printt(["Suddenly a man in a red suit breaks through the wall...","Spiderman is that you??/1?!?!?","He leaves just as fast as he came.",'Seems like he forgot something...'],[2,2,1,1])
+            printt(["Suddenly a man in a red suit breaks through the wall...","Spiderman is that you??/1?!?!?" if not hell else "Is there anything he can do to help?","He leaves just as fast as he came." if not hell else "If only you could flee as fast as him.",'Seems like he forgot something...'],[2,2,1,1])
             hasspidy=True
             print("\033[38;5;1m(Spidy bot obtained!)\033[0m")
           elif cancer:
@@ -1501,6 +1515,7 @@ def yskysn():
             print("(+1 life! After dying, become automatically invincible for 5 seconds! Red bull gives you wings.)")
             stat('reds',1)
             stat('red bulls',1)
+        
         elif theeven in [(2 if not cancer else 6),5]: #funny (defib)
           stat('doctors',1)
           printt(['Suddenly, a full doctors kit appears.',"It is loaded with a military grade med-kit, a defibrillator, medical gause, and much more.","Luckily, there are a few band-aids® nearby that useless set."],[1,2,.03])
@@ -1525,7 +1540,7 @@ def yskysn():
       elif selection==2: #heal up
         stat('heal up')
         printt(random.choice(['Staring straight into his eyes gives you a sudden confidence...','You remember that KYS can mean keep yourself safe...','The lightning seems to fill YOU with strength...','You try to imagine his face as the man face...']),1)
-        hp += miheal if (miheal:=heal(random.randrange(20,31)))!='no' else 0
+        yehp += miheal if (miheal:=heal(random.randrange(20,31)))!='no' else 0
         if miheal=='no':
           stat('useless turns')
           print("\033[38;5;88m(The lightning prevents it.)\033[0m")
@@ -1571,9 +1586,11 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
             if JUSTUPIT and not cutscene:
               JUSTUPIT=False
               up(True)
-          BASICCHECK(keyz)
+          BASICCHECK(keyz,False)
           if keyz=='q': #TESTING
             STOP = not STOP
+          if keyz=='e':
+            print(theows)
           if keyz=='g':
             c()
             for i in playin:
@@ -1739,7 +1756,7 @@ def printmaze(maze):
           final += printr(colors.get(i,("\033[48;5;172m" if counti%52>30 else "\033[48;5;178m")+(i if i not in 'ABCD-' else " " if i=='-' else [charss[k] for k in charss if i in k][0])),i not in charss2)
   print(final)
   for i in ['Q1','Q2','W1','W2']: colors[i] = "\033[48;5;27m" if 'Q' in i else '\033[48;5;41m'
-SCREENUP=False      
+SCREENUP=False
 clear,s_offset,offset = False,1,0
 while True:
   box1,box2,box3,box4=mazeq.index('┌'),mazeq.index('┐'),mazeq.index('└'),mazeq.index('┘')
