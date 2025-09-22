@@ -1,3 +1,5 @@
+
+    
 import os,time,sys,random,json,AUDIO
 from pygame import mixer
 from threading import Thread
@@ -35,14 +37,16 @@ Golden Arrow, (A message from a god... an arrow! A gold engraving says "Golden F
   - 2nd phase is actually completley different
     - make the battle area increase in size, cutscene?
   - 100% random attack schedule thing, one more extra attack that can happen
-  - Add multi word attack 1
+  - Add multi word attack 1 (done for phase 1)
   - Section where the board expands like a ton
-  - he no longer has random dialogues, his health is times a random amount (which is also what your attack is multipled by)
+  - he no longer has random dialogues, his health is times a random amount (which is also what your attack is multipled by), basically omega flowy lol
   
   
   - phase 1: attack 1: multi words, attack 2: norm + slow lasers/lasers on every red basically, attack3: fast lasers, attack 4: double horizontal lasers, attack 5: lightning but can come from top and bottom, attack 6: MULTIPLE IN ONE, randomness 
   - phase 1 end: "A bolt of lightning comes to strick YSKYSN, but the spidy bot.... takes it. It's gone,
-
+  
+  phase 2 pulls a sans and bro goes super sayian but its like you both are trapped in the lightning together
+  
 ALTER:
   - dmg multiplier gets +/- somewhere between .5-2 or something?
 
@@ -58,6 +62,13 @@ changed phase 3/4 attacks....
 
 HELL MODE!!!!!
 - pray for a better day
+- ADD DR. THUNDER??? - can heal yskysn to prevent you from being stuck in hell2 on the final attack (game wont let you kill him unless you have bow, add dialogues for every combination of bow/arrow/light)
+- THREE ENDSINGS????? - easy - heal yskysn after hell1 (make it like sans where he falls asleep or something and you can move to the item button????), he wont be nice about it tho but go to other dimension??
+- medium - normal route, kill with bow and he vanishes
+- hard - BUILD AETHER PORTAL AYYYY - starts off by spiderman dropping water bucket, then random guys or something dropping glowstone
+- starts off with 10 blocks needed, but then something like "All the tutorials fill in the corners... better be safe than sorry" then 14 blocks needed
+- Animationa at the end having the water just flow like it would then a final attack from yskysn then it lights, then youre in heaven!!!
+
 
 added bonus of Doomsday!
 '''
@@ -145,11 +156,7 @@ Music = mixer.music
 all_music = {}
 
 def file_name(name):
-  try:
-      base_path = sys._MEIPASS # PyInstaller creates a temp folder and stores path in _MEIPASS
-  except Exception:
-      base_path = os.path.abspath(".")
-  return os.path.join(base_path, name)
+  return os.path.join(os.getcwd(), name)
 
 all_sounds,sound_volume,music_volume,defaultvolume = {},1,1,1
 def sound(path:str,filename=True,name='SOUND',setvolume=1):
@@ -641,8 +648,9 @@ r='\033[0m'
 PREFS = acheck("prefs",["center",False,False,[1,1,1],False])
 defaultvolume,music_volume,sound_volume = PREFS[3]
 pause = PREFS[4]
+experimental = PREFS[2]
 def yskysn():
-  global afk
+  global afk,experimental
   
   #vars you can change in settings, preferences
   centerit,centermodes,skipintro,experimental = PREFS[0],["center","right","left"],PREFS[1],PREFS[2] # make settings!/hell mode things
@@ -682,22 +690,35 @@ def yskysn():
   iinv, ITEM_l_real,ITEM_r_real = ["Apple","Jalepeno"],["Apple","Cherry","Gum","Vanilla Cone","Placebo","Chocolate Cone","Jalepeno","Cheesecake"],["Red Pill","Blue Pill","Heaven's Light","Heaven's Bow","Heaven's Arrow"] #order to view items 
   HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = True,True,True
   #theres gotta be a better way for this
+  its = {'Jalepeno': ["HP",75],
+    'Cheesecake': ["HP",100],
+    'Chocolate Cone': ["HP",25,"DEF", 1],
+    'Vanilla Cone': ["HP",25,"AT",5],
+    'Placebo': ["PILL"],
+    'Gum': ["HP",25,"GUM",.75],
+    'Cherry': ["HP",50],
+    'Apple': ["HP",10],}
+  def useme(item): #rng manipulator??, add luck var that impacts item grabbing, make it like jester 
+    pass
+    
+  
   def up_items():
     return { #distance thing, stats (plus defense, heal etc), description, check (only for the ones at the top, red pill, light etc)
     'Jalepeno': [[[1106, 0], 3, 66, 0],"+75 HP","Scorching hot... A fiery start leads to a smoother end."],
-    'Cheesecake': [[[1180, 0], 3, 66, 1],"+100 HP, 2x damage taken next turn","A treat for the tolerant. Not for the lactose intolerant."],
+    'Cheesecake': [[[1180, 0], 3, 66, 1],"+100 HP, 2x damage taken next turn...","A treat for the tolerant. Not for the lactose intolerant."],
     'Chocolate Cone': [[[1096, 0], 3, 66, 1],"+25 HP, +1 defense!","A dark delight, made for the tough."],
     'Vanilla Cone': [[[1080, 0], 3, 66, 1],"+25 HP, +5 attack!","A coned confection, made for the strong."],
     'Placebo': [[[1088, 0], 2, 66, 1],"Once taken, never forgotten.","A truly effective medicine. Made to decieve, used to rationalize."],
     'Gum': [[[1135, 0], 2, 66, 2],"+25 HP, +defense next turn","A tough chew...  Not the most nutritious, but hard to hurt."],
-    'Cherry': [[[996, 997], 2, 66, 2],"+50 HP, +defense next turn","A lucky break, a jackpot of sorts. A quick fix to lost attention."],
+    'Cherry': [[[996, 997], 2, 66, 2],"+50 HP","A lucky break, a jackpot of sorts. A quick fix to lost attention."],
     'Apple': [[[1192, 0], 2, 66, 1],"+10 HP","An apple a day keeps the defibrillator away... The first resort."],
     "Heaven's Bow": [[[559, 0], 6, 66, 5],"Delivery. (Part 2/3)","A glow trapped in gold. Limitless potential, yet limited to the gods.",HEAVEN_BOW],
     "Heaven's Arrow": [[[559, 0], 6, 66, 5],"Swift justice. (Part 3/3)","A message straight to the point. Dont give up now!",HEAVEN_ARROW],
     "Heaven's Light": [[[494, 0], 6, 66, 18],"Radiance. (Part 1/3)","A blessing from above, in times of need.",HEAVEN_LIGHT],
-    'Red Pill': [[[494, 0], 6, 66, 25],"+15 crit damage, can be heightened...","The sky lights up, replaced with blood red. Once taken, never forgotten.",pill=='r'],
-    'Blue Pill': [[[494, 0], 6, 66, 25],"+5 blue shield, can be heightened...","The sky lights up, replaced with a solid blue. Once taken, never forgotten.",pill=='b'],
+    'Red Pill': [[[494, 0], 6, 66, 25],f"+{15*placeb} crit damage, can be heightened...","The sky lights up, replaced with blood red. Once taken, never forgotten.",pill=='r'],
+    'Blue Pill': [[[494, 0], 6, 66, 25],f"+{5*placeb} blue shield, can be heightened...","The sky lights up, replaced with a solid blue. Once taken, never forgotten.",pill=='b'],
     "None1":[[[1088, 0], 5, 66, 25],"None","None"],"None2":[[[494, 0], 6, 66, 25],"None","None",True]}
+  
   def up_symbs():
     def_space = "\033[48;5;52m " if pill=="r" else "\033[48;5;17m " if pill=="b" else " "
     def_l, def_g =  "\033[48;5;7m " if HEAVEN_LIGHT else def_space, '\033[48;5;242m ' 
@@ -729,6 +750,7 @@ def yskysn():
       '2': "\033[48;5;215m " if "Chocolate Cone" in iinv else def_g #choc cone
     }
   pill = " "
+  placeb = 0
   def distance(spot,dist=2,W=52,ex_W=0):
     '''Returns distance from SPOT, DIST distance, with a board of W width, with extra width horizontally of EX_W'''
     #top/bottom parts
@@ -795,7 +817,7 @@ def yskysn():
     special_ends,special_starts = ['^','0','1','2','4','7','8','*'],{";":both,"}":"Hell" not in mode(SAVE[0])}
     def blinks(): return {'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both,"%":experimental} #this is for the ending red/greens!!!!
     def endit(ending): #update this with special_ends!!!
-      return str({"^":f"< {centerit} >",'*': f"{round(defaultvolume*100,2):>03d}%",'7': f"{(round(music_volume*100))}%", '8':f"{(round(sound_volume*100))}%","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
+      return str({"^":f"< {centerit} >",'*': f"{round(defaultvolume*100):>03d}%",'7': f"{(round(music_volume*100))}%", '8':f"{(round(sound_volume*100))}%","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
   
     #if there is a colorcode, add on that # ofchars to the left offset
     def CENTEROFF(st):
@@ -945,6 +967,13 @@ def yskysn():
   if experimental:
     window.moveOutBottom()
   
+  #luci
+  if hell and not acheck("welcome to hell luci") and "LUCASLI" in name.upper():
+    c()
+    printt(["...","How long have you been waiting again?","Well its finally here, I'll probably forget this exists so I really hope I made it as cool as I thought of it as.","This is no round 63 challenge bro this might take a while to beat.","gl man"],[1,1,2,1,2])
+    achieve("welcome to hell luci")
+    anykey()
+    
   #------------------------- End Save/load data stuff ------------------------------
   
   def stat(stat_name, stat_change = 1):
