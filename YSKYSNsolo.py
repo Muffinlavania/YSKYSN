@@ -20,7 +20,6 @@ if WINDOWS and os.name=='nt': #doesnt work on mac?
 
 
 def changespeed(file, speed=1.0):
-  print(speed)
   return AUDIO.speed_change(file, speed*.256) #*4.25 cause idk
   #return AUDIO.speed_change(file, (1/speed)*4.25) #*4.25 cause idk
 
@@ -2168,3 +2167,4 @@ keyz things:
     level=2
     THREAD(target=spawners).start()
 '''
+
