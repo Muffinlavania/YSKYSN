@@ -1,15 +1,14 @@
-import wave
-try:
-    import audioop
-except ImportError:
-    import pyaudioop as audioop
+from pydub import AudioSegment
+#from pydub.playback import play as PLAY
 
-def spawnsound(file, speed):
-    with wave.open(file, 'rb') as wave_file:
-        # Get the parameters of the input wave file
-        channels, width, framerate, frames, _, _ = wave_file.getparams()
+def speed_change(filename, speed=1.0):
+    sound = AudioSegment.from_file(filename)
+    alteredframes = sound._spawn(sound.raw_data, overrides={
+        "frame_rate": int(sound.frame_rate * speed)
+    })
 
-        # Read the audio data from the input wave file
-        input_data = wave_file.readframes(frames)
-
-    return audioop.ratecv(input_data, width, channels, framerate, int(framerate * speed), None)[0]
+    # convert the sound with altered frame rate to a standard frame rate so that regular playback programs will work right. They often only know how to play audio at standard frame rate (like 44.1k)
+    return alteredframes.set_frame_rate(sound.frame_rate).raw_data
+    
+#play(speed_change("YSKYSN/dial1.wav", 3))
+#print("hi")
