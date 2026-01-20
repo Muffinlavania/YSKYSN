@@ -1,3 +1,8 @@
+#!/usr/bin/env -S python3 -i
+
+#-i in the shebang makes it not crash after running?, will probably need to rmeove that
+#needs to run on python 3.12 or else mixer and other stuff doesnt work - I'm not sure if the shebang will work with python3.12 instead of python3? so idk
+
 import os,time,sys,random,json,AUDIO
 from pygame import mixer
 from threading import Thread
@@ -15,7 +20,9 @@ if WINDOWS and os.name=='nt': #doesnt work on mac?
 
 
 def changespeed(file, speed=1.0):
-    return AUDIO.spawnsound(file, (1/speed)*4.25) #*4.25 cause idk
+  print(speed)
+  return AUDIO.speed_change(file, speed*.256) #*4.25 cause idk
+  #return AUDIO.speed_change(file, (1/speed)*4.25) #*4.25 cause idk
 
 
 
@@ -62,6 +69,7 @@ current day hell notes:
 
 
 WHAT IVE DONE (so no forgor)
+battling with python versions - had to switch up audio thing but lets hope it works on mac and pyinstaller?
 more achievements - accurate luci achievement
 slightly better attack RNG, lower bound 40 -> 50, upper bound 101->105, rusty mask odds increased, new mask....
 all lean difficulties is now harder to cheese with dream masks (they have % damage over 200 hp)
@@ -321,6 +329,7 @@ def upped_achieves():
   |Playing God - clean out hell.                            {s("Playing god")}|
   |AETHER - heaven on earth, just a myth? (VERY HARD)       {s("AETHER")}|
   |----------------------------------------------------------|
+  |ALTER - your other half?                                 {s('ALTER')}|
   |chaos chaos - beat alter Cloud 9 Mode                    {s('chaos')}|
   |DOOM - discover and beat Doomsday difficulty             {s("DOOM")}|'''+('''
   |Genocidal Maniac - one shot the boss???? (HOW???????)   ☠️|  ''' if acheck("ONE") else "")+'''
@@ -518,6 +527,7 @@ def move2(dir): #for alter
     mazeq=(main if mazeq==notmain else notmain) if dir=="right" else (notmain if mazeq==main else gamering)
     ALTER1 = 782 if dir=='right' else 829 #works out so its easy lol
     mixer.pause()
+    achieve("ALTER")
   if ischar(dir,'-└┘┌┐',True,ALTER1):
     ALTER1 += 52 if dir=='down' else -52 if dir=='up' else -1 if dir=='left' else 1
   if ischar(dir,'e',False,ALTER1) and mazeq==main:
