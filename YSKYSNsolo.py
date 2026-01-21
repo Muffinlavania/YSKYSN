@@ -267,6 +267,7 @@ def anykey(ffg=True):
   getkey1()
   c()
 
+until_clear = -1 
 def achieve(h='`',h1=True):
   global achievements
   if type(h) == list:
@@ -1936,19 +1937,36 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
     time.sleep(2)
     printt("\n\033[38;5;204m...")
     slepy(2)
+    has_printed = False
+    def printt_once(thing,dela =.03,n = True,N = False):
+      global has_printed
+      if not has_printed:
+        has_printed = True
+        printt(thing,dela,n,N)
     if hasspidy:
-      
       #revamp this achievement system
       printt(r+'\n[One final bolt of lightning comes from the sky,\n but luckily the \033[38;5;1mspidy bot'+r+' is there to block it...]\033[38;5;204m\n')
+      if cloud9 and both:
+        printt_once(['You beat me.... at my best.','Even in another form, even split in two.','You controlled the chaos.','I\'ll be returning to order, as now I\'m sure this throne belongs to you.'],[1,1,1,.03])
+        achieve("chaos")
+      if cloud9:
+        printt_once(['You beat me at my own game.','Even while I perked up, you perked up just the same...','I could learn a thing or two from you. Thanks.'],[1,2,1])
+        achieve("CLOUD 9")
+      if cancer and stat("useless turns") >= 10: #TODO
+        c()
+        printt_once(["wait wait how?????",'im like '],[])
+      if cancer:
+        printt_once(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now! (fr)"],[1,2,.03])
+        achieve("Cancer")
       if nonr:
         printt(["Even against all odds, you managed to do it.","No matter how much I got mad, you just spoke.","That means a lot man, for real.","\033[48;5;14mYou should love yourself, now!"+r],[2,1,2,.03])
         achieve("YSLYSN")
-      elif cloud9:
-        printt(['You beat me at my own game.','Even while I perked up, you perked up just the same...','I could learn a thing or two from you. Thanks.'],[1,2,1])
-        achieve("CLOUD 9")
       elif cancer:
         printt(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now! (fr)"],[1,2,.03])
         achieve("Cancer")
+        if stat("useless turns") <= 10:
+          printt
+          achieve("luci")
       elif noheal or bmulti==2 or xtreme:
         printt(['Wow.',"I was so mad I didn't even see how cool you were man.","Love yourself."+r],[1,2,.03])
         achieve(("True Chad" if noheal else 'LEAN' if xtreme else 'Double takedown'))
@@ -2167,4 +2185,5 @@ keyz things:
     level=2
     THREAD(target=spawners).start()
 '''
+
 
