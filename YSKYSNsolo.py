@@ -94,6 +94,7 @@ HELL MODE!!!!!
 
 
 added bonus of Doomsday!
+- like an onslaught, can only attack, and has a final attack? - different than hell mode cause in hell it's different attacks and more menchanics
 '''
 
 r='\033[0m'
@@ -1826,7 +1827,7 @@ Total Useless Turns: {s4('useless turns')}{r}
             print('(\033[38;5;88mYSKYSN\033[0m healed '+str(HEALING:=heal(random.randrange(40,65),kys))+'..)')
             bhp += HEALING
             if HEALING==0:
-              stat('useless turns')
+             #stat('useless turns')
               print("(What a loser...)")
           else:
             printt("Over the hills and above the clouds, the wind comes from above...",2)
@@ -1943,6 +1944,9 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
       if not has_printed:
         has_printed = True
         printt(thing,dela,n,N)
+    def printt_twice(thing,dela =.03,n = True,N = False):
+      if not has_printed:
+        printt(thing,dela,n,N)
     if hasspidy:
       #revamp this achievement system
       printt(r+'\n[One final bolt of lightning comes from the sky,\n but luckily the \033[38;5;1mspidy bot'+r+' is there to block it...]\033[38;5;204m\n')
@@ -1954,7 +1958,14 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         achieve("CLOUD 9")
       if cancer and stat("useless turns") >= 10: #TODO
         c()
-        printt_once(["wait wait how?????",'im like '],[])
+        printt_once(["wait wait how?????",'im like pretty sure this wasn\'t possible','well i guess i was wrong','i cant really give you an achievement for this you know','no one else would want to get it','well alright here\'s a fake one though'],[1,2,1,1,2,.03])
+        print("[You got \033[38;5;14mta be a lunatic\033[0m!]")
+        achieve("luci")
+      if xtreme:
+        if stat("useless turns") >= 10:
+          printt_twice([""])
+        
+
       if cancer:
         printt_once(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now! (fr)"],[1,2,.03])
         achieve("Cancer")
