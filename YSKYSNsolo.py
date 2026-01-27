@@ -68,6 +68,7 @@ current day hell notes:
 
 
 WHAT IVE DONE (so no forgor)
+fixed setting saving - experimental (for windows) and center mode didnt save
 battling with python versions - had to switch up audio thing but lets hope it works on mac and pyinstaller?
 more achievements - accurate luci achievement
 slightly better attack RNG, lower bound 40 -> 50, upper bound 101->105, rusty mask odds increased, new mask....
@@ -75,7 +76,7 @@ all lean difficulties is now harder to cheese with dream masks (they have % dama
 added tool tip toggle and more quality of life
 added a cap to the ramping - so it cant become literally impossible
 alter mode
-changed achievement SAVING (only) to be a list of all modes' numbers, need to update reading of it etc
+changed achievement SAVING (only) to be a list of all modes' numbers, need to update reading of it (DONE)
 made all modes mixable (minus the special one)
 added settings, volume control, things like that
 rebalanced phase 1 (faster ramping stuff like that)
@@ -184,6 +185,16 @@ def file_name(name):
   return os.path.join(os.getcwd(), name)
 
 all_sounds,sound_volume,music_volume,defaultvolume = {},1,1,1
+
+#used for the sound tool tip things
+#path:name
+music_tips = { #TODO
+  "YSKYSN/election.mp3":"MEGALOLAZING: Election Day - by aytanner",
+  "YSKYSN/smiling.mp3":"Smiling till the end - by Placeek (slowed)",
+  "YSKYSN/tears.mp3":"Tears in the Rain - by Drop0ff",
+  "YSKYSN/unwave.mp3":"Unwavering Persistence - OG by Drop0ff"
+}
+
 def sound(path:str,filename=True,name='SOUND',setvolume=1):
   global all_sounds,sound_volume
   all_sounds[name]=mixer.Sound(file_name(path) if filename else path)
@@ -197,10 +208,10 @@ def stopsound(name):
     del all_sounds[name]
 def music(name:str,music_path:str,canloop:bool=True,setvolume=1):
   global all_music,music_volume
-  if not all_music.get(name,False):
+  if not all_music.get(name,[False,'None'])[0]:
     if all_music!={}:
       Music.unload()
-    all_music = {name:True}
+    all_music = {name:[True,music_path]}
     Music.load(file_name(music_path))
     Music.set_volume((music_volume := setvolume)*defaultvolume)
     Music.play(-1 if canloop else 0)
@@ -699,25 +710,26 @@ YL='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--------
 YS=list('''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o''')
 ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll              o-\n-o          llllllllllllbssslllllllllllllllllllllllll          o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllll       o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSXXggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggXXgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------'
 r='\033[0m'
+
+
+
 PREFS = acheck("prefs",["center",False,False,[1,1,1],False])
 defaultvolume,music_volume,sound_volume = PREFS[3]
 pause = PREFS[4]
 experimental = PREFS[2]
-  
-
 
 def yskysn():
-  global afk,experimental
+  global afk,experimental, PREFS
   
   yskysning = True
-
+  PREFS = acheck("prefs",["center",False,False,[1,1,1],False])
   #vars you can change in settings, preferences
   centerit,centermodes,skipintro,experimental = PREFS[0],["center","right","left"],PREFS[1],PREFS[2] # make settings!/hell mode things
   
   if both:
     printt("Something feels off... \033[38;5;12mMaybe its you?\033[0m\n[ALTER mode activated...]")
     anykey()
-  playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww \n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww \n wwwg____________________________________________________gggww \n wgg__~_______~_______~_______~_______~_______~_______~___gwww \n wwg_____________________________________________________ggggw \n wwwg____________________________________________________gwwgw \n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww \n wgwg_____________________________________________________gwgw \n wgg______________________________________________________ggww \n wg___~_______~_______~_______~_______~_______~_______~___wgww \n wwg_____________________________________________________ggwww \n wgwg____________________________________________________gwgww \n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw \n wwwg____________________________________________________gwwgw \n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwww \n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww ''')
+  playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww \n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww \n wwwg____________________________________________________gggww \n wgg__~_______~_______~_______~_______~_______~_______~___gwww \n wwg_____________________________________________________ggggw \n wwwg____________________________________________________gwwgw \n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww \n wgwg_____________________________________________________gwgw \n wgg______________________________________________________ggww \n wg___~_______~_______~_______~_______~_______~_______~___wgww \n wwg_____________________________________________________ggwww \n wgwg____________________________________________________gwgww \n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw \n wwwg____________________________________________________gwwgw \n wwwwggggggggggggggggggggggggggggggggggggsggggggggggggggggggwww \n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww ''')
   playinref = playin.copy()
   playinref[415] = "~"
   bhp,yehp,owie,iframamo=1000,100,0,1.5
@@ -920,7 +932,16 @@ def yskysn():
     if experimental:
       window.moveToMid()
       time.sleep(.25)
+      
+    def save_has(thing):
+      nonlocal SAVE
+      return any([i in SAVE[0] for i in thing]) if type(thing) != str else thing in SAVE[0] 
     
+    def loadem():
+      nonlocal noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp,stats4past,SAVE
+      noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp = save_has(['12','94','50']), save_has(["16",'49','50']),2 if save_has("3") else 1, save_has(['94','50']),save_has(['64','61']),save_has('61') ,save_has('49'),save_has('50'),SAVE[1],SAVE[2],SAVE[3],SAVE[4],{int(i):j for i,j in SAVE[5].items()}
+      stats4past = stats4nerds.copy()
+      
     print("\033[38;5;88m")
     prints("YSKYSN\033[0m recognizes you...\nIt's as if he is expecting something.\nUse Up/Down to move, Z/Enter/Left/Right to select!\n\n[Any key to continue...]",[],'','','',True)
     while (t:=getkey1()): #find select, find selector
@@ -995,17 +1016,15 @@ def yskysn():
       if cancer:  xtreme,nonr,noheal = True,True,True
       if cloud9:  xtreme = True
     else:
-      noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp = SAVE[0] in ['12','94','50'], SAVE[0] in ["16",'49','50'],2 if SAVE[0]=="3" else 1, SAVE[0] in ['94','50'],SAVE[0] in ['64','61'],SAVE[0]=='61',SAVE[0]=='49',SAVE[0]=='50',SAVE[1],SAVE[2],SAVE[3],SAVE[4],{int(i):j for i,j in SAVE[5].items()}
-      stats4past = stats4nerds.copy()
+      loadem()
       print("Game loaded!")
       anykey()
   elif (SAVE:=acheck("s")) != False and SAVE[0] != False: #prevent it from erroring!!
     print(f"\033[38;5;153mSave data detected! (l to load, any other key to overide and start fight!)\033[0m\n\tMode: Normal{r}\n\tYour hp: {SAVE[1]}\n\tBoss hp: {SAVE[2]}\n\tSpidy?: {SAVE[4]}\n\tOther stats: Would take up too much space rn. L.")
     time.sleep(.5)
     if getkey1()=='l':
+      loadem()
       print("\033[38;5;88mYSKYSN\033[0m smiles.\n(Loaded game!)")
-      noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp = SAVE[0] in ['12','94','50'], SAVE[0] in ["16",'49','50'],2 if SAVE[0]=="3" else 1, SAVE[0] in ['94','50'],SAVE[0] in ['64','61'],SAVE[0]=='61',SAVE[0]=='49',SAVE[0]=='50',SAVE[1],SAVE[2],SAVE[3],SAVE[4],{int(i):j for i,j in SAVE[5].items()}
-      stats4past = stats4nerds.copy()
       anykey()
   else:
     pass #stuff for normal mode
@@ -1019,7 +1038,7 @@ def yskysn():
     coloreddict['g'] = '\033[48;5;91m '
   if cancer:
     coloreddict['w'] = '\033[48;5;5m '
-    for i in ['shields','reds','red bulls']: stats4nerds[i]=0
+    for i in ['shields','reds','red bulls']: stats4nerds[i]=stats4nerds.get(i,0)
   if hell:
     coloreddict['n'],coloreddict['g'],coloreddict['w'] = "\033[48;5;0m ",'\033[48;5;52m ','\033[48;5;90m '
     #hell mode 2: coloreddict['W'] = '\033[48;5;1m '
@@ -2196,5 +2215,6 @@ keyz things:
     level=2
     THREAD(target=spawners).start()
 '''
+
 
 
