@@ -188,7 +188,7 @@ all_sounds,sound_volume,music_volume,defaultvolume = {},1,1,1
 
 #used for the sound tool tip things
 #path:name
-music_tips = { #TODO
+music_tips = {
   "YSKYSN/election.mp3":"MEGALOLAZING: Election Day - by aytanner",
   "YSKYSN/smiling.mp3":"Smiling till the end - by Placeek (slowed)",
   "YSKYSN/tears.mp3":"Tears in the Rain - by Drop0ff",
@@ -1603,15 +1603,19 @@ Total Useless Turns: {s4('useless turns')}{r}
 
   yskysn_anim = False #while still on the main screen/animating bro
   up = False #update the screen
+
+  j=10 - bhp//(100*bmulti) #find saying things
+  original = f'{"The Last One Standing?" if doomsday else saying[j] if not (hell or cancer) else "Cancer." if cancer else CURT if not hell2 else "This is it. The eradication.":^63}'
+  
   def yskysn_uping(): #thread to up yskysn main thing
-    nonlocal up,yskysn_anim,j,CURT
+    nonlocal up,yskysn_anim,j,CURT,original
     while yskysning:
       while yskysn_anim:
         if up:
           rc()
           printman(YS)
           printman('o'*63+f'\n                      QYSKYSN HP: {bhp:>5}',True)
-          print("\n"+("\033[38;5;180m" if not (hell or cancer or doomsday) else '')+f'{"The Last One Standing?" if doomsday else saying[j] if not (hell or cancer) else "Cancer." if cancer else CURT if not hell2 else "This is it. The eradication.":^63}'+r)
+          print("\n"+("\033[38;5;180m" if not (hell or cancer or doomsday) else '')+original+r)
           if can_tip:
             print(f"\n{'[A/D to move, Z to select, N = stats, 0 = Show music]':^63}\n{'[C to reset screen, l = save & quit, t = toggle tips]':^63}")
           print(f"\033[38;5;63m{f'[Parts: {len(i for i in [HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW] if i)}/3]':^63}\033[0m" if hell2 else f'\033[38;5;1m{"[Spidy]":^63}'+r if hasspidy else "")
@@ -1650,11 +1654,34 @@ Total Useless Turns: {s4('useless turns')}{r}
 
   #start yskysn
 
-  #cool music thingie, TODO
   scrollin = False
+  
   def scrollit():
-    nonlocal up
-    up = True
+    nonlocal up,original,j,scrollin
+    scrollin = True 
+    original_real = f'{"The Last One Standing?" if doomsday else saying[j] if not (hell or cancer) else "Cancer." if cancer else CURT if not hell2 else "This is it. The eradication.":^63}'
+    toscroll = f'{music_tips.get(all_music.get("yskysn",["?","?"])[1],"???? - by ????"):^63}'
+    for ind,i in enumerate(toscroll):
+      if not yskysn_anim: return
+      original = original[1:]+i
+      if ind%2==0:
+        up=True
+        time.sleep(.1)
+    original = toscroll 
+    up = True 
+    time.sleep(1)
+    for ind,i in enumerate(original_real):
+      if not yskysn_anim: return
+      original = original[1:]+i
+      if ind%3==0:
+        up=True
+        time.sleep(.1)
+    original = f'{"The Last One Standing?" if doomsday else saying[j] if not (hell or cancer) else "Cancer." if cancer else CURT if not hell2 else "This is it. The eradication.":^63}'
+    scrollin = False
+
+
+
+
 
   yskysn_anim = True 
   up = True
@@ -1676,6 +1703,7 @@ Total Useless Turns: {s4('useless turns')}{r}
       
       yskysn_anim = True 
       
+      original = f'{"The Last One Standing?" if doomsday else saying[j] if not (hell or cancer) else "Cancer." if cancer else CURT if not hell2 else "This is it. The eradication.":^63}'
       while pickin:
         #rc()
         #printman(YS)
@@ -1693,6 +1721,7 @@ Total Useless Turns: {s4('useless turns')}{r}
         if experimental and notmoved:
           window.moveInTop()
           notmoved = False
+        
         yskysn_anim = True 
         up = True
         wee=getkey1() #find yskysn input,find yskysn menu (INPUT NPUT oiDWNIOWNDJKFdkkfnkalKWMDLKWmd)
@@ -1963,7 +1992,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
       if not has_printed:
         has_printed = True
         printt(thing,dela,n,N)
-    def printt_twice(thing,dela =.03,n = True,N = False):
+    def printt_twice(thing,dela =.03,n = True,N = False): #only printts if nothing has printt_onced
       if not has_printed:
         printt(thing,dela,n,N)
     if hasspidy:
@@ -2215,6 +2244,3 @@ keyz things:
     level=2
     THREAD(target=spawners).start()
 '''
-
-
-
