@@ -68,6 +68,7 @@ current day hell notes:
 
 
 WHAT IVE DONE (so no forgor)
+revamped end of fight dialogues/achievement handling (TEST THIS)
 fixed setting saving - experimental (for windows) and center mode didnt save
 battling with python versions - had to switch up audio thing but lets hope it works on mac and pyinstaller?
 more achievements - accurate luci achievement
@@ -1978,7 +1979,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
 
   musicstop()
 
-  if bhp<0:
+  if bhp<=0:
     achieve('s',[[False],False,False,False,False])
     coloreddict['m']='\033[48;5;166m '
     coloreddict['W']='\033[48;5;9m '
@@ -1996,7 +1997,6 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
       if not has_printed:
         printt(thing,dela,n,N)
     if hasspidy:
-      #revamp this achievement system
       printt(r+'\n[One final bolt of lightning comes from the sky,\n but luckily the \033[38;5;1mspidy bot'+r+' is there to block it...]\033[38;5;204m\n')
       if cloud9 and both:
         printt_once(['You beat me.... at my best.','Even in another form, even split in two.','You controlled the chaos.','I\'ll be returning to order, as now I\'m sure this throne belongs to you.'],[1,1,1,.03])
@@ -2004,32 +2004,35 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
       if cloud9:
         printt_once(['You beat me at my own game.','Even while I perked up, you perked up just the same...','I could learn a thing or two from you. Thanks.'],[1,2,1])
         achieve("CLOUD 9")
-      if cancer and stat("useless turns") >= 10: #TODO
-        c()
-        printt_once(["wait wait how?????",'im like pretty sure this wasn\'t possible','well i guess i was wrong','i cant really give you an achievement for this you know','no one else would want to get it','well alright here\'s a fake one though'],[1,2,1,1,2,.03])
-        print("[You got \033[38;5;14mta be a lunatic\033[0m!]")
-        achieve("luci")
+      if cancer:
+        if stat("useless turns")>=10:
+          c()
+          printt_once(["wait wait how?????",'im like pretty sure this wasn\'t possible','well i guess i was wrong','i cant really give you an achievement for this you know','no one else would want to get it','well alright here\'s a fake one though'],[1,2,1,1,2,.03])
+          print("[You got \033[38;5;14mta be a lunatic\033[0m!]")
+          achieve("luci")
+        else:
+          printt_once(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now! (fr)"],[1,2,.03])
+        achieve("Cancer")
       if xtreme:
         if stat("useless turns") >= 10:
-          printt_twice([""])
-        
-
-      if cancer:
-        printt_once(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now! (fr)"],[1,2,.03])
-        achieve("Cancer")
-      if nonr:
-        printt(["Even against all odds, you managed to do it.","No matter how much I got mad, you just spoke.","That means a lot man, for real.","\033[48;5;14mYou should love yourself, now!"+r],[2,1,2,.03])
-        achieve("YSLYSN")
-      elif cancer:
-        printt(["You're..... invincible.","Even through my uncontrollable rage, you beat me, flawlessly.","There aren't many people like you anymore. Love yourself man, now! (fr)"],[1,2,.03])
-        achieve("Cancer")
-        if stat("useless turns") <= 10:
-          printt
+          printt_twice(["Wow... I was no match.","Even throwing away 10 turns wasn't enough for you - you had to finish the job as well.","I have nothing but respect for you."])
           achieve("luci")
-      elif noheal or bmulti==2 or xtreme:
-        printt(['Wow.',"I was so mad I didn't even see how cool you were man.","Love yourself."+r],[1,2,.03])
-        achieve(("True Chad" if noheal else 'LEAN' if xtreme else 'Double takedown'))
-      else:
+        else:
+          printt_twice(['Wow.',"I was so mad I didn't even see how cool you were man.","Love yourself."+r],[1,2,.03])
+          achieve("LEAN")
+      if nonr:
+        printt_twice(["Even against all odds, you managed to do it.","No matter how much I got mad, you just spoke.","That means a lot man, for real.","\033[48;5;14mYou should love yourself, now!"+r],[2,1,2,.03])
+        achieve("YSLYSN")
+      elif noheal:
+        printt_twice(["You just had to flex without healing, huh?",'how niche'],[1,.03])
+        achieve("True Chad")
+      if bmulti==2:
+        printt(["Even at twice my strength, I was no match...","You've shown me the path to righteousness."],[2,.03])
+        if stat("speak") <= 10:
+          print("[One Punch!!!!!]")
+          achieve("opm")
+        achieve("Double takedown")
+      if "Normal" in mode():
         printt(['So much.... peace.',"You are worth something.","Your life serves tons of purpose!","\033[38;5;154m[\033[38;5;204mYSLYSN\033[38;5;154m walks away with new purpose...]"+r],[2,1,2,.03])
         for i in coloreddict:
           if i not in ['o','-']:
