@@ -33,27 +33,39 @@ def changespeed(file, speed=1.0):
 
 '''
 2/24/26
-make the item view thing actually work (it shouldnt take a turn, make the display prettier too)
-make the items actually drop with pray (random chance for Dr. Thunder on any item drop as well?)
-Placebo cool stuff
-RNG Manipulator maybe? (you can increase certain drops)
+DONE (maybe make prettier tho) - make the item view thing actually work (it shouldnt take a turn, make the display prettier too)
+DOING - make the items actually drop with pray (random chance for Dr. Thunder on any item drop as well?)
+DOING - Placebo cool stuff
+MAYBE - RNG Manipulator maybe? (you can increase certain drops)
 3/4/26
 finish doomsday thingies
 3/5/26
 DONE - implement quickloadsave for this - if you die during doomsday, you can go straight back to the attack you died on, its basically cancer but inf retries and you have to no hit every single mode
 DONE? (test) - can you load a game when bhp is at like 1 and then trigger alter and get an achievement that way 
 3/7/26
-fixed music volume getting fucked up for some reason
-make Cloud9 or Doomsday cooler by adding like 2 words instead of 1, 2nd phase always spawns on you, lasers always spawn on you or next to you in phase 3 etc
-DOING - yeah lowkey cloud9 is just unfair make it normal random but with like that ^
+DONE - fixed music volume getting fucked up for some reason
+DONE - make Cloud9 or Doomsday cooler by adding like 2 words instead of 1, 2nd phase always spawns on you, lasers always spawn on you or next to you in phase 3 etc
+        yeah lowkey cloud9 is just unfair make it normal random but with like that ^
+        cloud9 is now revamped!!!
 3/8/26
-removed Cloud9 doing like the fuck ass xtreme hard mode attacks cause fuck that
-made phase 1 and 2 "enchanced" (1 spawns 'homing' words and doesn't get any faster (cause its lowkey skill), 2 spawns ones on you and in a star shape)
+DONE - removed Cloud9 doing like the fuck ass xtreme hard mode attacks cause fuck that
+DONE - made phase 1 and 2 "enchanced" (1 spawns 'homing' words and doesn't get any faster (cause its lowkey skill), 2 spawns ones on you and in a star shape)
 3/9/26
-Great idea alrert!!! add a tutorial when you first load up the update
-introduces you to all the settings while you can play with them in real time
-make a new dial3.wav that plays during the tutorial (ofc you can change volume and it switches to dial2.wav when need be to actually be lore accurate or maybe somehow sync it up to the beats?)
-make new setting to show/hide YSKYSN board movement spots (how would this work with phase 2?) and show/hide YSKYSN during attacks (kinda cringe)
+DOING - Great idea alrert!!! add a tutorial when you first load up the update
+        introduces you to all the settings while you can play with them in real time
+DOING -  make a new dial3.wav that plays during the tutorial (ofc you can change volume and it switches to dial2.wav when need be to actually be lore accurate or maybe somehow sync it up to the beats?)
+DOING - make new setting to show/hide YSKYSN board movement spots (how would this work with phase 2?) and show/hide YSKYSN during attacks (kinda cringe)
+3/25/26
+DONE- ok im annoyed by the rng a bit lol - when only speaking over and over your odds of getting hockey masks and defib drop?
+DONE -me thinks the randrange was broken for masks, it doesnt actually take the last number (its like [:num])
+3/26/26
+DONE - cloud9 phase 3.5 horizontal lasers (danger on the 1st 2, then no danger and it follows you)
+3/27/26
+DONE - cloud9 phase 4 crazy lasers (phase 3 modification also applies here and wow holy moly thats lowk impossible but its fine)
+DONE - cloud9 phase 5 lightning, from all sides? (also spawns a laser so you HAVE to move diagnol)
+TBD - might want to test to make sure i didnt fuck anything else up
+DONE - Made song offset/speed save
+
 
 DONE:
 - Switch "MAGIC" with "PRAY " and "HEAL UP" with " ITEMS "
@@ -197,10 +209,12 @@ with open('yskysndata.json','r') as j:
 starter(tempr)
 c()
 
+def acheck(thing, default = False):
+  return achievements.get(thing,default)
 
 #-----Music-----
 mixer.init(channels = 2)
-clear,s_offset,offset = False,1,0 #clear isnt used for music but whatever lol
+clear,s_offset,offset = False,acheck("song_speed",1),acheck("song_offset",0) #clear isnt used for music but whatever lol
 
 Music = mixer.music
 
@@ -225,8 +239,7 @@ music_tips = { #find music tips, find show music
 def sound(path:str,filename=True,name='SOUND',setvolume=1):
   global all_sounds,sound_volume
   all_sounds[name]=mixer.Sound(file_name(path) if filename else path)
-  sound_volume = setvolume
-  mixer.Sound.set_volume(all_sounds[name],setvolume*defaultvolume)
+  mixer.Sound.set_volume(all_sounds[name],sound_volume * setvolume *defaultvolume)
   mixer.Sound.play(all_sounds[name])
   return True
 def stopsound(name):
@@ -296,7 +309,7 @@ def getkey1():
   global afk,keyz,keyz2
   afk=True
   while afk:
-    pass
+    time.sleep(.05)
   po0=keyz
   keyz=''
   return po0.lower() if po0 not in [UP,DOWN,LEFT,RIGHT] else po0
@@ -304,8 +317,9 @@ def getkey1():
 def anykey(ffg=True):
   if ffg:
     print(r+'\n[Any key to continue]')
-  getkey1()
+  g = getkey1()
   c()
+  return g
 
 def achieve(h='`',h1=True):
   global achievements
@@ -314,7 +328,7 @@ def achieve(h='`',h1=True):
     return
   f=achievements[h] if h in achievements.keys() else False
   if h!='`':
-    if not f or h in ['s','m1','m2','prefs']:
+    if not f or h in ['s','m1','m2','prefs','song_speed','song_offset']:
       achievements[h]=h1
       if h1==True:
         print(r+'[You got \033[38;5;86m'+h+r+'!]')
@@ -327,8 +341,6 @@ def achieve(h='`',h1=True):
   with open('yskysndata.json','w') as j:
     j.write(json.dumps(achievements2))
 
-def acheck(thing, default = False):
-  return achievements.get(thing,default)
 
 def s(jh,achievement=True):
   return ('\033[48;5;46m' if (acheck(jh) if achievement else jh) else '\033[48;5;160m') + (" " if not achievement or not acheck(jh+"A") else "A") + r
@@ -346,7 +358,7 @@ def upped_achieves():
   |Double takedown - twice the hp is nothing.               {s('Double takedown')}|
   |YSLYSN - The true ending, good luck...                   {s('YSLYSN')}|
   |----------------------------------------------------------|
-  |{"??????" if not acheck("LYS") else "Cancer"} - {"Beat normal mode first.    " if not acheck("LYS") else "you asked, i merely gave."}                       {s("Cancer")}|
+  |{"??????" if not acheck("LYS") else "Cancer"} - {"Beat normal mode first.    " if not acheck("LYS") else "you asked, I merely gave."}                       {s("Cancer")}|
   |{"???????" if not acheck("LEAN") else "CLOUD 9"} - {"Beat lean mode first.   " if not acheck("LEAN") else "and so drugs truly lose."}                       {s("CLOUD 9")}|
   |{"?????" if not te else "Hell."} - {"Beat ALL NORMAL MODES first.      " if not te else "its not possible. please.         " if not acheck("Hell.") else "yet somehow, the player prevailed."}               {s("Hell.")}|
   |----------------------------------------------------------|
@@ -364,7 +376,7 @@ def upped_achieves():
   |guilty as charged - have over 1,000 hp                   {s("guilty")}|
   |tanked - take exactly 1 damage from any source           {s("tanked")}|
   |----------------------------------------------------------|
-  |get dunked on - beat hell mode, but not that time        {s("dunked")}|
+  |Get dunked on - beat hell mode, but not that time        {s("dunked")}|
   |Playing God - clean out hell.                            {s("Playing god")}|
   |AETHER - heaven on earth, just a myth? (VERY HARD)       {s("AETHER")}|
   |----------------------------------------------------------|
@@ -376,7 +388,7 @@ def upped_achieves():
   ''']
 
 def achievers():
-  c(.25)
+  c()
   ach_lists,ach_cur = upped_achieves(), 0
   while True:
     print(ach_lists[ach_cur])
@@ -459,15 +471,15 @@ gamering=list('''
 )+--------------------------((-------]]]]]]]]]]]]))
 )+--------------------------((----------------]]]))
 )+--------------------------((----------------@]]))
-)+--------------------------((-------]]-------]]]))
-)+--------------------------((-------]]]]]]]]]]]]))
+)+--------------------------((----------------]]]))
+)+--------------------------((----------------]]]))
 )+--------------------------((-----------------┌┐!!
 )+--------------------------((-----------------└┘!!
 ))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))
 ))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))]]]]]))
 ''')
 #-----moving stuff-----
-d11,d12,d21,d22,d31,d32,d41,d42,d51,d52,d61,d62,d71,d72 = "hey hi\ndid you know you could actually use your truth data for this game\nfr!!!!!! just like put it in the same folder as this exe and bam haha achievement extraction go brrrrr\nits like actually kinda good game design\nimpossible","pretty sure the guy who made this didnt take into account the other way around then called it a feature....\nmaybe this game kinda sucks","wait how did you find me\nmy disguise is crazy good bro\nloooooook at me you cant\nin fact i cant see myself...\nwhy is the depth thing realistic like i want to see myself???","like these stupid things carry onto the next screen in the same exact location\nits like a filter man....","You know, I was incredibly scared of that guy to the east until I found out his real name.\nIt's 'You Should Keep Yourself Safe Now.'\nAt least that's what that guy over there told me...","He's still super scary, but now I can pretend I'm better than him because his name doesnt mean the other thing I thought about, that isnt his real name I swear, it's only that name that the other guy told me because I know I could trust the other guy and not my gut since my gut always lies to me, and there's nothing like a friend that I met two seconds ago, but we didnt even meet fr I'm just pretending we did so there's context behind this conversation because I'm socially incapable of not being awkward.\n\nYou know?","hiiiiiiiiiii did you see the new update\nlike sure half of the boss is just copied from that other game but the new modes are coool hehe\nfunny names too and i think theres gonna be one more, que epico","i heard there was this one guy, a true legend...\nhe beat every single mode on this boss fight....\n\nthe creator took that personally, creating Cancer difficulty for that exact reason....\nif you havent seen it yet, i suggest saving your brain cells","you know the achievements tab right?\nat the bottom is something that says like 'beat all the ez modes' or something right\nand i beat them JUST FOR THAT, took me a few seconds since im like that yk\nBUT THE GOD DAMN MODE ISNT EVEN OUT YET?????\nlike how can you say to unlock something that doesnt even exist.","did i beat the other modes? no, of course not.\nthey are impossible.","nah bro you talk to that guy to the left of me?\nbros bonkers\ni dont think mans seen the sun period\ni mean i havent either but thats besides the point\nat least i know what the sun is","you dont know what the sun is?\nstop capping this isnt the truth\ngo outside look at the sky","Never mind, I'm alive!!!!!\nThat is if you remember me from last update...\nEither way, I figured the game out!\n\nThe top part is to control the overall speed of the level, and change said level if you want to go back....\n\nOh yeah, to actually play, first start the game by activating the pink buttons, which should start something like a countdown...\nOrbs will spawn from the left, and I think you need to catch them by standing next to the tile they will land on, I couldn't quite win though....","It's quite cool you can activate two tiles at once, it makes the game at least playable....\n\nBut if you forgot how to work it, next to me controls, blue for speed, green for level 'select', pink to start the game\nCatch the orbs coming from the left after the countdown, and beyond that, I got no clue.\nPretty sure there a tip jar for other stuff too..."
+d11,d12,d21,d22,d31,d32,d41,d42,d51,d52,d61,d62,d71,d72 = "hey hi\ndid you know you could actually use your truth data for this game\nfr!!!!!! just like put it in the same folder as this exe and bam haha achievement extraction go brrrrr\nits like actually kinda good game design\nimpossible","pretty sure the guy who made this didnt take into account the other way around then called it a feature....\nmaybe this game kinda sucks","wait how did you find me\nmy disguise is crazy good bro\nloooooook at me you cant\nin fact I cant see myself...\nwhy is the depth thing realistic like I want to see myself???","like these stupid things carry onto the next screen in the same exact location\nits like a filter man....","You know, I was incredibly scared of that guy to the east until I found out his real name.\nIt's 'You Should Keep Yourself Safe Now.'\nAt least that's what that guy over there told me...","He's still super scary, but now I can pretend I'm better than him because his name doesnt mean the other thing I thought about, that isnt his real name I swear, it's only that name that the other guy told me because I know I could trust the other guy and not my gut since my gut always lies to me, and there's nothing like a friend that I met two seconds ago, but we didnt even meet fr I'm just pretending we did so there's context behind this conversation because I'm socially incapable of not being awkward.\n\nYou know?","hiiiiiiiiiii did you see the new update\nlike sure half of the boss is just copied from that other game but the new modes are coool hehe\nfunny names too and I think theres gonna be one more, que epico","i heard there was this one guy, a true legend...\nhe beat every single mode on this boss fight....\n\nthe creator took that personally, creating Cancer difficulty for that exact reason....\nif you havent seen it yet, I suggest saving your brain cells","you know the achievements tab right?\ni've been grinding and grinding that new mode man\n(pretty sure it's unbeatable but if anyone was to do it it would be me)\nin any case, give me a few more tries to beat it\nthen I can tell everyone else how I did it.","did I beat the other modes? no, of course not.\nthey are impossible.","nah bro you talk to that guy to the left of me?\nbros bonkers\ni dont think mans seen the sun period\ni mean I havent either but thats besides the point\nat least I know what the sun is","you dont know what the sun is?\nstop capping this isnt the truth\ngo outside look at the sky","Never mind, I'm alive!!!!!\nThat is if you remember me from last update...\nEither way, I figured the game out!\n\nThe top part is to control the overall speed of the level, and change said level if you want to go back....\n\nOh yeah, to actually play, first start the game by activating the pink buttons, which should start something like a countdown...\nOrbs will spawn from the left, and I think you need to catch them by standing next to the tile they will land on, I couldn't quite win though....","It's quite cool you can activate two tiles at once, it makes the game at least playable....\n\nBut if you forgot how to work it, next to me controls, blue for speed, green for level 'select', pink to start the game\nCatch the orbs coming from the left after the countdown, and beyond that, I got no clue.\nPretty sure there a tip jar for other stuff too..."
 charss = {'AaEimqu':'┌','Bbfjnrv':'┐','Ccgkosw':'└','Ddhlptx':'┘'}
 charss2,npcers,npnums = ''.join(charss),{'abcd':[d11,d12],'Efgh':[d21,d22],'ijkl':[d31,d32],'mnop':[d41,d42],'qrst':[d51,d52],'uvwx':[d61,d62],"ABCD":[d71,d72]},{}
 def np(o):
@@ -510,7 +522,7 @@ def distance(spot,distance=2,limit=6969):
 mazeq,nextone = main,[]  #find mazeq
 radio_on,radio_off,canspam = distance(419,3),distance(419,4),mazeq==notmain
 
-tips = ["Use ]/[ to adjust song offset, ] to add, [ to subtract!","There will be a secret for going to yskysn with the alter, just you wait!!!","Your character is two tall... would be a shame if you only had to move once most of the time.","Splitting your SOUL doesn't mean you can move them at the same time... You still are one person after all!","Don't know where the audio is coming from? Check the room next to this one, this totally makes sense!","Remember, the easiest controls are WASD for your main self, and IJKL for the other half...","It is possible to beat speed 9. I havent, but you can.","Annoyed by the countdown? Press 5 to start the game instantly! (also works anywhere!)","Can't hit the notes? Try being better!\n(and understanding the notes register when they HIT/disappear, not when they get to the line)","Can't hit the last note in level 2? Be less color blind!","Bad at videogame? Decrease the speed! And touch less grass!","Trying speed 9 constantly? Touch grass, drink water, look up what a shower is, and stop.","I don't know what to put here. How are you :) (i hope you said good)",'You can use +/- on your keyboard to change the volume of everything! (Also works for boss music/sounds!)','Make sure to meet spiderman before beating the boss... thank me later.']
+tips = ["Use ]/[ to adjust song offset, ] to add, [ to subtract!","There is a secret for going to the YSKYSN boss outside of your own body...","Your character is two tall... would be a shame if you only had to move once most of the time.","Splitting your SOUL doesn't mean you can move them at the same time... You still are one person after all!","Don't know where the audio is coming from? Check the room next to this one, this totally makes sense!","Remember, the easiest controls are WASD for your main self, and IJKL for the other half...","It is possible to beat speed 9. I havent, but you can.","Annoyed by the countdown? Press 5 to start the game instantly! (also works anywhere!)","Can't hit the notes? Try being better!\n(and understanding the notes register when they HIT/disappear, not when they get to the line)","Can't hit the last note in level 2? Be less color blind!","Bad at videogame? Decrease the speed! And touch less grass!","Trying speed 9 constantly? Touch grass, drink water, look up what a shower is, and stop.","I don't know what to put here. How are you :) (i hope you said good)",'You can use +/- on your keyboard to change the volume of everything! (Also works for boss music/sounds!)','Make sure to meet spiderman before beating the boss... thank me later.',"Changing settings ouside of the YSKYSN settings menu will not save permanently, this includes volume controlled with +/-!","Press tab whenever you want a little attention.","Cloud 9 is an unlockable YSKYSN mode... every attack is a bit more honed in, and less RNG dependant."]
 
 def checkthing():
   global hassseen2
@@ -530,7 +542,7 @@ def move(dir):
     both,canspam=False,mazeq==notmain
     c()
   elif ischar(dir,'0'):
-    printt(["It's an incredibly old radio, barely able to play audio...", "A poster on the back confirms a salesman used to own it...","Must not have sold."],[2,2,1])
+    printt(["It's an incredibly ancient radio, barely able to play audio...", "A ripped poster on the back shows some dollar signs, and in big letters 'SALE'...","Must not have sold."],[2,2,1])
     anykey()
   elif ischar(dir,'@'):
     print("A tip jar...\n\033[38;5;135mReach in for a tip?\033[0m (y for yes)")
@@ -744,6 +756,7 @@ r='\033[0m'
 PREFS = acheck("prefs",["center",False,False,[1,.5,1],False,True,True])
 if len(PREFS) != 7:
   PREFS = ["center",False,False,[1,.5,1],False,True,True]
+  achieve('prefs',PREFS)
 
 defaultvolume,music_volume,sound_volume = PREFS[3]
 pause = PREFS[4]
@@ -792,8 +805,8 @@ def yskysn(quickloadsave=False):
     '~':'\033[38;5;62m◌'#empty space to move in
   }
   #HELLMODE STUFF
-  iinv, ITEM_l_real,ITEM_r_real = [],["Apple","Cherry","Gum","Vanilla Cone","Placebo","Chocolate Cone","Jalepeno","Cheesecake"],["Dr. Thunder","Red Pill","Blue Pill","Heaven's Light","Heaven's Bow","Heaven's Arrow"] #order to view items 
-  HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = False,False,False
+  iinv, ITEM_l_real,ITEM_r_real = ["Cherry","Vanilla Cone"],["Apple","Cherry","Gum","Vanilla Cone","Placebo","Chocolate Cone","Jalepeno","Cheesecake"],["Dr. Thunder","Red Pill","Blue Pill","Heaven's Light","Heaven's Bow","Heaven's Arrow"] #order to view items 
+  HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = True,False,False #TESTING
   #theres gotta be a better way for this
   its = { #HP - heal yoself, BHP - heal YSKYSN, DEF - perm raise defense, ATT - perm raise speech power, MUL - set dmg multiplier for next turn, MAX - increases MAX HP PILL - yeah its for da pill, 
     'Jalepeno': ["HP",65],
@@ -839,7 +852,7 @@ def yskysn(quickloadsave=False):
     'Red Pill': [[[494, 0], 6, 66, 25],f"+{15*placeb} crit damage, can be heightened...","The sky lights up, replaced with blood red. Once taken, never forgotten.",pill=='r'],
     'Blue Pill': [[[494, 0], 6, 66, 25],f"+{5*placeb} blue shield, can be heightened...","The sky lights up, replaced with a solid blue. Once taken, never forgotten.",pill=='b'],
     'Dr. Thunder': [[[783, 0], 3, 66, 1],"Heal 50 boss HP","Heal YSKYSN, if all else fails. The devil's advocate."],
-    "None1":[[[1088, 0], 5, 66, 25],"None","None"],"None2":[[[494, 0], 6, 66, 25],"None","None",True]}
+    "None1":[[[1088, 0], 5, 66, 25],"None","None",True],"None2":[[[494, 0], 6, 66, 25],"None","None",True]}
   
   def up_symbs():
     def_space = "\033[48;5;52m " if pill=="r" else "\033[48;5;17m " if pill=="b" else " "
@@ -897,7 +910,7 @@ def yskysn(quickloadsave=False):
     nonlocal distant,HEAVEN_LIGHT,HEAVEN_ARROW,HEAVEN_BOW,pill
     ITEM_items = up_items()
     pill = "r" if "Red Pill" in iinv else "b" if "Blue Pill" in iinv else " "
-    ITEM_l,ITEM_r = f if (f:=[i for i in ITEM_l_real if i in iinv])!=[] else ["None1"],f if (f:=[i for i in ITEM_r_real if ITEM_items.get(i,['','','',False])[3]]) else ["None2"]
+    ITEM_l,ITEM_r = f if (f:=[i for i in ITEM_l_real if i in iinv])!=[] else ["None1"],f if (f:=[i for i in ITEM_r_real if i in iinv or (len(tMp:=ITEM_items.get(i,['','','',False]))>3 and tMp[3])]) else ["None2"]
     CUR,current = ITEM_l,0
     c()
     while True:
@@ -1077,7 +1090,9 @@ def yskysn(quickloadsave=False):
           print("[Normal mode active!]")
       
       if not skipintro:
-        anykey(not hell)
+        print("[If you don't want to overwrite your save, press 'z' to cancel!]")
+        if anykey(not hell) == 'z':
+          return
       yehp = 1 if nonr else 100
 
       #set up stuff
@@ -1154,9 +1169,9 @@ def yskysn(quickloadsave=False):
 
 
   buttons=f'''
-   !╓─────────╖    @╓─────────╖        #╓─────────╖     $╓─────────╖
-   !║  {"SLASH" if doomsday else "SPEAK"}  ║    @║  {" ... " if doomsday else "MAGIC" if not hell else "PRAY."}  ║        #║ {"  ...  " if doomsday else "HEAL UP" if not hell else " ITEMS "} ║     $║{"   ...   " if doomsday else "   KYS   " if not hell else "REMEMBER."}║
-   !╙─────────╜    @╙─────────╜        #╙─────────╜     $╙─────────╜
+  !╓─────────╖    @╓─────────╖        #╓─────────╖     $╓─────────╖
+  !║  {"SLASH" if doomsday else "SPEAK"}  ║    @║  {" ... " if doomsday else "MAGIC" if not hell else "PRAY."}  ║        #║ {"  ...  " if doomsday else "HEAL UP" if not hell else " ITEMS "} ║     $║{"   ...   " if doomsday else "   KYS   " if not hell else "REMEMBER."}║
+  !╙─────────╜    @╙─────────╜        #╙─────────╜     $╙─────────╜
   '''
   #thresholds: 600, 300
   #for health: 750, 500, 250
@@ -1272,7 +1287,7 @@ def yskysn(quickloadsave=False):
   # -------------------------------------------------------- Attacks --------------------------------------------------------------
   
   #attack vars
-  phase1li= ["BURN"]*5 + ["KYSN"] * 4 + ["DIE."]*3 + ["HATE"]*3 + ["CRY."]*3 + ["STOP"]*2 + ["HAHA","HEHE",'hihi','LMAO','XDXD','BUMB','LUCI'] #words
+  phase1li= ["BURN"]*5 + ["KYSN"] * 4 + ["DIE."]*3 + ["HATE"]*3 + ["!#!$"]*4 + ["CRY."]*3 + ["STOP"]*2 + ["HAHA","HEHE",'hihi','LMAO','XDXD','DEAD','LUCI'] #words
   RED = False #red bull
   
   #phase 1 helping funcs
@@ -1303,7 +1318,7 @@ def yskysn(quickloadsave=False):
       attack_log('Death detected, returning.')
       return
     
-    lol2=99 if not cloud9 else 2#random.randrange(0,5)
+    lol2=99 if not cloud9 else random.randrange(0,6)
     
     if lol2 != 99 and lol==9:
       attack_log(f"Forcing attack #{lol2} (if num>=6 it will be #6!)\nCloud9? (attack will be enchanced!) - {cloud9}\n")
@@ -1455,7 +1470,8 @@ def yskysn(quickloadsave=False):
       while stg < end_amo:
         DEWIT = True  #used to spawn a horizontal lazer immediately, the walrus operator thing should swap the 2nd time
         upimps2 = upimps if not cloud9 else [i for i in upimps if (whereheat-i)%64 in [0,8,56]]
-        [imafire.append([danger((D:=random.choice(upimps2 if updown(DEWIT) else random.choice([leftimps,rightimps]))),(12 if updown(DEWIT) else 51),'no') * 0, D, updown(DEWIT)] if (not hell or (DEWIT:=not DEWIT)) or True else []) for i in [stg % 5 == 0, (p_num == 4 or hell) and (random.randint(1,4 if hell else 5) == 1), hell and p_num != 2] if i] #rn does hell phase 1, normal phase 1/2, NEED TO DO HORIZONTAL FOR HELL 2
+        D = random.choice(upimps2 if updown(DEWIT) else (random.choice([leftimps,rightimps]))) if not cloud9 or updown(DEWIT) else {whereheat-i:i for i in leftimps}[min([whereheat-i if whereheat-i > 0 else 100000 for i in leftimps])]
+        [imafire.append([(0 if stg>6 and cloud9 and not updown(DEWIT) else danger(D,(12 if updown(DEWIT) else 51),'no')) * 0, D, updown(DEWIT)] if (not hell or (DEWIT:=not DEWIT)) or True else []) for i in [stg % 5 == 0, (p_num == 4 or hell) and (random.randint(1,4 if hell else 5) == 1), hell and p_num != 2] if i] #rn does hell phase 1, normal phase 1/2, NEED TO DO HORIZONTAL FOR HELL 2
         
         for i in imafire:
           i[0] += 1
@@ -1478,17 +1494,17 @@ def yskysn(quickloadsave=False):
       thereds = []
       UNMARK()
 
-    elif (bhp>=400*bmulti and not cloud9) or lol==4 or lol2==4: #phase 4, lasers on rows, JUST USED FOR REFERENCE RN
-      turn2(4,lol)
-      owie=(15 if lol!=4 else 20)+(5 if xtreme else 0)+turnramp[4]
-      
-      for i in range(random.randrange((7 if lol!=4 else 13),(14 if lol!=4 else 18))):
-        if yehp > 0:
-          spacer=random.choice(random.choice([leftimps,rightimps]))
-          surt=danger(spacer,51,(.75 if lol!=4 else .5)-(.2 if xtreme else 0))
-          more(spacer,51,'r',surt,(.5 if lol!=4 else .3)-(.2 if xtreme else 0))
-          time.sleep((.5 if lol!=4 and not xtreme else 0))
-          thereds=[]
+    #elif (bhp>=400*bmulti and not cloud9) or lol==4 or lol2==4: #phase 4, lasers on rows, JUST USED FOR REFERENCE RN
+    #  turn2(4,lol)
+    #  owie=(15 if lol!=4 else 20)+(5 if xtreme else 0)+turnramp[4]
+    #  
+    #  for i in range(random.randrange((7 if lol!=4 else 13),(14 if lol!=4 else 18))):
+    #    if yehp > 0:
+    #      spacer=random.choice(random.choice([leftimps,rightimps]))
+    #      surt=danger(spacer,51,(.75 if lol!=4 else .5)-(.2 if xtreme else 0))
+    #      more(spacer,51,'r',surt,(.5 if lol!=4 else .3)-(.2 if xtreme else 0))
+    #      time.sleep((.5 if lol!=4 and not xtreme else 0))
+    #      thereds=[]
 
     elif (bhp>=100*bmulti and not cloud9) or lol==5 or lol2==5: #phase 5, lightning bolts come from both sides to your space using algorithm thing
       turn2(5,lol)
@@ -1497,11 +1513,15 @@ def yskysn(quickloadsave=False):
       attack_log(f"Phase 5 Attack inbound\nSTATS: owie dmg - {owie}, ramping - {turnramp[5]}")
       
       for _ in range(random.randrange((15 if lol!=5 else 20),(25 if lol!=5 else 30))):
-        ni1,ni2=random.choice(leftimps),random.choice(rightimps)
-        pos=whereheat #so 0% chance for error lol (whereheat is player pos)
-        lists={ni1:[],ni2:[]}
+        pos = whereheat #so 0% chance for error lol (whereheat is player pos)
+
+        lists = {random.choice(leftimps):[],random.choice(rightimps):[]}
         
-        for i in [ni1,ni2]:
+        if cloud9:
+          lists[random.choice(leftimps)] = []
+          lists[random.choice(rightimps)] = []
+
+        for i in lists.keys():
           hei=abs(returnit(i in leftside)-i)//64
           wid=abs((i+(hei*64) if pos>i else i-(hei*64))-pos)
           muli=(-1 if i in rightside else 1)
@@ -1525,13 +1545,15 @@ def yskysn(quickloadsave=False):
             for id in range(1,wid+1):
               lists[i].append(i+(id*(-1 if i in rightside else 1)))
 
-        hib=lists[ni1]
+        
+        hib = []
+        [(hib := hib + list(e)) for e in lists.values()]
+        if cloud9:
+          h = [p for p in upimps if (whereheat-p)%64==0][0]
+          hib += [h+64*p for p in range(12)]
 
-        for i in lists[ni2]:
-          hib.append(i)
-
-        danger(0,hib,(.75 if lol!=5 else .5)-(.4 if xtreme and lol!=5 else .25 if lol==5 and xtreme else 0))
-        more(hib,0,'w',1,(.4 if lol!=5 else .25) - (.1 if xtreme else 0))
+        danger(0,hib,(.75 if lol!=5 else .5)-(0 if cloud9 else .4 if xtreme and lol!=5 else .25 if lol==5 and xtreme else 0))
+        more(hib,0,'w',1,(.4 if lol!=5 else .25) - (.1 if xtreme and not cloud9 else 0))
 
     else: #phase 6, random attacks
       for i in turnramp.keys():
@@ -1570,8 +1592,8 @@ def yskysn(quickloadsave=False):
 
   def movi(dire): #8 left to right, 192 up/down
     nonlocal playin
-    beez=playin.index('▢')
-    playin[beez]='~'
+    beez = playin.index('▢')
+    playin[beez] = '~'
     if dire in ['d',RIGHT] and beez not in [247,439,631,823]:
       playin[beez+8]='▢'
     elif dire in ['w',UP] and beez not in [199,207,215,223,231,239,247]:
@@ -1702,6 +1724,8 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
           print("\n"+("\033[38;5;180m" if not (hell or cancer or doomsday) else '\033[38;5;125m')+original+r)
           if can_tip:
             print(f"\n{'[A/D to move, Z to select, N = stats, 0 = Show music]':^63}\n{'[C to reset screen, l = save & quit, t = toggle tips]':^63}")
+          if both:
+            print("\033[38;5;132m[ALTER]\033[0m")
           print(f"\033[38;5;63m{f'[Parts: {len(i for i in [HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW] if i)}/3]':^63}\033[0m" if hell2 else f'\033[38;5;1m{"[Spidy]":^63}'+r if hasspidy else "")
           print(f"\033[38;5;79m{'Health - '+str(yehp):^63}")
           printman(buttons,False)
@@ -1770,6 +1794,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
   if cloud9:
     Thread(target = yskysn_animation).start()
   music("yskysn","YSKYSN/frog.mp3" if cloud9 else "YSKYSN/smiling.mp3" if cancer or hell else "YSKYSN/election.mp3" if xtreme else "YSKYSN/tears.mp3" if nonr else "YSKYSN/unwave.mp3",True)
+  howmanytwin, getonwithitbro = 0,False #getonwithitbro becomes True when youve been magicing a bunch
   while bhp>0 and (yehp>0 or iframamo!=1.5):
     coloreddict['Q']=hddict[bhp//(250*bmulti)]
     pickin=True
@@ -1852,6 +1877,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
         pass
       elif selection==0: #attack #speak
         stat('speak',1)
+        howmanytwin, getonwithitbro = 0,False  
         damdan=random.randrange(50,105+ze2)
         lasthit = damdan
         printt(['A'+random.choice([' loving',' graceful',' caring',' thoughtful','n emotional',' kind',' heartfelt',' cool'])+' remark makes \033[38;5;88mYSKYSN'+r+' feel a little more love...',('Just a small bit though...' if damdan<60 else 'It had some effect..' if damdan<74 else 'He seems to have felt that...' if damdan<90  else 'You hit him in a sensitive spot...')],[2,.03])
@@ -1859,6 +1885,9 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
         bhp -= damdan + zeeeee
       elif selection==1: #magic
         stat('magic',1)
+        howmanytwin += 1
+        if howmanytwin > 4:
+          getonwithitbro = True
         printt("Limitless potential, in the purplest form!" if cloud9 else "If only you were a wizard..." if not hell else ("Another faithful request to the gods above..." if HEAVEN_ARROW else "You channel your prayers to the skys above..." if HEAVEN_BOW else "Under the presence of light, you pray for a sign...") if hell2 and any([HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW]) else "You look to the skies, in search of anything.",1)
         theeven=random.randrange(0,6) #4 options?
         #1 is not an option when: has spidy and NOT cancer mode (red bull replaces it) or hell2 mode (hell1 uses spidy, hell2 is heavens stuff)
@@ -1868,7 +1897,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
         if theeven in [0,4,(2 if cancer else 6)]:
           printt("You spot a mask on the floor..." if not hell else "",2)
           
-          gret=random.randrange(0,6 if (hasspidy or hell) else 5) #for hell: 0 = arrow thing/choc cone, 1/3 = bow morale/gum, 2/4 =  light thing/ vanilla cone
+          gret=random.randrange(0,7 if (hasspidy or hell) else 6) #for hell: 0 = arrow thing/choc cone, 1/3 = bow morale/gum, 2/4 =  light thing/ vanilla cone
           
           #TODO HERE
 
@@ -1885,7 +1914,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
                 pass #heaven arrow
               else:
                 pass #choc cone
-          if gret in [1,3,5]:
+          if gret in [1,3,5, 4 if not getonwithitbro else 5]:
             if not hell2:
               stat('rusty mask',1)
               printt(["It's a rusty metal mask, with a slight hint of blood...","Much to old to wear, but it sure looks cool..."],[2,.03,.03])
@@ -1896,7 +1925,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
                 pass
               else: #vanilla cone
                 pass
-          if gret in [2,4,0 if cancer else 4]:
+          if gret in [2,0 if cancer else 4 if not getonwithitbro else 2]:
             stat('hockey mask',1)
             if not cancer:
               printt(["It's a big hockey mask.","Seems big enough to help for a little..."],[2,.03])
@@ -1907,9 +1936,9 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
               printt(["A pink one! Looks like a very chubby face...","Seems to be able to absorb a hit...."],[2,.03])
               print("\033[38;5;26m+1 Shield!\033[0m")
           if gret==6: #rustiest mask/red pill blue pill?, only after spidy or in hell
-            if not hell2:
+            if not hell:
               stat('rustiest mask',1)
-              printt(['An entire chunk of the ceiling falls down - an oxidixed behemoth.','The wholeplate crumbles to bits with an impact on the ground...','All but a single piece, a mask of sorts.','Faint bits of red and yellow remain on the mask, enough to make you feel it\'s power...'],[2,1,1,.03])
+              printt(['An entire chunk of the ceiling falls down - an oxidixed behemoth.','The whole plate crumbles to bits upon impact with the ground...','All but a single piece, a mask of sorts.','Faint bits of red and yellow remain on the mask, enough to make you feel it\'s power...'],[2,1,1,.03])
               print('\033[38;5;202m(Your limits have been increased... +50 possible speech damage!)\033[0m')
             else: #red pill, blue pill?
               pass
@@ -1932,7 +1961,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
             stat('reds',1)
             stat('red bulls',1)
         
-        elif theeven in [(2 if not cancer else 6),5]: #funny (defib), making into random item for Hell
+        elif theeven in [(2 if not cancer else 6 if not getonwithitbro else 5),5]: #funny (defib), making into random item for Hell
           stat('doctors',1)
           yehp += q if type(q:=heal((40 if not xtreme else 30))) == int else 0
           RANDING = 0 if not cloud9 else random.randint(0,4)
@@ -1947,7 +1976,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
           if q in ['no',0]:
             stat('useless turns',1)
 
-        elif theeven==3: #heal him, hell: ?
+        elif theeven in [3 if not getonwithitbro else 6,3]: #heal him, hell: ?
           stat('yskysn heals',1)
           if not cloud9:
             printt("Suddenly the thunder outside gets even more intense...",2)
@@ -1967,6 +1996,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
       elif selection==2: #heal up
         if hell:
           itemView()
+          turn = "iteming"
         else:
           stat('heal up',1)
           printt(random.choice(['Staring straight into his eyes gives you a sudden confidence...','You remember that KYS can mean keep yourself safe...','The lightning seems to fill YOU with strength...','You try to imagine his face as the man face...']),1)
@@ -1987,9 +2017,14 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
           printt(["You decide to Keep Yourself Safe.","(-25% damage next turn!)"],[1,.03])
           tmpdmgmul *= .75
       if not theender:
-        anykey()
-        stat('turns',1)
-        turn='kill yourself, now!!!!!!!!!!!!!!!!!'
+        if turn!='iteming':
+          if both:
+            print(f"\033[38;5;132m[{random.choice(["Are you really you?","Is the damage felt any better?","The painful side of you shows...","Your mind betrays you..."])}]")
+          anykey()
+          stat('turns',1)
+          turn='kill yourself, now!!!!!!!!!!!!!!!!!'
+        else:
+          turn = 'gamer'
       else:
         yehp = 0
     else:
@@ -2087,7 +2122,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
       if cancer:
         if stat("useless turns")>=10:
           c()
-          printt_once(["wait wait how?????",'im like pretty sure this wasn\'t possible','well i guess i was wrong','i cant really give you an achievement for this you know','no one else would want to get it','well alright here\'s a fake one though'],[1,2,1,1,2,.03])
+          printt_once(["wait wait how?????",'im like pretty sure this wasn\'t possible','well I guess I was wrong','i cant really give you an achievement for this you know','no one else would want to get it','well alright here\'s a fake one though'],[1,2,1,1,2,.03])
           print("[You got \033[38;5;14mta be a lunatic\033[0m!]")
           achieve("luci")
         else:
@@ -2180,7 +2215,7 @@ KeyboardThread(thingthing)
 #-------start tutorial!-------    for everyone new to the update - will show new settings you can toggle (in boss, in song, volume, and explain new boss thingies)
 #volume - will only save when you adjust it in settings - 
 T_speed = 5
-def startmusic():
+def startmusic_tut():
   time.sleep(6.75-((6.75/10)*T_speed)+offset)
 
   sound(changespeed("YSKYSN/dial2.wav", SPEEDS[str(speed)]*s_offset),False,'TUTORIAL_DIAL')
@@ -2194,10 +2229,10 @@ if True: #for now
 elif acheck("Welcome to the new update!"):
   pass
 else:
-  startmusic()
+  startmusic_tut()
   printt("")
   getkey1()
-
+  achieve("Welcome to the new update")
   #acheck()
 
 stopsound("TUTORIAL_DIAL")
@@ -2316,12 +2351,14 @@ while True:
   if h == '1': #TESTING
     print("Experimental things: " + str(experimental:=not experimental))
   if h in '[]':
-    s_offset = round(s_offset-.02 if h=='[' and s_offset>.5 else s_offset+.02,2)
+    s_offset = round(s_offset-.01 if h=='[' and s_offset>.5 else s_offset+.01,2)
     print(f"Song speed: x{s_offset}, only applies to minigame!")
+    achieve("song_speed", s_offset)
     clear=True
   if h in ";'":
     offset = round(offset-.05 if h==';' else offset+.05,2)
     print(f"Song offset: {offset}sec, only applies to minigame!")
+    achieve("song_offset", offset)
     clear=True
   print("\033[H",end="")
   if h in '=-+':
