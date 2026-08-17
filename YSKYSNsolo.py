@@ -5,9 +5,12 @@
 
 import os,time,sys,random,json,AUDIO
 from pygame import mixer
+from pygame import time as pytime
 from threading import Thread
 
-#wtf is going ph with phase 3 lol
+print("\033[?25l",end='') #hide cursor
+clock = pytime.Clock()
+
 #btw i do os.name OR windows cause then vsc stops yelling at me and i also know which is which
 
 WINDOWS = os.name=='nt'
@@ -41,7 +44,7 @@ MAYBE - RNG Manipulator maybe? (you can increase certain drops)
 finish doomsday thingies
 3/5/26
 DONE - implement quickloadsave for this - if you die during doomsday, you can go straight back to the attack you died on, its basically cancer but inf retries and you have to no hit every single mode
-DONE? (test) - can you load a game when bhp is at like 1 and then trigger alter and get an achievement that way 
+DONE (should be fixed) - can you load a game when bhp is at like 1 and then trigger alter and get an achievement that way 
 3/7/26
 DONE - fixed music volume getting fucked up for some reason
 DONE - make Cloud9 or Doomsday cooler by adding like 2 words instead of 1, 2nd phase always spawns on you, lasers always spawn on you or next to you in phase 3 etc
@@ -53,8 +56,8 @@ DONE - made phase 1 and 2 "enchanced" (1 spawns 'homing' words and doesn't get a
 3/9/26
 DOING - Great idea alrert!!! add a tutorial when you first load up the update
         introduces you to all the settings while you can play with them in real time
-DOING -  make a new dial3.wav that plays during the tutorial (ofc you can change volume and it switches to dial2.wav when need be to actually be lore accurate or maybe somehow sync it up to the beats?)
-DOING - make new setting to show/hide YSKYSN board movement spots (how would this work with phase 2?) and show/hide YSKYSN during attacks (kinda cringe)
+DONE -  make a new dial3.wav that plays during the tutorial (ofc you can change volume and it switches to dial2.wav when need be to actually be lore accurate or maybe somehow sync it up to the beats?)
+DONE - make new setting to show/hide YSKYSN board movement spots (how would this work with phase 2?) and show/hide YSKYSN during attacks (kinda cringe)
 3/25/26
 DONE- ok im annoyed by the rng a bit lol - when only speaking over and over your odds of getting hockey masks and defib drop?
 DONE -me thinks the randrange was broken for masks, it doesnt actually take the last number (its like [:num])
@@ -63,8 +66,29 @@ DONE - cloud9 phase 3.5 horizontal lasers (danger on the 1st 2, then no danger a
 3/27/26
 DONE - cloud9 phase 4 crazy lasers (phase 3 modification also applies here and wow holy moly thats lowk impossible but its fine)
 DONE - cloud9 phase 5 lightning, from all sides? (also spawns a laser so you HAVE to move diagnol)
-TBD - might want to test to make sure i didnt fuck anything else up
+TESTED - might want to test to make sure i didnt fuck anything else up
 DONE - Made song offset/speed save
+3/28/26
+DONE - added song volumes, frog.mp3 was so loud lol
+DONE - Make another animation for YSKYSN - a flash going through all the lightning? use a list of indexes and just go through that with like white
+3/29/26
+TESTED - ending dialogue was bugged lol (killed a cloud9 run), fixed that (nonlocal instead of global), ALTER + save data works like a charm 
+DOING? - Easier way to toggle settings, kinda buns
+3/31/26
+Worked on tutorial a bit
+DONE - Changed dial3 from mp3 to wav (UPLOAD THIS TO GIT, mp3s dont work with changespeed)
+4/21/26
+TEST - implemented another lightning animation, should apply to everything but normal/bhpx2 and redid how the animation works for the eyes too (so theyre synced, might have broken everything!)
+4/26/26
+DONE - used clock.tick with the tutorialminigame (its literally made for stuff like this, why didnt i do this before???)
+DONE - need to just add the cointrols for the minigame, implemented them affecting stuff (volumes are the actual volumes, offsets are just for the tutorial)
+DOING - apply this to the actual minigame too??? (it would help a ton) i had to adjust [23][1] to 17 not 19
+4/29/26
+DONE - fixed changing sound volumes screwing up when you set the volume to be lower in the code - this might be broken for music too?
+7/10/26
+TEST - test with lukang li - lightning kinda works, animation didnt work at all
+TEST - fixed that, need to fix other stuff i think idk 
+DOING - finish doomsday and hell pls
 
 
 DONE:
@@ -223,7 +247,7 @@ all_music = {}
 def file_name(name):
   return os.path.join(os.getcwd(), name)
 
-all_sounds,sound_volume,music_volume,defaultvolume = {},1,.5,1
+all_sounds,sound_volume,music_volume,defaultvolume = {},1,1,1
 
 #used for the sound tool tip things
 #path:name
@@ -235,17 +259,23 @@ music_tips = { #find music tips, find show music
   "YSKYSN/frog.mp3":"frog - by joyful",
   "DIAL":"https://www.youtube.com/watch?v=OgzW03-5UUU"
 }
-
-def sound(path:str,filename=True,name='SOUND',setvolume=1):
+music_volumes = {
+  "YSKYSN/election.mp3":.75,  
+  "YSKYSN/smiling.mp3":1, 
+  "YSKYSN/tears.mp3":1, 
+  "YSKYSN/unwave.mp3":.8,
+  "YSKYSN/frog.mp3":.4,
+}
+def sound(path:str,filename=True,name='SOUND',setvolume=1,loops = 0, fadein = 0):
   global all_sounds,sound_volume
-  all_sounds[name]=mixer.Sound(file_name(path) if filename else path)
-  mixer.Sound.set_volume(all_sounds[name],sound_volume * setvolume *defaultvolume)
-  mixer.Sound.play(all_sounds[name])
+  all_sounds[name]=[mixer.Sound(file_name(path) if filename else path),setvolume]
+  mixer.Sound.set_volume(all_sounds[name][0],sound_volume * setvolume *defaultvolume)
+  mixer.Sound.play(all_sounds[name][0],loops,0,fadein)
   return True
 def stopsound(name):
   global all_sounds
   if name in all_sounds:
-    mixer.Sound.stop(all_sounds[name])
+    mixer.Sound.stop(all_sounds[name][0])
     del all_sounds[name]
 def music(name:str,music_path:str,canloop:bool=True,setvolume=1):
   global all_music,music_volume
@@ -254,7 +284,7 @@ def music(name:str,music_path:str,canloop:bool=True,setvolume=1):
       Music.unload()
     all_music = {name:[True,music_path]}
     Music.load(file_name(music_path))
-    Music.set_volume((music_volume * setvolume)*defaultvolume)
+    Music.set_volume((music_volume * setvolume)*defaultvolume*music_volumes.get(music_path,1))
     Music.play(-1 if canloop else 0)
   elif not Music.get_busy():
     Music.unpause()
@@ -273,8 +303,8 @@ def setvolume(h, mode = "def"):
   [(music_volume := termper) if mode == 'music' else (sound_volume := termper) if mode == 'sound' else (defaultvolume := termper)]
   Music.set_volume(music_volume*defaultvolume)
   if len(all_sounds)>0:
-    for i in all_sounds:
-      mixer.Sound.set_volume(all_sounds[i],sound_volume*defaultvolume)
+    for i in all_sounds.values():
+      mixer.Sound.set_volume(i[0],sound_volume*defaultvolume*i[1])
 
 def musictoggle():
   global pause
@@ -316,7 +346,7 @@ def getkey1():
 
 def anykey(ffg=True):
   if ffg:
-    print(r+'\n[Any key to continue]')
+    print(r+('\n[Any key to continue]' if ffg and type(ffg)!=str else ffg))
   g = getkey1()
   c()
   return g
@@ -599,10 +629,11 @@ song2_ALTER = [["AMONGUS",23],["4", 4], ["3", 4], ["4", 4], ["5", 3], ["5", 3], 
 
 SPEEDS = {"1": 0.48025, "2": 0.5355, "3": 0.612, "4": 0.70975, "5": 0.85, "6": 1.04125, "7": 1.36, "8": 1.9125, "9": 3.4} #updated :DDD
 
-nextone2,candie,hassseen2 = [],True,False #for testing stuff
+nextone2,hassseen2 = [],False #for testing stuff
 
-def spawners(skip=False,alter_song=song2_ALTER): #find minigame
-  global gamering,maxlevel,level,colors,SCREENUP,ALTER1,message,nextone,nextone2,both
+aliver = True
+def spawners(skip=False,alter_song=song2_ALTER,candie=True): #find minigame
+  global gamering,maxlevel,level,colors,SCREENUP,ALTER1,message,nextone,nextone2,both,aliver
   
   song = song1 if level==1 else song2
   #alter ego moment
@@ -614,8 +645,7 @@ def spawners(skip=False,alter_song=song2_ALTER): #find minigame
   True, False,[55+(52*int(song[1][0][0],16))],[] if not both else [55+(52*int(alter_song[1][0][0],16))],'\033[48;5;8m ',"Countdown: in...",True
   
   def moveall():
-    global gamering
-    nonlocal aliver
+    global gamering,aliver
     ind2 = len(gamering) 
     gm = ''.join(gamering)
     for sym,check in zip(['1','2','3'],[[box1],[ALTER1],[box1,ALTER1]]):
@@ -652,7 +682,7 @@ def spawners(skip=False,alter_song=song2_ALTER): #find minigame
   if not skip:
     START() 
   message="Good Luck!"
-  if mazeq==gamering:
+  if in_tutorial or mazeq==gamering:
     gamering[55+(52*int(song[sd['ind1']][0][0],16))] = '1'
   else:
     aliver=False
@@ -683,7 +713,7 @@ def spawners(skip=False,alter_song=song2_ALTER): #find minigame
           sd[END]=True
     end = all([sd['end1'],sd['end2']])
     moveall()
-    if mazeq!=gamering:
+    if mazeq!=gamering and not in_tutorial:
       aliver=False
       
   if aliver:
@@ -711,6 +741,9 @@ def printt(thingggg,dela=.03,iiu=True,npc=False):
     sys.stdout.flush()
     if keyz2!='x':
       time.sleep((dela if indeci else .02) if not npc or i!='\n' else 1)
+    else:
+      sys.stdout.write(thingggg[ind+1:])
+      break
   if dela!=False and iiu!=False: #i get lazy lol
     print("")
   if dela>=.5 or type(iiu)!=bool: #thank you binary for existing
@@ -719,9 +752,9 @@ def printt(thingggg,dela=.03,iiu=True,npc=False):
 
 def slepy(amonu):
   global keyz2
-  for _ in range(6):
+  for _ in range(4):
     if keyz2!='x':
-      time.sleep(amonu/6)
+      time.sleep(amonu/4)
   keyz2=''
   return "\033[0m\n" #now i can put this at the end of print() lol
 
@@ -957,7 +990,7 @@ def yskysn(quickloadsave=False):
     
     def blinks(): return {'a':bmulti==2,'b':nonr,'c':noheal,'d':xtreme,'e':cloud9,'f':hell,'&':not skipintro,':':both,"%":experimental,"$":showyskysn,"@":showspaces} #this is for the ending red/greens!!!!
     def endit(ending): #update this with special_ends!!!
-      return str({"^":f"< {centerit} >",'*': f"{round(defaultvolume*100):>03d}%",'7': f"{(round(music_volume*100))}%", '8':f"{(round(sound_volume*100))}%","0":mode(SAVE[0]),"1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
+      return str({"^":f"< {centerit} >",'*': f"{round(defaultvolume*100):>03d}%",'7': f"{(round(music_volume*100))}%", '8':f"{(round(sound_volume*100))}%","0":f"{"[" if SAVE[6] else ''}{mode(SAVE[0])}{"]" if SAVE[6] else ''}","1":SAVE[1],"2":SAVE[2],"4":SAVE[4]}.get(ending,''))
   
     #if there is a colorcode, add on that # ofchars to the left offset
     def CENTEROFF(st):
@@ -991,7 +1024,7 @@ def yskysn(quickloadsave=False):
     
     #extra space (" ") after word means its 100% normal, a hashtag ("#") is for ones that can be selected but not achiev
     buts = '\n-Save Data#\n\n0Double Boss HP | a\n\n1No hit (1 hp)  | b\n2     No heals  | c\n\n3Extreme mode   | d\n\n4CLOUD 9        | e\n5Hell.          | f\n\nySettings#\nxExit#\nzContinue#\n;ALTER          | :\n'
-    buts_settings = """\nSettings (these will save!) \n\nGeneral \n0 Center mode: ^\n1 Show introduction text | &\n2 Volume: *\n3     Music: 7\n4     Sounds: 8\n5 Experimental things!! | %\nYSKYSN \n6 Show YSKYSN while attacking | $\n7 Show spaces to move while attacking | @\n\nyExit Settings#\n"""
+    buts_settings = """\nSettings (these will save!) \n\nGeneral \n0 Center mode: ^\n1 Show introduction text | &\n2 Volume: *\n3    Boss Music: 7\n4    Other Sound: 8\n5 Experimental things!! | %\nYSKYSN \n6 Show YSKYSN while attacking | $\n7 Show spaces to move while attacking | @\n\nyExit Settings#\n"""
     buts_save = """Save Data \nWill be overidden if you start another game! \nLoaded game will instantly start! \n\n#Mode: 0\n#Your hp: 1\n#Boss hp: 2\n}Spidy?: 4\n\nxLoad Save#\nyBack#\n"""
     SAVEITPLEASE, cur,curlist = False, 0, modes_allow #saveitplease = load the save after it breaks or something idk what im doing
 
@@ -1044,7 +1077,7 @@ def yskysn(quickloadsave=False):
           if g=='z':
             break
         elif curlist==sets_allow:
-          (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if Left else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) + c() if g=='0' else (skipintro:=not skipintro) if g=='1' else (experimental:=not experimental) if g=='5' else setvolume(not Left, 'def' if g=='2' else 'music' if g=='3' else 'sound') if g in ['3','4','2'] else (showyskysn:=not showyskysn) if g=='6' else (showspaces:=not showspaces) if g=='7' else ""
+          (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (centerit := centermodes[(ind:=centermodes.index(centerit))-(1 if Left else -1 if ind!=len(centermodes)-1 else len(centermodes)-1)]) + c() if g=='0' else (skipintro:=not skipintro) if g=='1' else (experimental:=WINDOWS and not experimental) if g=='5' else setvolume(not Left, 'def' if g=='2' else 'music' if g=='3' else 'sound') if g in ['3','4','2'] else (showyskysn:=not showyskysn) if g=='6' else (showspaces:=not showspaces) if g=='7' else ""
           achieve("prefs",[centerit,skipintro,experimental,[defaultvolume,music_volume,sound_volume],pause,showyskysn,showspaces])
         elif curlist==save_allow:
           (curlist:=modes_allow) + [c(),(cur:=0)] if (g:=curlist[cur])=='y' else (SAVEITPLEASE := True)
@@ -1338,7 +1371,7 @@ def yskysn(quickloadsave=False):
       time.sleep(2)
       cutscene=False
       c()
-      printman(YSK[0:960])
+      printman(YSK[0:960],True,1)
       upit(2)
       sound("YSKYSN/KYSAFE.wav")
       iframamo=.25
@@ -1565,17 +1598,19 @@ def yskysn(quickloadsave=False):
     attackin=False
     attack_log("Finished attack.")
   
-  
+  place = []
   def printman(yt,l=True, ever = ""): #find print
     YY,final='',''
     if cancer and stat('shields')>0:
         YY='\033[48;5;21m'
     
     for coi,i in enumerate(yt):
-      final += ever
-      if i in coloreddict and l or (not l and (i in thesymlist or i in '!@#$Xw_g~▢rx')):
+      final += ever if ever != 1 else ""
+      if coi in place and ever == 1:
+        final += '\033[48;5;252m '
+      elif i in coloreddict and l or (not l and (i in thesymlist or i in '!@#$Xw_g~▢rx')):
         if coi not in dang and ((coi not in theows+orang+imblue) or i not in ['~','▢']) or l:
-          final += (backer+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '')+coloreddict[i] + (r if ('!' not in yt and i!='Q') else '')
+          final += (backer+(YY if i=='▢' else '') if (i in ['~','▢'] or i in thesymlist) else '') + (coloreddict[i] + (r if ('!' not in yt and i!='Q') else '') if showspaces or i!='~' else ' ') #test this
         else:
           if coi in dang:
             if i not in ['~','▢']:
@@ -1719,42 +1754,70 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
       while yskysn_anim:
         if up:
           rc()
-          printman(YSK)
+          printman(YSK,True,1)
           printman('o'*63+f'\n                      QYSKYSN HP: {bhp:>5}',True)
           print("\n"+("\033[38;5;180m" if not (hell or cancer or doomsday) else '\033[38;5;125m')+original+r)
           if can_tip:
             print(f"\n{'[A/D to move, Z to select, N = stats, 0 = Show music]':^63}\n{'[C to reset screen, l = save & quit, t = toggle tips]':^63}")
           if both:
-            print("\033[38;5;132m[ALTER]\033[0m")
+            print(f"\033[38;5;132m{"[ALTER]":^63}\033[0m")
           print(f"\033[38;5;63m{f'[Parts: {len(i for i in [HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW] if i)}/3]':^63}\033[0m" if hell2 else f'\033[38;5;1m{"[Spidy]":^63}'+r if hasspidy else "")
           print(f"\033[38;5;79m{'Health - '+str(yehp):^63}")
           printman(buttons,False)
         time.sleep(.05)
       time.sleep(.3)
 
-  def yskysn_animation(): #Thread this, this only controls the YS string, not the actual display of it
-    nonlocal YSK
-    nonlocal yskysn_anim,up
+  def yskysn_animation(eyes = True, lightning = True): #Thread this, this only controls the YS string, not the actual display of it
+    nonlocal YSK,yskysn_anim,up,place
     I = YSK.index("W")
+    
     eye_coords = [I,I+1,I+2,I+7,I+8,I+9]
+    place,places = [],[[73,74],[136,137,138],[199,200],[264,265],[329,330,331],[394,395],[456,457,458,459],[519,520,521],[584,585,586],[587,588,589,590,649,650,651],[527,528,529,712,713],[775,776,466,467,468],[838,839],[901,902],[966,967,968,969,1031,1032],[970,971,972,973,974,975,909,910,550,551,552],[911,912,913,914,915,850,851,852,853,615,616,617,618],[790,791,792,793,794,795,854,855,856,682,683,684,685],[857,858,859,860,861,862,863,864,927,749,750],[928,929,930,994,995,814,815,816,817],[996,997,998,999,1000,1061,936,875,876,877,878,754,755,756,820],[937,938,939,1062,1063,1064,1065,1066,1067,691,692,627,885],[500,563,564,628,1068,1069,1006,1007,1008,947,948,949,950,951,822],[946,1009,1010,1011,1015,1016,759,502,437,438,439,374],[1080,1081,696,503,567,375,376,312],[1145,1146,632,633,568,313,248,249],[183,184,120,698,762],[763,827,828],[892,893,894]]
+    count,eye_start,lightning_start = 0,0,0
+
+
+    def eyeing():
+      nonlocal YSK,yskysn_anim,up,eye_coords
+      for i in random.choice([[1,-1],[-1,1]]):
+        for j in range(2):
+          eye_coords = [I+i for I in eye_coords.copy()]
+          while "W" in YSK:
+            YSK[YSK.index("W")] = 'b'
+          for e in eye_coords:
+            YSK[e] = "W"
+          up = True
+          yield True
+          #time.sleep(.1)
+        for i in range(5): yield True
+        #time.sleep(.5)
+      yield False
+    
+    def lightninging():
+      nonlocal place
+      for i in places:
+        place = i
+        yield True
+      yield False
     while yskysning:
+      count = 0
       time.sleep(1)
       while yskysn_anim:
-        up = True 
-        time.sleep(random.randint(3,5))
-        if not yskysn_anim:
-          continue
-        for i in random.choice([[1,-1],[-1,1]]):
-          for j in range(2):
-            eye_coords = [I+i for I in eye_coords.copy()]
-            while "W" in YSK:
-              YSK[YSK.index("W")] = 'b'
-            for e in eye_coords:
-              YSK[e] = "W"
-            up = True
-            time.sleep(.1)
-          time.sleep(.5)
-
+        if count==0:
+          eye_going, lig_going = eyes, lightning 
+          eye_start = random.randint(30,50)
+          lightning_start = random.randint(20,40)
+          eyeGen = eyeing()
+          LGen = lightninging()
+        count += 1
+        if count > eye_start and eye_going:
+          eye_going = next(eyeGen)
+          up = True 
+        if count > lightning_start and lig_going:
+          lig_going = next(LGen)
+          up = True 
+        time.sleep(.1)
+        if not (lig_going or eye_going):
+          count = 0
   #start yskysn
 
   scrollin = False
@@ -1791,16 +1854,17 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
   original = ""
   j=10 - bhp//(100*bmulti) #find saying things
   Thread(target = yskysn_uping).start()
-  if cloud9:
-    Thread(target = yskysn_animation).start()
-  music("yskysn","YSKYSN/frog.mp3" if cloud9 else "YSKYSN/smiling.mp3" if cancer or hell else "YSKYSN/election.mp3" if xtreme else "YSKYSN/tears.mp3" if nonr else "YSKYSN/unwave.mp3",True)
+
+  Thread(target = yskysn_animation, args=[cloud9,doomsday or hell or nonr]).start() #args = [eyes_animation, lightning_animation]
+  
+  music("yskysn","YSKYSN/frog.mp3" if cloud9 else "YSKYSN/smiling.mp3" if hell else "YSKYSN/tears.mp3" if nonr else "YSKYSN/election.mp3" if xtreme else "YSKYSN/unwave.mp3",True)
   howmanytwin, getonwithitbro = 0,False #getonwithitbro becomes True when youve been magicing a bunch
   while bhp>0 and (yehp>0 or iframamo!=1.5):
     coloreddict['Q']=hddict[bhp//(250*bmulti)]
     pickin=True
     if turn!='gamer':
       rc()
-      printman(YSK[0:960])
+      printman(YSK[0:960],True,1)
     if turn=='gamer':
       j=10 - bhp//(100*bmulti) #find saying things
       CURT = random.choice(HELL_s[j].split("|"))
@@ -1886,7 +1950,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
       elif selection==1: #magic
         stat('magic',1)
         howmanytwin += 1
-        if howmanytwin > 4:
+        if howmanytwin > 4 and not cloud9: #disabled during cloud9 cause lowkey every attack is the same lol
           getonwithitbro = True
         printt("Limitless potential, in the purplest form!" if cloud9 else "If only you were a wizard..." if not hell else ("Another faithful request to the gods above..." if HEAVEN_ARROW else "You channel your prayers to the skys above..." if HEAVEN_BOW else "Under the presence of light, you pray for a sign...") if hell2 and any([HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW]) else "You look to the skies, in search of anything.",1)
         theeven=random.randrange(0,6) #4 options?
@@ -1914,10 +1978,10 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
                 pass #heaven arrow
               else:
                 pass #choc cone
-          if gret in [1,3,5, 4 if not getonwithitbro else 5]:
+          if gret in [1,3,5,4 if getonwithitbro else 5]:
             if not hell2:
               stat('rusty mask',1)
-              printt(["It's a rusty metal mask, with a slight hint of blood...","Much to old to wear, but it sure looks cool..."],[2,.03,.03])
+              printt(["It's a rusty metal mask, with a slight hint of blood...","Much too old to wear, but it sure looks cool..."],[2,.03,.03])
               print('\033[38;5;214m(Speech power permanently +20!)\033[0m')
             else:
               if HEAVEN_LIGHT and not HEAVEN_BOW: #heaven bow
@@ -2045,7 +2109,8 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         coloreddict['▢']='\033[38;5;51m▢'
         c()
         afk=True
-        printman(YSK[:960])
+        if showyskysn:
+          printman(YSK[:960])
         coloreddict['m'], okle = f"\033[48;5;{232 if doomsday else 3 if bhp >= 600*bmulti else 131 if bhp >= 300*bmulti else 196}m ",yehp #find change mouth color
         while attackin and yehp>0: #find yskysn game inp, find game 
           whereheat = playin.index('▢')
@@ -2095,7 +2160,6 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
   musicstop()
 
   if bhp<=0:
-    achieve('s',[[False],False,False,False,False])
     coloreddict['m']='\033[48;5;166m '
     coloreddict['W']='\033[48;5;9m '
     printman(YL)
@@ -2104,7 +2168,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
     slepy(2)
     has_printed = False
     def printt_once(thing,dela =.03,n = True,N = False):
-      global has_printed
+      nonlocal has_printed
       if not has_printed:
         has_printed = True
         printt(thing,dela,n,N)
@@ -2159,11 +2223,12 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
       STATS('\n----------------\nYour final stats:')
       achieve('LYS')
       anykey()
+      achieve('s',[[False],False,False,False,False,100])
     else:
       printt('\033[38;5;60mSuddenly, one last bolt of lightning comes from the sky,\nand hits the now \033[38;5;204mYSLYSN\033[0m \033[38;5;60mdirectly in the head...',2)
       c()
       coloreddict['m'],coloreddict['W']='\033[48;5;3m ','\033[48;5;7m '
-      printman(YSK)
+      printman(YSK,True,1)
       slepy(2)
       printt(["\n\n\033[38;5;88mYSKYSN has rebirthed!\033[0m","[If only there was something magical to block that bolt...]"],[2,1])
       print(r+"\033[38;5;6m'R' to retry the fight\n\033[38;5;60mAny other key to exit\n\033[0m[Any key to continue]")
@@ -2175,7 +2240,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
         yskysn()
   elif yehp<=0 and not theender:
     if not doomsday:
-      achieve('s',[[False],False,False,False,False,False])
+      achieve('s',[[False],False,False,False,False,False,100])
       time.sleep(1)
       printt(r+"...",2)
     if doomsday:
@@ -2209,56 +2274,6 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
   yskysning = False
 
 
-
-
-KeyboardThread(thingthing)
-#-------start tutorial!-------    for everyone new to the update - will show new settings you can toggle (in boss, in song, volume, and explain new boss thingies)
-#volume - will only save when you adjust it in settings - 
-T_speed = 5
-def startmusic_tut():
-  time.sleep(6.75-((6.75/10)*T_speed)+offset)
-
-  sound(changespeed("YSKYSN/dial2.wav", SPEEDS[str(speed)]*s_offset),False,'TUTORIAL_DIAL')
-  
-  mixer.Sound.set_volume(all_sounds['TUTORIAL_DIAL'],.5*defaultvolume)
-  time.sleep(1)
-  if 'TUTORIAL_DIAL' in all_sounds:
-    mixer.Sound.set_volume(all_sounds['TUTORIAL_DIAL'],1*defaultvolume)
-if True: #for now
-  pass
-elif acheck("Welcome to the new update!"):
-  pass
-else:
-  startmusic_tut()
-  printt("")
-  getkey1()
-  achieve("Welcome to the new update")
-  #acheck()
-
-stopsound("TUTORIAL_DIAL")
-
-#-------start game--------
-printt("\033[38;5;88mWelcome to the YSKYSN boss!\033[0m\nPress 'a' to view achievements!\n")
-print("\033[?25l",end='') #hide cursor
-while True:
-  if os.get_terminal_size().lines < 33:
-    print(f"{bold}Hey! Your terminal might be too short to display correctly... \n(33 lines tall is the minimum, press C to check height again and this will disappear when its ok){r}\n")
-
-  if acheck("LYS"):
-    print("\033[38;5;88mYou again...\033[0m\n")
-  print("Basic controls (ingame only!!):\n\tWASD/Arrow keys to move\n\tV - view achievements\n\tC - redraw screen\n\tMusic controls:\n\t\t+/- to control volume (applies to all sounds, everywhere in game!)\n\t\tp to toggle music\n\n\033[38;5;40mPress 's' to go to the game!\033[0m")
-  
-  e = getkey1()
-  if e == 's':
-    break
-  if e=='c':
-    c()
-  elif e == 'a':
-    achievers()
-  c()
-  print("\033[38;5;88mWelcome to the YSKYSN boss!\033[0m\nPress 'a' to view achievements!\n")
-
-c()
 def remains(i,list):
   return len([e for e in list if (i-e)%52==0])>0
 lancd=[i for i in range(1000) if remains(i,[32,37,33,34,35,36])]
@@ -2275,7 +2290,9 @@ def printmaze(maze):
   g = maze!=gamering
   final = ""
   for counti,i in enumerate(maze):
-    if i not in ['-','e','┌','┐','└','┘'] and i not in charss2 and g:
+    if in_tutorial and not g and 32<counti%52<50 and 135<counti<890:
+      final += printr("\033[48;5;172m ")
+    elif i not in ['-','e','┌','┐','└','┘'] and i not in charss2 and g:
       final += colors.get(i,i) + r
     else:
       if g:
@@ -2307,7 +2324,215 @@ def printmaze(maze):
           final += printr(colors.get(i,("\033[48;5;172m" if counti%52>30 else "\033[48;5;178m")+(i if i not in 'ABCD-' else " " if i=='-' else [charss[k] for k in charss if i in k][0])),i not in charss2)
   print(final)
   for i in ['Q1','Q2','W1','W2']: colors[i] = "\033[48;5;27m" if 'Q' in i else '\033[48;5;41m'
-SCREENUP=False
+
+
+
+box1,box2,box3,box4=mazeq.index('┌'),mazeq.index('┐'),mazeq.index('└'),mazeq.index('┘')
+KeyboardThread(thingthing)
+#-------start tutorial!-------    for everyone new to the update - will show new settings you can toggle (in boss, in song, volume, and explain new boss thingies) find tutorial
+#volume - will only save when you adjust it in settings - 
+Ts_offset, Toffset,Tturns = 1,0,-1
+reprint = True #tutorial printing the controls and stuff (to not cause lag)
+def startmusic_tut():
+  global nextone,tut_minigame,SCREENUP,Tturns,reprint
+  pls_work_adjustment = 0
+  sd = {'ind1':1,'its1':0,'end1':False}  #adjust its1
+  song1_cop = song1.copy()
+  song1_cop[1][1] = 32
+  song1_cop[23][1] = 17
+  song1_cop[32][1] = 2
+  song1_cop.append(['8',1])
+  song = song1_cop
+
+  def play_Tmusic():
+    global reprint
+    nonlocal sd
+    time.sleep(4.5)
+    while tut_minigame:
+      time.sleep(Toffset if Toffset>0 else 0)
+      sound(changespeed("YSKYSN/dial3.wav",3*Ts_offset),False,'0',.3,0,400 if pls_work_adjustment == 0 else 0) 
+      c()
+      reprint = True
+      sd['its1'] += 2
+      print(f"\033[38;5;99m[Playing dial3.wav after {Toffset} secs, {100*Ts_offset}% speed, {100*defaultvolume*sound_volume}% volume]\033[0m\n")
+      pytime.delay(50000)
+      while mixer.get_busy():
+        pytime.delay(10)
+    stopsound('0')
+    if in_tutorial:
+      sound(changespeed("YSKYSN/dial3.wav",3*Ts_offset),False,'0',.3,-1) 
+    
+  Thread(target=play_Tmusic).start()
+
+  def moveall():
+    global gamering
+    ind2 = len(gamering) 
+    gm = ''.join(gamering)
+    while (ind2:=gm.rfind('1',0,ind2))!=-1:
+      gamering[ind2]='-'
+      if gamering[ind2+1]!='(':
+        gamering[ind2+1]='1'
+  
+  gamering[55+(52*int(song[sd['ind1']][0][0],16))] = '1'
+
+  while tut_minigame:
+    nextone=[55+(52*int(i,16)) for i in song[sd['ind1']+1][0]] if sd['ind1']+1<len(song) else []
+    SCREENUP = True
+    
+    clock.tick(5.7) #this is op lol how come i didnt use this earlier
+    #time.sleep(.17) #28.302273, .168
+
+    if sd['ind1']!=len(song):
+      sd['its1']+=1
+      if sd['its1']>=song[sd['ind1']][1]:
+        sd['ind1']+=1
+        if sd['ind1']!=len(song):
+          for i in song[sd['ind1']][0]:
+            gamering[55+(52*int(i,16))] = '1'
+        sd['its1']=0
+    else:
+      Tturns -= 1
+      reprint = True
+      sd['ind1'] = 1
+      sd['its1'] = 4 if (pls_work_adjustment:=pls_work_adjustment+1) % 2 == 0 else 3#(0 if (pls_work_adjustment:=pls_work_adjustment+1)%3==0 else 1)
+    
+    moveall()
+      
+  for i in ['1','2','3']:
+    while i in gamering:
+      gamering[gamering.index(i)] = '-'
+
+
+SCREENUP=True
+tut_minigame = True
+in_tutorial = False
+def tutorial():
+  global in_tutorial,tut_minigame,afk,SCREENUP,message,keyz,Ts_offset,Toffset,defaultvolume,reprint
+  message = "Tutorial..."
+  in_tutorial = True
+  e = Thread(target = startmusic_tut)
+  e.start()
+  printt("....",.2)
+  e.join(timeout = 5)
+  printt([f"\033[38;5;221mHello {name}, welcome to the new update!\033[0m","This is a tutorial meant to introduce you to all the features, controls, and settings you can edit for the YSKYSN experience!!","\nYour first tip - hold X while text like this reads out letter by letter to speed up the process - and halve waiting times between text!", "Test it out here - hold X whenever you're ready to speed up this long sentence, unless you want to sit through the entire thing! (I've also made the text slower so holding X is even more valuable, and you won't skip any text by holding X, but be careful not to hold it too much!)"],[1,1,1,.04])
+  anykey()
+  printt(["Now that you know how to speed up text, let's move onto some other general controls!", f"\nFirst of all: {bold}the minigame!{r}","Off to the very left you will find a rhythm minigame, where you must catch notes to the beat!","While the song is supposed to line up perfectly with the notes, depending on your computer it might not.","The following controls are meant to help with this issue, and more!"],[.5,])
+  time.sleep(1)
+  anykey("\n[Any key to go to the song demo!]")
+  keyz = 'w'
+  afk = True
+  tut_minigame = True 
+  time.sleep(.5)
+  while keyz!='z':
+    afk,reprint = True,True
+    if keyz in '[]':
+      Ts_offset = round(Ts_offset-.01 if keyz=='[' and Ts_offset>.5 else Ts_offset+.01,2)
+    if keyz in ";'":
+      Toffset = round(Toffset-.05 if keyz==';' else Toffset+.05,2)
+    if keyz in ['-','=','+']:
+      setvolume(keyz)
+    while afk:
+      if SCREENUP:
+        print("\033[H",end="")
+        printmaze(gamering)
+        SCREENUP=False
+        if reprint:
+          print(f"[All changes to the song apply after {Tturns%4} more repeats]\n")
+          print(f'{f"Volume: {defaultvolume:.2f}":<34}Adjust with - / +\n{f"Song speed: x{Ts_offset:.2f}":<34}Adjust with [ / ]\n{f"Song offset: {'+' if Toffset>0 else ''}{Toffset:.2f} secs":<34}Adjust with ; / \'\n\n{"(Z to proceed)":>35}')
+          reprint = False
+  tut_minigame = False 
+  c(1)  
+  printt("Now that you've gotten a taste for the minigame, lets move on to the main show...",1)
+  printt("\033[38;5;125mThe YSKYSN boss fight!!\033[0m",1)
+  printt("To the right of spawn is YSKYSN... approach him if you dare. Your first encounter with him will put you two in an immediate battle!",1)
+  printt("You will be introduced to how YSKYSN attacks when confronting him. For now, it's important to know what options you have to customize your experience.",1)
+  time.sleep(2)
+  anykey()
+  printt("The first of the customization you can do is for the actual boss fight!",1)
+  printt("Your first boss fight will play by the default settings (everything turned on), but afterwards, you can toggle these settings!",1)
+  printt("All of these settings can be accessed after beating YSKYSN for the first time, under the Settings button.")
+
+
+  printt("After successfully beating YSKYSN for the first time, you will gain access to modifiers!",1)
+  printt("Using these modifiers, you can fight a stronger YSKYSN boss fight, and get new interactions, items, attacks, achievements, and more.",1)
+  printt("There are also some secret combinations of modifiers for unique experiences, and some special modifiers that unlock only after beating other ones!",1)
+  printt("Here is a quick demo of the modifier selection - and you might even find some of the secret modifiers here...",1)
+  anykey()
+  LEAN,NOHIT,NOHEAL,HP2X = False, False, False, False
+  Tbuts = '\n\n0Double Boss HP | 5\n\n1No hit (one hp)| 6\n2    No heals  | 7\n\n3Extreme mode   | 8\n4Continue\nSettings (not available in Tutorial)\n'
+  Tselect = 0
+  def printTbuts():
+    final,selected = '',False
+    for i in Tbuts:
+      if i=='\n': final+='\n\033[0m'
+      elif i in '01234' and Tselect == int(i): final, selected = final + '\033[48;5;5m', True
+      elif i in '5678': final += ('\033[48;5;2m ' if {'5': HP2X, '6':NOHIT, '7':NOHEAL, '8':LEAN}[i] else '\033[48;5;160m ') + ('\033[48;5;5m' if selected else '')
+      elif i not in '01234': final += i
+      else: selected = False 
+   
+    print(f"Selected mode: {f'\033[38;5;{"88" if (e:=all([LEAN,NOHIT,HP2X])) else "99" if (LEAN and NOHIT) else "171" if LEAN  else "202" if HP2X else "194" if NOHIT else "7"}m'+\
+      ("Doomsday." if e else "Cancer." if (LEAN and NOHIT) else f"NO HIT{'+' if any([LEAN,HP2X]) else ''}" if NOHIT else\
+        f"LEAN{'+' if any([NOHEAL,HP2X]) else ''}" if LEAN else f"NO HEALS{'+' if HP2X else ''}" if NOHEAL else "2x HP" if HP2X else "Normal")+\
+        "\033[0m"}")
+    
+    print(final) 
+  c()
+  while True:
+    rc()
+    print("Arrow keys/WASD to navigate, Enter to select")
+    printTbuts()
+    Tinp = getkey1()
+    if Tinp in [UP,DOWN,'w','s']:
+      Tselect += (1 if Tselect!=4 else -4) if Tinp in [DOWN,'s'] else (-1 if Tselect!=0 else 4)
+    elif Tinp in ['a','d',LEFT,RIGHT,ENTER]:
+      HP2X = not HP2X if Tselect == 0 else HP2X 
+      NOHIT = not NOHIT if Tselect == 1 else NOHIT 
+      NOHEAL = not NOHEAL if Tselect == 2 else NOHEAL 
+      LEAN = not LEAN if Tselect == 3 else LEAN 
+      if Tselect == 4: break 
+    
+
+
+  time.sleep(2)
+  c()
+  
+  tut_minigame = False
+  #getkey1()
+  #achieve("Welcome to the new update")
+  in_tutorial = False
+  message = "Pink to start..."
+  stopsound("0")
+
+if acheck("Welcome to the new update!"):
+  pass
+else:
+  pass
+  #tutorial()
+  #acheck()
+
+
+#-------start game--------
+printt("\033[38;5;88mWelcome to the YSKYSN boss!\033[0m\nPress 'a' to view achievements!\n")
+while True:
+  if os.get_terminal_size().lines < 33:
+    print(f"{bold}Hey! Your terminal might be too short to display correctly... \n(33 lines tall is the minimum, press C to check height again and this will disappear when its ok){r}\n")
+
+  if acheck("LYS"):
+    print("\033[38;5;88mYou again...\033[0m\n")
+  print("Basic controls (ingame only!!):\n\tWASD/Arrow keys to move\n\tV - view achievements\n\tC - redraw screen\n\tMusic controls:\n\t\t+/- to control volume (applies to all sounds, everywhere in game!)\n\t\tp to toggle music\n\n\033[38;5;40mPress 's' to go to the game!\033[0m")
+  
+  e = getkey1()
+  if e == 's':
+    break
+  if e=='c':
+    c()
+  elif e == 'a':
+    achievers()
+  c()
+  print("\033[38;5;88mWelcome to the YSKYSN boss!\033[0m\nPress 'a' to view achievements!\n")
+
+c()
+
 while True:
   box1,box2,box3,box4=mazeq.index('┌'),mazeq.index('┐'),mazeq.index('└'),mazeq.index('┘')
   printmaze(mazeq)
@@ -2343,13 +2568,16 @@ while True:
     if '207m' in colors['Z'] and mazeq==gamering:
       checkthing()
       THREAD(target=spawners, args=(True)).start()
-    else:
+    elif mazeq!=gamering:
       print("Quick load YSKYSN save? (Press 5 again to confirm)")
       if getkey1()=='5':
         yskysn(True)
       c()
+    else:
+      aliver = False
+
   if h == '1': #TESTING
-    print("Experimental things: " + str(experimental:=not experimental))
+    print(f"{mazeq.index('┌')%52}, {mazeq.index("┌")}")
   if h in '[]':
     s_offset = round(s_offset-.01 if h=='[' and s_offset>.5 else s_offset+.01,2)
     print(f"Song speed: x{s_offset}, only applies to minigame!")
