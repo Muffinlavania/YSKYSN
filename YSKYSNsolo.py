@@ -89,7 +89,10 @@ DONE - fixed changing sound volumes screwing up when you set the volume to be lo
 TEST - test with lukang li - lightning kinda works, animation didnt work at all
 TEST - fixed that, need to fix other stuff i think idk 
 DOING - finish doomsday and hell pls
-
+8/17/26
+DOING - adding faliure easter egg
+        made model even tho its lowk ass, its YSF
+        need to add model and attack, different phase 5 that chooses 3/4 of the updownleftright and uses those as the start/end?
 
 DONE:
 - Switch "MAGIC" with "PRAY " and "HEAL UP" with " ITEMS "
@@ -257,7 +260,9 @@ music_tips = { #find music tips, find show music
   "YSKYSN/tears.mp3":"Tears in the Rain - by Drop0ff",
   "YSKYSN/unwave.mp3":"Unwavering Persistence - OG by Drop0ff",
   "YSKYSN/frog.mp3":"frog - by joyful",
+  "YSKYSN/failure.wav":"failure - by ptasinski/RJ Pasin",
   "DIAL":"https://www.youtube.com/watch?v=OgzW03-5UUU"
+  
 }
 music_volumes = {
   "YSKYSN/election.mp3":.75,  
@@ -265,6 +270,7 @@ music_volumes = {
   "YSKYSN/tears.mp3":1, 
   "YSKYSN/unwave.mp3":.8,
   "YSKYSN/frog.mp3":.4,
+  "YSKYSN/faliure.wav":.8
 }
 def sound(path:str,filename=True,name='SOUND',setvolume=1,loops = 0, fadein = 0):
   global all_sounds,sound_volume
@@ -782,6 +788,7 @@ YL='''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--------
 YS=list('''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-------rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__------rbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg_------rbbbbbbbbbbbbbbbbr----------___gwwwgg__---o\no-__gggwwwwgg_------rrbbbbbbbbbbbbbbrr----------_ggwgwwgg__---o\no-__ggwwwgggg_-------rrbbbmmmmmbbbBrr----------__gwwggwwgg__--o\no-__gggwwwgg_---------rrBbbbbbbbBBBr-----------__gwwgggwwgg__-o\no-__ggggwwwgg_-----rrrrnBBBBBBBBBbbrrr-----_____ggwwgggwgwgg_-o\no--_gggwwggg_--rrrrrnnnnnbbbbbbbbbnnnnrr____gggggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrrggggwwwwggwgwggggwwggo\no__ggwwgggggggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o''')
 YS2=list('''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_--------rrGGGGGGGGGGGGGr---------------__gwg__---o\no--__ggwwwgg_-------rGGGGGGGGGGGGGGGGr--------------_gwwgg_---o\no--__gwwggg_--------rGBbbbbbbbbbbbBGGGr------------__ggwwg_---o\no--__ggwwggg_-----__rBBBBBBbbbBBBBBBGGr-----------__gggwwg_---o\no--__gggwwwg__-____grbbbWWWbbbbWWWbbbr------------_ggwwwgg_---o\no--__ggggwwgg___ggggrbbbbbbbbbbbbbbbbr____------___gwwwgg__---o\no-__gggwwwwggggggwwwrrbbbbbbbbbbbbbbrrggg___----_ggwgwwgg__---o\no-__ggwwwgggggwwwggggrrbbbmmmmmbbbBrrwwwggg______gwwggwwgg__--o\no-__gggwwwwwwwggggg___rrBbbbbbbbBBBrggwwwwgggg___gwwgggwwgg__-o\no-__ggggwwwgggg____rrrrnBBBBBBBBBbbrrrgggwwwwgg_ggwwgggwgwgg_-o\no--_gggwwggg___rrrrrnnnnnbbbbbbbbbnnnnrrggggwwgggwwwggwggwwgg_o\no-_gggwwgg____rrnnnnnwwwwwwnnnnnnnnnnnnrr__ggwwwwggwgwggggwwggo\no__ggwwgg__gggrnnwwwwwwwwwwwwwwwnnnnnnnnrrwwwwggggggwggg_ggwwwo\no__gwwggggggwwwwwwwnnnnnnnnnnnwwwwnnnnnwwwwrrggggwwwwwwgg_ggggo\no_gggwwwwwwwwwwnnnnnnnnnnnnnnnnnnwwwwwwwnnnnrwwwwwwgggwwgg___-o\no-_gggwwgggggrnnnnnnnnnnnnnnnnnnnnnnwwwwwwwwwggggggg_ggwwgg_--o\no-__gggggg___rnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnrgg_______ggwwg_--o''')
 ITEMS='-----------------------------------------------------------------\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-o                      lllllllllllllllll                      o-\n-o                     lllllllllllllllllll                     o-\n-o                    lllllllllllllllllllll                    o-\n-o                   lllttlllbbbbbbbbbblllll                   o-\n-o                  llllllabbbllllllsssllllll                  o-\n-o                lllllllbbbaallllsslllllllllll                o-\n-o               lllllllbblllaalssllllllllllllll               o-\n-o              llllllllblllllsslllllllllllllllll              o-\n-o              llllllllblllsslllllllllllllllllll       drd    o-\n-o          llllllllllllbssslllllllllllllllllllllllll   drdd   o-\n-o       lllllllllllllllllllllllllllllllllllllllllllllllddd    o-\n-o   ggggggggggggggggggggggggggggggggggggggggggggggggggggggg   o-\n-ogggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ogggSSRRggggggggggggggVVVgggggggggggggOOOgggggggggHgggggggggggo-\n-ogggRRgggggggggggggggVVVVVggggP=PggggOOOOOgggggggJJggggggZggggo-\n-ogggggggggGGGGGggggggg111ggggggggggggg222gggggggJJgggggCCCCCggo-\n-oggBLgggggggggggggggggg1ggggggggggggggg2gggggggggggggggcccccggo-\n-ogAAAgggggggggggggggggggggggggggggggggggggggggggggggggggggggggo-\n-ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-\n-----------------------------------------------------------------'
+YSF=list('''ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\no--__gggwwgg_gggggggggggggggggggggggggggggggggg-----__gwg__---o\no--__ggwwwgg_gwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwgg----_gwwgg_---o\no--__gwwggg__gwooooooooooooooooooooooooooooowwwggg-__ggwwg_---o\no--__ggwwggg_gwooo______________________ooroww-wwg__gggwwg_---o\no--__gggwwwg_gworo___ggggggggg_--_ggggg__orow---wwwggwwwgg_---o\no--__ggggwwggwworo_gggwwwgggg__--__ggwwg_oroww--_wwwwwwgg__---o\no-__gggwwwwggwworo_gwwwggg____-_____ggwg_oroww--_ggwgwwgg__---o\no-__ggwwwgggwwworo_gwwgg________g____ggg_oroww___gwwggwwgg__--o\no-__gggwwwwwwgworo_gggg____ggggggggg__gg_orowg___gwwgggwwgg__-o\no-__ggggwwwgggworo______ggggwwwwwwwgg____orowgg_ggwwgggwgwgg_-o\no--_gggwwggg_-woro__gggggwwwwwgggwwwgg___orowwgggwwwggwggwwgg_o\no-_gggwwgg___-woro_ggwwwwwwwggggggwwwggg_orowwwwwggwgwggggwwggo\no__ggwwgg__gggworo_ggwggggggg____gwwwwwg_orowwggggggwggg_ggwwwo\no__gwwggggggwwworo__gggg______-__ggggggg_orowggggwwwwwwgg_ggggo\no_gggwwwwwwwwwworoo______________________ooowwwwwwwgggwwgg___-o\no-_gggwwggggggwooooooooooooooooooooooooooooowwgggggg_ggwwgg_--o\no-__gggggg___gwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwggg______ggwwg_--o''')
 r='\033[0m'
 
 
@@ -818,7 +825,7 @@ def yskysn(quickloadsave=False):
   upimps,leftside,leftimps,rightside,rightimps,spaced=[135,143,151,159,167,175,183],[134,198,262,326,390,454,518,582,646,710,774,838],[198,390,582,774],[185,249,313,377,441,505,569,633,697,761,825,889],[249,441,633,825],[199,207,215,223,231,239,247,391,399,407,415,423,431,439,583,591,599,607,615,623,631,775,783,791,799,807,815,823]
   JUSTUPIT,kys,itsafirst,hasspidy=False,False,not acheck("LYS"),False #itsafirst first attacking turn, 2.6 spidy cycle
   zeeeee,ze2,whereheat,dmgmul,backer,tmpdmgmul=0,0,0,1,"\033[48;5;235m",1 #doomsday change this to 0 so like i need it
-  noheal,xtreme,bmulti,hell,hell2,cloud9,cancer,nonr,doomsday=False,False,1,False,False,False,False,False,False #different modes
+  noheal,xtreme,bmulti,hell,hell2,cloud9,cancer,nonr,doomsday,FAILURE=False,False,1,False,False,False,False,False,False,False #different modes
   turnramp_maxes = {0:8,1:8,2:8,3:8,4:8,5:8}
   turnramp={0:-1,1:-1,2:-1,3:-1,4:-1,5:-1} #:flushed:
   coloreddict={
@@ -1857,7 +1864,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
 
   Thread(target = yskysn_animation, args=[cloud9,doomsday or hell or nonr]).start() #args = [eyes_animation, lightning_animation]
   
-  music("yskysn","YSKYSN/frog.mp3" if cloud9 else "YSKYSN/smiling.mp3" if hell else "YSKYSN/tears.mp3" if nonr else "YSKYSN/election.mp3" if xtreme else "YSKYSN/unwave.mp3",True)
+  music("yskysn","YSKYSN/failure.wav" if FAILURE else "YSKYSN/frog.mp3" if cloud9 else "YSKYSN/smiling.mp3" if hell else "YSKYSN/tears.mp3" if nonr else "YSKYSN/election.mp3" if xtreme else "YSKYSN/unwave.mp3",True)
   howmanytwin, getonwithitbro = 0,False #getonwithitbro becomes True when youve been magicing a bunch
   while bhp>0 and (yehp>0 or iframamo!=1.5):
     coloreddict['Q']=hddict[bhp//(250*bmulti)]
