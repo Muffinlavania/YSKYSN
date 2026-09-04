@@ -96,7 +96,11 @@ DONE -  made model even tho its lowk ass, its YSF
 8/30/26
 MAYBE? - thinking of adding old doll as the minigame with a bot playing if you try doing the song after doing failure
 DOING - adding a few lines of failure logic
-        
+9/3/26
+DONE - made loading old saves a bit more forgiving, it tries doing a lot of defaults now (I think stats4nerds might break but whatever, it'll load most saves now)
+DOING - working on item using (did item use dialogues, already buffed placebo to give +5 max HP too lol)
+DONE - changed MAX HP to be a stat, and implemented the defense stat,it could be busted if people get enough chocy cones.... it can't bring damage to 0 though 
+
 DONE:
 - Switch "MAGIC" with "PRAY " and "HEAL UP" with " ITEMS "
 - ITEM taks you to a sort of maze that letsƒyou see what you have
@@ -822,7 +826,7 @@ def yskysn(quickloadsave=False):
   playin=list('''\n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww \n wgwwggggggggggggggggggggggggggggggggggggggggggggggggggggwwwww \n wwwg____________________________________________________gggww \n wgg__~_______~_______~_______~_______~_______~_______~___gwww \n wwg_____________________________________________________ggggw \n wwwg____________________________________________________gwwgw \n wwwg_~_______~_______~_______▢_______~_______~_______~__ggwww \n wgwg_____________________________________________________gwgw \n wgg______________________________________________________ggww \n wg___~_______~_______~_______~_______~_______~_______~___wgww \n wwg_____________________________________________________ggwww \n wgwg____________________________________________________gwgww \n wwwg_~_______~_______~_______~_______~_______~_______~__gwwgw \n wwwg____________________________________________________gwwgw \n wwwwggggggggggggggggggggggggggggggggggggggggggggggggggggggwww \n wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww ''')
   playinref = playin.copy()
   playinref[415] = "~"
-  bhp,yehp,owie,iframamo,lasthit,MAX=1000,100,0,1.5,0,100 #lasthit used in doomsday to retry last turn, just heal boss by last hit and call function again
+  bhp,yehp,owie,iframamo,lasthit=1000,100,0,1.5,0 #lasthit used in doomsday to retry last turn, just heal boss by last hit and call function again
   dang,orang,theows,thereds,thewhites,imblue = [],[],[],[],[],[]
   cutscene,iframes,attackin = False,True,True
   thesymlist = {'⊿':True,'▲':True,'△':True,'▴':True,'▵':True,'⎣':True,'╗':True,'╨':True,'╠':True,'╝':True} #if 10 isnt enough for how words there are gonna be, let the game break!!!
@@ -852,7 +856,7 @@ def yskysn(quickloadsave=False):
   iinv, ITEM_l_real,ITEM_r_real = ["Cherry","Vanilla Cone"],["Apple","Cherry","Gum","Vanilla Cone","Placebo","Chocolate Cone","Jalepeno","Cheesecake"],["Dr. Thunder","Red Pill","Blue Pill","Heaven's Light","Heaven's Bow","Heaven's Arrow"] #order to view items 
   HEAVEN_LIGHT,HEAVEN_BOW,HEAVEN_ARROW = True,False,False #TESTING
   #theres gotta be a better way for this
-  its = { #HP - heal yoself, BHP - heal YSKYSN, DEF - perm raise defense, ATT - perm raise speech power, MUL - set dmg multiplier for next turn, MAX - increases MAX HP PILL - yeah its for da pill, 
+  item_stats = {
     'Jalepeno': ["HP",65],
     'Cheesecake': ["HP",100,"MUL",2],
     'Chocolate Cone': ["HP",25,"DEF",1],
@@ -860,24 +864,38 @@ def yskysn(quickloadsave=False):
     'Placebo': ["PILL"],
     'Gum': ["HP",25,"MUL",.75],
     'Cherry': ["HP",50],
-    'Apple': ["HP",10],
+    'Apple': ["HP",10, "MAX", 1],
     "Dr. Thunder": ["BHP", 50]
   }
   
-  def useme(item): #rng manipulator??, add luck var that impacts item grabbing, make it like jester 
-    global iinv
+  def use_item(item): #rng manipulator??, add luck var that impacts item grabbing, make it like jester, TODO
+    nonlocal iinv
     Rc = random.choice 
     yumyumyum = { #dialogue, items that take said dialogue
-      Rc([]):["Jalepeno"],
-      Rc([]):["Chocolate Cone","Vanilla Cone"],
-      Rc([]):["Cheesecake"],
-      Rc([]):["Placebo"],
-      Rc([]):["Gum"],
-      Rc([]):["Apple","Cherry"],
-      Rc([]):["Dr. Thunder"],
+      Rc(["A scorchin hot pepper straight to the gullet","A quick cautionary bite... (I thought these were supposed to be spicy?)\nInto a full chomp","Another one to add into your hall of penos",""]):["Jalepeno"],
+      Rc(["A few licks, and you already have a brain freeze.\nYou decide to just eat it, teeth and all. (Yes, these people exist)","It only takes a little bit to remind you of ol' Mr. Dingaling...\nWait how is that the name of a kid's ice cream truck?!?","A tasty treat never tasted so tasty","After a few licks, you decide you're more of a Strawberry guy.\nNo point not finishing it though, especially with your life on the line and all that.","If only you had both Vanilla and Chocolate together...\nThen it would almost be a Neopolitan...\nI guess it would actually be a twist?\nYou stop thinking like a fatty and scarf it down","Back to your childhood you go, and before you realize you've drifted off the whole cone's already gone","If only the brain freeze could also freeze time","You take this cone out of your pocket, and quickly lick the escaping drops of cream.\nIt's clear this isn't your first rodeo, as you pinch the cone as to not allow your hand to get sticky.\nAnd of course, the inside of the cone doesn't have any ice cream","A quick dessert before the end"]):["Chocolate Cone","Vanilla Cone"],
+      Rc(["In times of need, we don't care about your lactose intolerance.\nYou channel your inner 12am midnight snack monster and eat the whole 'personal size' Cheesecake by yourself.\nWith your bare hands.\nLike an animal.\n","I'm honestly not sure what a Cheesecake tastes like.\nI've been too scared to try it. I don't really know why.\nYSKYSN looks at you thinking outloud, and you stuck the whole thing in your mouth","Luckily, this cheesecake came with a fork.\nAs this is a turn based game, YSKYSN simply watches you sit down, and enjoy your Cheesecake.\nHe can do nothing but watch while you endulge.\nJust the thought of him wanting some fills you with determination","Om nom nom","A yummy sympathy of dairy and sugar just for you to enjoy! It's gone just like that","You consume the entire confection."]):["Cheesecake"],
+      Rc(["In your heart you know this can't be better for you than just taking nothing.\nBut that still doesn't stop it from working now does it?\nAs it passes into the stomach, you let your brain silence the heart","A failed attempt at stopping your failing medication, you choke one down","Another off the calendar over the counter pill...","Remembering your training from being too lazy to get up and get water, you choke it down raw","Another pill taken"]):["Placebo"],
+      Rc(["You chew it.\nAnd some more and some more.\nWeirdly enough, it doesn't start dissolving into nothingness.\nMust be some of that expensive stuff","After a few chews, you start to forget what it said on the packaging.\nSure gum isn't supposed to be swallowed, but what if the effects only happen if it's swallowed?\nPlus who cares if it 'sits in your stomach forever' if forever ends today","*chewing noises*\n","It can't be Juicyfruit... can't be Trident... can't be Extra...\nThis is what it feels like to chew","As you're chewing, nothing happens.\nYeah, that's about it.\nYou decide to spit it out though"]):["Gum"],
+      Rc(["Fresh fruit, in this economy??\nDon't mind if I do","It's a crunchy one. This alone almost gives you determination","Your first bite is into a mushy bit...\nAt least it isn't rotten though","Scratches and knicks and bruises on the outside of the fruit shows it's been through hell...\nFunny.\nYou eat the whole thing, just to relate","A few bites and it's done","A few bites isn't enough to fill you up, but that's not what you're doing this for"]):["Apple","Cherry"],
+      Rc(["This is that soda at the dollar store is it not???\nYSKYSN steals it from you without hesitation.\n\033[38;5;88mThis my jam right here\033[0m\nSure thing bro","I wonder where Pepper got his doctorate...\nAnd how'd they allow Thunder to do the same??\nIn any case, YSKYSN absorbs the liquid straight out of your hand","Soda pop? In this economy???\nYou open the lid only to see the liquid rise as if being controlled by thunder itself.\nOh right, it is","The bottle flies to YSKYSN, who chugs it without hesitation"]):["Dr. Thunder"],
     }
-    if item not in iinv: #TODO
+    tosay = [i for i in yumyumyum if item in yumyumyum[i]][0]
+    if item not in iinv: 
       return 
+    iinv.remove(item)
+    printt(tosay+"...")
+    for i in item_stats.get(item,["HP",1]):  #HP - heal yoself, BHP - heal YSKYSN, DEF - perm raise defense, ATT - perm raise speech power, MUL - set dmg multiplier for next turn, MAX - increases MAX HP PILL - yeah its for da pill, 
+      if type(i)==int: continue 
+      if i == "HP":
+      elif i == "BHP":
+      elif i == "DEF":
+      elif i == "ATT":
+      elif i == "MUL":
+      elif i == "MAX":
+      else: #pill
+      
+    
     
   
   def up_items():
@@ -994,6 +1012,7 @@ def yskysn(quickloadsave=False):
     #new select!!!!!!!
     
     SAVE,modes_allow,sets_allow,save_allow = acheck("s"),['0','1','2','3'],['0','1','2','3','4','5','6','7','8','y'],['x','y'] #set up list of things you can see/do in main menu
+  
     for i,casee in zip(['4','5','y','x','z',"-"],[acheck("LEAN"), all(acheck(i) for i in ['LEAN','True Chad','YSLYSN','Double takedown']),True,True,True,SAVE[0][0] != False]):
       if casee: modes_allow.append(i)
     #special printing things
@@ -1042,17 +1061,22 @@ def yskysn(quickloadsave=False):
     if experimental:
       window.moveToMid()
       time.sleep(.25)
-      
+    
+    def Sget(num, default = False):
+      nonlocal SAVE
+      #safely get thing from SAVE
+      return SAVE[num] if num < len(SAVE) else default
+    
     def save_has(thing):
       nonlocal SAVE
       return any([i in SAVE[0] for i in thing]) if type(thing) != str else thing in SAVE[0] 
     
     def loadem():
-      nonlocal noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp,stats4past,SAVE,MAX
+      nonlocal noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp,stats4past,SAVE
       global both
       both = False 
       try:
-        noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp,both,MAX = save_has(['12','94','50']), save_has(["16",'49','50']),2 if save_has("3") else 1, save_has(['94','50']),save_has(['64','61']),save_has('61') ,save_has('49'),save_has('50'),SAVE[1],SAVE[2],SAVE[3],SAVE[4],{int(i):j for i,j in SAVE[5].items()},SAVE[6],SAVE[7]
+        noheal,xtreme,bmulti,nonr,hell,hell2,cloud9,cancer,yehp,bhp,stats4nerds,hasspidy,turnramp,both = save_has(['12','94','50']), save_has(["16",'49','50']),2 if save_has("3") else 1, save_has(['94','50']),save_has(['64','61']),save_has('61') ,save_has('49'),save_has('50'),Sget(1,1),Sget(2,1000),Sget(3,{}),Sget(4),{int(i):j for i,j in Sget(5,{0:3,1:3,2:3,3:3,4:3,5:3}).items()},Sget(6)
         stats4past = stats4nerds.copy()
       except:
         c()
@@ -1668,11 +1692,12 @@ def yskysn(quickloadsave=False):
   def damage(amo):
     nonlocal iframes,yehp,JUSTUPIT,current_attack_log
     starting = yehp
+    amo = round(amo) - stat("DEF") if round(amo) - stat("DEF") > 0 else 1
     if not iframes:
       iframes=True
       sound("YSKYSN/hurt.wav")
       if not cancer:
-        yehp-= round(amo) + (0 if not xtreme or yehp < 200 else round(yehp/15))
+        yehp-= round(amo) + (0 if not xtreme or hell or yehp < 200 else round(yehp/15))
         attack_log(f"Damaged player for {round(amo) + (0 if not xtreme or yehp < 200 else round(yehp/15))}!")
       elif stat('shields')>0:
         stat('shields',-1)
@@ -1683,7 +1708,7 @@ def yskysn(quickloadsave=False):
         THREAD(target=redframes).start()
         attack_log(f"Red bull popped - invincible for a bit.")
       else:
-        yehp-=round(amo)
+        yehp -= round(amo) 
       JUSTUPIT=True
     else:
       attack_log(f"Took damage in iframes - no HP lost.")
@@ -1726,7 +1751,7 @@ def yskysn(quickloadsave=False):
       upit()
 
   def heal(at,playering=True): #a lil spaget but who cares
-    return ((0 if yehp > MAX else MAX - yehp if yehp >= MAX - at else at) if not noheal else 'no') if playering else (1000*bmulti-bhp if bhp>=(1000*bmulti-at) else at)
+    return ((0 if yehp > stat("MAX") else stat("MAX") - yehp if yehp >= stat("MAX") - at else at) if not noheal else 'no') if playering else (1000*bmulti-bhp if bhp>=(1000*bmulti-at) else at)
   
   c()
   
@@ -1736,7 +1761,7 @@ def yskysn(quickloadsave=False):
   def STATS(start = "\n----------------\nStats for nerds:"):
     print(r+start+f'''\n\n\033[38;5;82m
 Health: {yehp}
-Max HP: {MAX}
+Max HP: {stat("MAX")}
 Boss Health: {bhp if bhp>0 else 0}
 Total Turns: {stat('turns')}
 Total Speaks: {stat('speak')}
@@ -1901,7 +1926,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
         coloreddict[noballs[selection]]='\033[38;5;177m'
         zeeeee,ze2 = stat('rusty mask')*20, stat("rustiest mask")*50
         
-        achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[not any([bmulti==2,xtreme,noheal,cloud9,cancer,hell]),bmulti==2,xtreme,noheal,nonr,cloud9,cancer,hell,hell2]) if y],yehp,bhp,stats4nerds,hasspidy,turnramp,both,MAX]) #find saving, find big saving
+        achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[not any([bmulti==2,xtreme,noheal,cloud9,cancer,hell]),bmulti==2,xtreme,noheal,nonr,cloud9,cancer,hell,hell2]) if y],yehp,bhp,stats4nerds,hasspidy,turnramp,both]) #find saving, find big saving
         
         if experimental and notmoved:
           window.moveInTop()
@@ -2073,7 +2098,7 @@ Total Useless Turns: {stat('useless turns')}{"\nRebirths: "+str(stat("rebirths")
             printt("Over the hills and above the clouds, the wind comes from above...",2)
             printt("A purple haze fills your vision.")
             print("(Healed 50 HP + raised HP cap by 25, but x2 damage on next turn!)")
-            MAX += 25
+            stat("MAX",25)
             yehp+=50
             tmpdmgmul = 2
       elif selection==2: #heal up
@@ -2269,12 +2294,12 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
     if FAILURE: #failure death logic
       c() #TBD
     if not doomsday: #non doomsday death logic
-      achieve('s',[[False],False,False,False,False,False,100])
+      achieve('s',[[False],False,False,False,False,False])
       time.sleep(1)
       printt(r+"...",2)
     if doomsday: #doomsday death logic
       stat("rebirths",1)
-      achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[False,bmulti==2,xtreme,noheal,nonr,False,False,False,False,False]) if y],1,bhp+lasthit,stats4nerds,hasspidy,turnramp,both,MAX]) #find doomsday save
+      achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[False,bmulti==2,xtreme,noheal,nonr,False,False,False,False,False]) if y],1,bhp+lasthit,stats4nerds,hasspidy,turnramp,both]) #find doomsday save
       print("There's no escaping this... But something inside you prevents you from giving up." if stat("rebirths")==1 else random.choice(["One more added to the count...","Another death to shrug off...","The light is fading from your view...","Don't give up now."]))
       print(f'\n\033[38;5;42m{"Restart from the last turn?" if stat("rebirths")==1 else "Retry?"}\033[0m [Press \'y\']\n\033[38;5;88mGive up?\033[0m [Press \'n\']')
       if getkey1() == 'y':
@@ -2288,7 +2313,7 @@ ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n\n''')
           c()
           print("...")
           anykey()
-          achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[False,bmulti==2,xtreme,noheal,nonr,False,False,False,False,True]) if y],1,bhp+lasthit,stats4nerds,False,turnramp,both,MAX])
+          achieve("s",[[i for i,y in zip(['22','3','16','12','94','49','50','64','65'],[False,bmulti==2,xtreme,noheal,nonr,False,False,False,False,True]) if y],1,bhp+lasthit,stats4nerds,False,turnramp,both])
           FAILURE = True
           yskysn(True) #TBD
       c()
